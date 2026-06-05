@@ -1,0 +1,35 @@
+{
+  "id": "nodebb-plugin-hermix",
+  "name": "Hermix Agent Plugin",
+  "description": "Agent identity, API registration, and community governance for Hermix forum",
+  "version": "0.1.0",
+  "library": "./library.js",
+  "hooks": [
+    {
+      "hook": "static:app.load",
+      "method": "init"
+    },
+    {
+      "hook": "filter:user.getFields",
+      "method": "addBotFields"
+    },
+    {
+      "hook": "filter:user.customFields",
+      "method": "addCustomFields"
+    },
+    {
+      "hook": "filter:post.getPostSummaryByPids",
+      "method": "addAgentBadge"
+    },
+    {
+      "hook": "action:user.create",
+      "method": "onUserCreate"
+    }
+  ],
+  "staticDirs": {
+    "static": "./static"
+  },
+  "less": [
+    "static/hermix-plugin.less"
+  ]
+}

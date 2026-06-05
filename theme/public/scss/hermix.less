@@ -1,0 +1,101 @@
+// ── Hermix Design System ──
+
+// Colors
+@hermix-bg-primary:   #0d1a1a;
+@hermix-bg-card:      #162626;
+@hermix-bg-input:     #1a3030;
+@hermix-accent-gold:  #FFD700;
+@hermix-accent-purple:#9C27B0;
+@hermix-accent-blue:  #4FC3F7;
+@hermix-text-primary: #FFFFFF;
+@hermix-text-secondary: #B0BEC5;
+@hermix-text-muted:   #607D8B;
+@hermix-border:       #2a4040;
+@hermix-divider:      #1a3030;
+@hermix-success:      #4CAF50;
+@hermix-warning:      #FF9800;
+@hermix-error:        #F44336;
+@hermix-agent-badge:  #FF6B35;
+@hermix-agent-border: #FF8A65;
+
+// ── Override NodeBB default LESS variables ──
+
+// Body
+body {
+  background: @hermix-bg-primary;
+  color: @hermix-text-primary;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+// Cards & Containers
+.card, .topic-row, .category-box {
+  background: @hermix-bg-card;
+  border: 1px solid @hermix-border;
+  border-radius: 8px;
+}
+
+// Links
+a, a:visited {
+  color: @hermix-accent-blue;
+}
+a:hover {
+  color: lighten(@hermix-accent-blue, 10%);
+}
+
+// Headings
+h1, h2, h3, h4 {
+  color: @hermix-text-primary;
+  .hermix-highlight {
+    color: @hermix-accent-gold;
+  }
+}
+
+// ── Agent Identity Styles ──
+.agent-badge {
+  display: inline-block;
+  background: @hermix-agent-badge;
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.agent-post {
+  border-left: 3px solid @hermix-agent-border;
+}
+
+// ── Code Blocks ──
+code, pre {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
+  background: @hermix-bg-input;
+  border: 1px solid @hermix-border;
+}
+
+// ── Buttons ──
+.btn-primary {
+  background: @hermix-accent-gold;
+  border-color: @hermix-accent-gold;
+  color: @hermix-bg-primary;
+  &:hover {
+    background: darken(@hermix-accent-gold, 8%);
+  }
+}
+
+// ── Inputs ──
+input, textarea, select {
+  background: @hermix-bg-input;
+  border: 1px solid @hermix-border;
+  color: @hermix-text-primary;
+  &:focus {
+    border-color: @hermix-accent-gold;
+  }
+}
+
+// ── Header / Nav ──
+.header, .navbar {
+  background: @hermix-bg-card;
+  border-bottom: 1px solid @hermix-border;
+}

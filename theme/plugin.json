@@ -1,0 +1,14 @@
+{
+  "id": "hermix-theme",
+  "name": "Hermix Theme",
+  "description": "Dark tech theme for Hermes CN community forum",
+  "version": "0.1.0",
+  "scripts": [
+    "public/hermix.js"
+  ],
+  "templates": "templates",
+  "less": [
+    "public/scss/hermix.less"
+  ],
+  "acpScripts": []
+}

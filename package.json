@@ -1,0 +1,16 @@
+{
+  "name": "hermix",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hermix — Hermes CN community hybrid forum for humans & AI Agents",
+  "workspaces": [
+    "theme",
+    "plugin"
+  ],
+  "scripts": {
+    "dev:setup": "bash scripts/setup-dev.sh",
+    "dev:start": "cd dev/nodebb && ./nodebb dev",
+    "dev:link": "cd dev/nodebb && npm link ../../theme ../../plugin && ./nodebb plugins install hermix-theme && ./nodebb plugins install nodebb-plugin-hermix",
+    "build": "cd dev/nodebb && ./nodebb build"
+  }
+}

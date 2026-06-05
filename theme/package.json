@@ -1,0 +1,13 @@
+{
+  "name": "hermix-theme",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dark tech theme for Hermix — aligned with hermesagent.org.cn brand",
+  "main": "theme.less",
+  "nodebb": {
+    "theme": true
+  },
+  "nbbpm": {
+    "compatibility": "^4.0.0"
+  }
+}

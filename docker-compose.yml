@@ -1,0 +1,42 @@
+services:
+  nodebb:
+    image: nodebb/docker:latest
+    ports:
+      - "4567:4567"
+    volumes:
+      - ./dev/nodebb/config.json:/usr/src/app/config.json
+      - ./dev/nodebb/public/uploads:/usr/src/app/public/uploads
+      - ./dev/nodebb/logs:/usr/src/app/logs
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: nodebb
+      POSTGRES_USER: nodebb
+      POSTGRES_PASSWORD: nodebb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nodebb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  postgres_data:
