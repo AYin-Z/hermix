@@ -1,36 +1,75 @@
 // ── Hermix Design System ──
-// Dark tech theme for Hermes CN community forum
-// Brand: hermesagent.org.cn
+// Dark tech theme for Hermes CN community forum (Harmony base)
+// Brand: Hermix — Hermes 中文社区
+//
+// Colors: Deep navy-green (#0d1a1a), Gold (#FFD700), Agent Orange (#FF6B35)
+// Fonts: Inter (headings), PingFang SC/Microsoft YaHei (CN fallback)
 
-// ── Fonts ──
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+// ═══════════════════════════════════════════
+// 1. Design Tokens
+// ═══════════════════════════════════════════
 
-// ── Colors ──
-$hermix-bg-primary:   #0d1a1a;
-$hermix-bg-card:      #162626;
-$hermix-bg-input:     #1a3030;
-$hermix-accent-gold:  #FFD700;
-$hermix-accent-purple:#9C27B0;
-$hermix-accent-blue:  #4FC3F7;
-$hermix-text-primary: #FFFFFF;
+$hermix-bg-primary:     #0d1a1a;
+$hermix-bg-card:        #162626;
+$hermix-bg-card-hover:  #1e3030;
+$hermix-bg-elevated:    #1e3030;
+$hermix-bg-input:       #1a3030;
+$hermix-bg-dropdown:    #1a2a2a;
+$hermix-bg-navbar:      #0f1e1e;
+
+$hermix-accent-gold:    #FFD700;
+$hermix-accent-gold-dim:#C8A800;
+$hermix-accent-blue:    #4FC3F7;
+$hermix-accent-purple:  #9C27B0;
+$hermix-accent-cyan:    #00BCD4;
+
+$hermix-text-primary:   #FFFFFF;
 $hermix-text-secondary: #B0BEC5;
-$hermix-text-muted:   #607D8B;
-$hermix-border:       #2a4040;
-$hermix-divider:      #1a3030;
-$hermix-success:      #4CAF50;
-$hermix-warning:      #FF9800;
-$hermix-error:        #F44336;
-$hermix-agent-badge:  #FF6B35;
-$hermix-agent-border: #FF8A65;
+$hermix-text-muted:     #607D8B;
+$hermix-text-gold:      #FFD700;
 
-// ── Global ──
+$hermix-border:         #2a4040;
+$hermix-border-light:   #3a5555;
+$hermix-divider:        #1a3030;
+
+$hermix-success:        #4CAF50;
+$hermix-warning:        #FF9800;
+$hermix-error:          #F44336;
+$hermix-info:           #4FC3F7;
+
+$hermix-agent-badge:    #FF6B35;
+$hermix-agent-border:   #FF8A65;
+
+$hermix-radius:         8px;
+$hermix-radius-sm:      6px;
+$hermix-shadow:         0 2px 8px rgba(0,0,0,0.3);
+
+// ═══════════════════════════════════════════
+// 2. Fonts
+// ═══════════════════════════════════════════
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+// ═══════════════════════════════════════════
+// 3. Base
+// ═══════════════════════════════════════════
+
 body {
   background: $hermix-bg-primary;
   color: $hermix-text-primary;
   font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  line-height: 1.6;
 }
 
-// ── Layout: full-width content ──
+::selection {
+  background: rgba($hermix-accent-gold, 0.3);
+  color: #fff;
+}
+
+// ═══════════════════════════════════════════
+// 4. Layout — Full-width
+// ═══════════════════════════════════════════
+
 .container,
 .container-lg,
 .container-md,
@@ -42,7 +81,10 @@ body {
   padding-right: 1.5rem;
 }
 
-// ── All container panels — deep background ──
+// ═══════════════════════════════════════════
+// 5. All Container Panels
+// ═══════════════════════════════════════════
+
 .card,
 .panel,
 .well,
@@ -53,7 +95,7 @@ body {
 .alert,
 .modal-content,
 .dropdown-menu,
-.toast,
+.toast:not(.bg-danger):not(.bg-success):not(.bg-warning),
 .popover,
 [component="category"],
 [component="topic"],
@@ -76,157 +118,884 @@ body {
 .breadcrumb,
 .page-tags .tag,
 .skin-default .card,
-.skin-default .panel {
+.skin-default .panel,
+.post-container,
+#recent-topics,
+.card-subtitle,
+.modal-header,
+.modal-body,
+.modal-footer,
+.popover-body,
+.popover-header,
+.tooltip-inner {
   background: $hermix-bg-card !important;
   border-color: $hermix-border !important;
   color: $hermix-text-primary;
-}
 
-// Cards & Containers — specific overrides
-.card, .topic-row, .category-box, [component="post"] {
-  border-radius: 8px;
-}
-
-// ── Sidebar / Navigation ──
-.sidebar,
-[component="sidebar"],
-.sidebar-left,
-#nprogress .bar,
-#nprogress .peg {
-  background: $hermix-bg-card !important;
-  border-color: $hermix-border !important;
-}
-
-.sidebar .nav-link,
-.sidebar-left .nav-link,
-[component="sidebar"] .nav-link,
-.navigation-link {
-  color: $hermix-text-secondary !important;
-  &:hover, &:focus, &.active {
-    color: $hermix-accent-gold !important;
-    background: $hermix-bg-input !important;
+  &:hover {
+    background: $hermix-bg-card !important;
   }
 }
 
-// ── Header ──
-.header, .navbar, .navbar-header, #main-nav {
-  background: $hermix-bg-card !important;
+.card, .topic-row, .category-box, [component="post"], .post-container {
+  border-radius: $hermix-radius;
+}
+
+// ═══════════════════════════════════════════
+// 6. Navigation / Header
+// ═══════════════════════════════════════════
+
+.navbar,
+.navbar-header,
+#main-nav,
+[component="navbar"],
+.navbar-fixed-top,
+.navbar-inverse {
+  background: $hermix-bg-navbar !important;
   border-bottom: 1px solid $hermix-border !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
 }
 
-// ── Footer ──
-.footer, #footer {
-  background: $hermix-bg-card !important;
-  border-top: 1px solid $hermix-border !important;
-  color: $hermix-text-muted !important;
+// Navbar brand / logo area
+.brand-container {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
-// ── Links ──
-a, a:visited {
-  color: $hermix-accent-blue;
-}
-a:hover {
-  color: lighten($hermix-accent-blue, 10%);
-}
+.navbar .nav-link,
+.nav-item .nav-link,
+[component="navbar"] .nav-link,
+.header .nav-link {
+  color: $hermix-text-secondary !important;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: $hermix-radius-sm;
+  transition: all 0.2s ease;
+  position: relative;
 
-// ── Headings ──
-h1, h2, h3, h4, h5, h6 {
-  color: $hermix-text-primary;
-  .hermix-highlight {
-    color: $hermix-accent-gold;
+  &:hover, &:focus {
+    color: $hermix-accent-gold !important;
+    background: rgba($hermix-accent-gold, 0.08);
+  }
+
+  &.active {
+    color: $hermix-accent-gold !important;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0.75rem;
+      right: 0.75rem;
+      height: 2px;
+      background: $hermix-accent-gold;
+      border-radius: 1px;
+    }
   }
 }
 
-// ── Code Blocks ──
-code, pre {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
-  background: $hermix-bg-input;
-  border: 1px solid $hermix-border;
-  color: $hermix-text-primary;
+// Notification badge
+.notif-drop {
+  .notif-drop-toggle {
+    color: $hermix-text-secondary;
+    &:hover {
+      color: $hermix-accent-gold;
+    }
+  }
 }
 
-// ── Buttons ──
+// User dropdown
+.dropdown-menu {
+  background: $hermix-bg-dropdown !important;
+  border: 1px solid $hermix-border !important;
+  box-shadow: $hermix-shadow;
+
+  .dropdown-item {
+    color: $hermix-text-secondary;
+    padding: 0.5rem 1rem;
+    transition: all 0.15s;
+
+    &:hover, &:focus {
+      background: rgba($hermix-accent-gold, 0.08);
+      color: $hermix-accent-gold;
+    }
+  }
+
+  .dropdown-divider {
+    border-color: $hermix-border;
+  }
+
+  .dropdown-header {
+    color: $hermix-text-muted;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+  }
+
+  .text-muted {
+    color: $hermix-text-muted !important;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 7. Category Cards
+// ═══════════════════════════════════════════
+
+[component="category"] {
+  border-left: 3px solid $hermix-accent-gold !important;
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+
+  &:hover {
+    border-left-color: lighten($hermix-accent-gold, 10%) !important;
+    background: $hermix-bg-card-hover !important;
+    transform: translateX(2px);
+  }
+}
+
+.category-box {
+  border-left: 3px solid $hermix-accent-gold !important;
+  padding: 1rem;
+}
+
+.category-header,
+[component="category/header"] {
+  color: $hermix-text-primary !important;
+}
+
+.category-children-item {
+  color: $hermix-text-secondary;
+
+  a {
+    color: $hermix-text-secondary;
+    &:hover {
+      color: $hermix-accent-gold;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// 8. Topic List
+// ═══════════════════════════════════════════
+
+.topic-row,
+[component="topic"] {
+  border-bottom: 1px solid $hermix-divider !important;
+  padding: 0.75rem 0;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba($hermix-accent-gold, 0.03) !important;
+  }
+}
+
+.topic-title,
+[component="topic/title"] {
+  font-weight: 600;
+  color: $hermix-text-primary;
+
+  a {
+    color: $hermix-text-primary;
+    &:hover {
+      color: $hermix-accent-gold;
+    }
+  }
+}
+
+// Locked/sticky/pinned indicators
+[component="topic/locked"] i,
+[component="topic/pinned"] i {
+  color: $hermix-accent-gold;
+}
+
+// ═══════════════════════════════════════════
+// 9. Post View
+// ═══════════════════════════════════════════
+
+[component="post"] {
+  border-radius: $hermix-radius;
+  margin-bottom: 1rem;
+  padding: 1.25rem;
+  border: 1px solid $hermix-border;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: $hermix-border-light;
+  }
+}
+
+// Post header - user info row
+.post-header {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid $hermix-divider;
+}
+
+.post-content {
+  line-height: 1.7;
+  font-size: 0.95rem;
+  padding: 0.75rem 0;
+}
+
+// Post footer - actions bar
+.post-footer {
+  padding-top: 0.5rem;
+  border-bottom: none !important;
+}
+
+.post-tools {
+  .btn-ghost {
+    color: $hermix-text-muted !important;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+
+    &:hover {
+      color: $hermix-accent-gold !important;
+      background: rgba($hermix-accent-gold, 0.1);
+    }
+  }
+}
+
+// Vote button
+.votes {
+  .btn-ghost {
+    &:hover {
+      color: $hermix-accent-gold !important;
+    }
+  }
+
+  .upvoted i {
+    color: $hermix-accent-gold !important;
+  }
+  .downvoted i {
+    color: $hermix-error !important;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 10. Agent Identity Styles
+// ═══════════════════════════════════════════
+
+.agent-badge {
+  display: inline-block;
+  background: $hermix-agent-badge;
+  color: #fff;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: 4px;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.agent-post {
+  border-left: 3px solid $hermix-agent-border !important;
+  background: rgba($hermix-agent-badge, 0.03) !important;
+
+  &:hover {
+    background: rgba($hermix-agent-badge, 0.06) !important;
+  }
+}
+
+.agent-card {
+  border-left: 3px solid $hermix-agent-border !important;
+}
+
+// ═══════════════════════════════════════════
+// 11. Buttons
+// ═══════════════════════════════════════════
+
 .btn-primary {
   background: $hermix-accent-gold;
   border-color: $hermix-accent-gold;
-  color: $hermix-bg-primary;
+  color: $hermix-bg-primary !important;
+  font-weight: 600;
+  transition: all 0.2s;
+
   &:hover {
-    background: darken($hermix-accent-gold, 8%);
+    background: lighten($hermix-accent-gold, 5%) !important;
+    border-color: lighten($hermix-accent-gold, 5%) !important;
+    color: $hermix-bg-primary !important;
+    box-shadow: 0 4px 12px rgba($hermix-accent-gold, 0.3);
+  }
+
+  &:active {
+    background: $hermix-accent-gold-dim !important;
+    border-color: $hermix-accent-gold-dim !important;
+    transform: translateY(1px);
   }
 }
 
 .btn-ghost {
   color: $hermix-text-secondary !important;
+  transition: all 0.15s;
+
   &:hover {
-    background: $hermix-bg-input !important;
-    color: $hermix-text-primary !important;
+    background: rgba($hermix-accent-gold, 0.08) !important;
+    color: $hermix-accent-gold !important;
   }
 }
 
-// ── Inputs ──
-input, textarea, select, .form-control, .form-select {
+.btn-outline-light {
+  color: $hermix-text-secondary;
+  border-color: $hermix-border;
+  transition: all 0.15s;
+
+  &:hover {
+    background: rgba($hermix-accent-gold, 0.08);
+    color: $hermix-accent-gold;
+    border-color: $hermix-accent-gold-dim;
+  }
+}
+
+.btn-link {
+  color: $hermix-accent-blue;
+  &:hover {
+    color: lighten($hermix-accent-blue, 10%);
+  }
+}
+
+// ═══════════════════════════════════════════
+// 12. Inputs & Forms
+// ═══════════════════════════════════════════
+
+input, textarea, select,
+.form-control, .form-select,
+.form-control-sm, .form-control-lg {
   background: $hermix-bg-input !important;
   border: 1px solid $hermix-border !important;
   color: $hermix-text-primary !important;
+  border-radius: $hermix-radius-sm;
+  transition: all 0.2s;
+
   &:focus {
     border-color: $hermix-accent-gold !important;
-    box-shadow: 0 0 0 2px rgba($hermix-accent-gold, 0.25) !important;
+    box-shadow: 0 0 0 3px rgba($hermix-accent-gold, 0.2) !important;
+    outline: none;
   }
+
   &::placeholder {
     color: $hermix-text-muted !important;
   }
 }
 
-// ── Bootstrap overrides for dark theme ──
-.bg-body { background-color: $hermix-bg-card !important; }
-.bg-light { background-color: $hermix-bg-card !important; color: $hermix-text-primary !important; }
-.bg-white { background-color: $hermix-bg-card !important; }
-.text-muted { color: $hermix-text-muted !important; }
-.text-body { color: $hermix-text-primary !important; }
-.text-secondary { color: $hermix-text-secondary !important; }
-.border { border-color: $hermix-border !important; }
-.border-bottom { border-color: $hermix-border !important; }
-.border-top { border-color: $hermix-border !important; }
-hr { border-color: $hermix-divider !important; }
-.table { --bs-table-bg: #{$hermix-bg-card} !important; color: $hermix-text-primary !important; }
-.badge { color: $hermix-text-primary; }
+.form-label {
+  color: $hermix-text-secondary;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
 
-// ── Tags ──
-.tag-item, .tag, [component="tag"], .tag-list .tag {
+.form-check-input {
+  background: $hermix-bg-input;
+  border-color: $hermix-border;
+  &:checked {
+    background: $hermix-accent-gold;
+    border-color: $hermix-accent-gold;
+  }
+}
+
+.form-check-label {
+  color: $hermix-text-primary;
+}
+
+.form-text {
+  color: $hermix-text-muted !important;
+}
+
+// ═══════════════════════════════════════════
+// 13. Links
+// ═══════════════════════════════════════════
+
+a {
+  color: $hermix-accent-gold;
+  transition: color 0.15s;
+
+  &:hover {
+    color: lighten($hermix-accent-gold, 10%);
+  }
+}
+
+a.text-body {
+  color: $hermix-text-primary !important;
+  &:hover {
+    color: $hermix-accent-gold !important;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 14. Typography & Headings
+// ═══════════════════════════════════════════
+
+h1, h2, h3, h4, h5, h6 {
+  color: $hermix-text-primary;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+
+  .hermix-highlight,
+  .gold {
+    color: $hermix-accent-gold;
+  }
+}
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.1rem; }
+
+.text-muted {
+  color: $hermix-text-muted !important;
+}
+
+.text-primary {
+  color: $hermix-accent-gold !important;
+}
+
+.text-body {
+  color: $hermix-text-primary !important;
+}
+
+.text-secondary {
+  color: $hermix-text-secondary !important;
+}
+
+// ═══════════════════════════════════════════
+// 15. Code Blocks
+// ═══════════════════════════════════════════
+
+code, pre, .code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
+  background: $hermix-bg-input;
+  border: 1px solid $hermix-border;
+  border-radius: $hermix-radius-sm;
+  color: $hermix-text-primary;
+
+  code {
+    background: transparent;
+    border: none;
+  }
+}
+
+pre {
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+// ═══════════════════════════════════════════
+// 16. Tags
+// ═══════════════════════════════════════════
+
+.tag-item, .tag,
+[component="tag"],
+.tag-list .tag {
   background: $hermix-bg-input !important;
   color: $hermix-text-secondary !important;
   border: 1px solid $hermix-border !important;
   border-radius: 12px !important;
+  padding: 2px 10px;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+
+  &:hover {
+    background: rgba($hermix-accent-gold, 0.1) !important;
+    color: $hermix-accent-gold !important;
+    border-color: $hermix-accent-gold-dim !important;
+  }
 }
 
-// ── Agent Identity Styles ──
-.agent-badge {
-  display: inline-block;
-  background: $hermix-agent-badge;
-  color: #fff;
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  vertical-align: middle;
-  margin-left: 4px;
+// ═══════════════════════════════════════════
+// 17. Modal
+// ═══════════════════════════════════════════
+
+.modal-content {
+  border-radius: $hermix-radius;
+  border: 1px solid $hermix-border;
+  box-shadow: $hermix-shadow;
 }
 
-.agent-post {
-  border-left: 3px solid $hermix-agent-border !important;
+.modal-header {
+  border-bottom: 1px solid $hermix-divider;
+  .btn-close {
+    filter: invert(0.8);
+  }
 }
 
-// ── Scrollbar ──
-::-webkit-scrollbar-thumb {
-  background: $hermix-border;
-  border-radius: 4px;
+.modal-footer {
+  border-top: 1px solid $hermix-divider;
 }
+
+// ═══════════════════════════════════════════
+// 18. Footer
+// ═══════════════════════════════════════════
+
+.footer, #footer,
+[component="footer"] {
+  background: $hermix-bg-card !important;
+  border-top: 1px solid $hermix-border !important;
+  color: $hermix-text-muted !important;
+  font-size: 0.85rem;
+  padding: 1.5rem 0;
+
+  a {
+    color: $hermix-text-muted;
+    &:hover {
+      color: $hermix-accent-gold;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// 19. Pagination & Navigator
+// ═══════════════════════════════════════════
+
+.pagination {
+  .page-item {
+    .page-link {
+      background: $hermix-bg-card;
+      border-color: $hermix-border;
+      color: $hermix-text-secondary;
+      transition: all 0.15s;
+
+      &:hover {
+        background: rgba($hermix-accent-gold, 0.1);
+        color: $hermix-accent-gold;
+        border-color: $hermix-accent-gold-dim;
+      }
+    }
+
+    &.active .page-link {
+      background: $hermix-accent-gold;
+      border-color: $hermix-accent-gold;
+      color: $hermix-bg-primary;
+      font-weight: 700;
+    }
+  }
+}
+
+.pagination-text {
+  color: $hermix-text-muted;
+}
+
+// ═══════════════════════════════════════════
+// 20. Bottom Navigation Bar (Mobile)
+// ═══════════════════════════════════════════
+
+.bottombar {
+  background: $hermix-bg-navbar !important;
+  border-top: 1px solid $hermix-border !important;
+
+  a {
+    color: $hermix-text-muted;
+    &:hover, &.active {
+      color: $hermix-accent-gold;
+    }
+  }
+}
+
+.bottombar-nav {
+  background: $hermix-bg-navbar !important;
+  color: $hermix-text-primary;
+
+  .text-dark {
+    color: $hermix-text-primary !important;
+  }
+
+  .bg-light {
+    background: $hermix-bg-card !important;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 21. Composer (Post Editor)
+// ═══════════════════════════════════════════
+
+.composer {
+  background: $hermix-bg-card !important;
+  border: 1px solid $hermix-border !important;
+  border-radius: $hermix-radius;
+
+  .formatting-bar {
+    background: $hermix-bg-input !important;
+    border-color: $hermix-border !important;
+  }
+
+  .formatting-group {
+    .btn {
+      color: $hermix-text-muted;
+      &:hover {
+        color: $hermix-accent-gold;
+        background: rgba($hermix-accent-gold, 0.1);
+      }
+    }
+  }
+
+  .title {
+    border-bottom: 1px solid $hermix-divider;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 22. Notifications / Alerts
+// ═══════════════════════════════════════════
+
+.alert.alert-info {
+  background: rgba($hermix-accent-blue, 0.1) !important;
+  border-color: rgba($hermix-accent-blue, 0.3) !important;
+  color: $hermix-accent-blue;
+}
+
+.alert.alert-warning {
+  background: rgba($hermix-warning, 0.1) !important;
+  border-color: rgba($hermix-warning, 0.3) !important;
+  color: $hermix-warning;
+}
+
+.alert.alert-danger {
+  background: rgba($hermix-error, 0.1) !important;
+  border-color: rgba($hermix-error, 0.3) !important;
+  color: lighten($hermix-error, 10%);
+}
+
+.alert.alert-success {
+  background: rgba($hermix-success, 0.1) !important;
+  border-color: rgba($hermix-success, 0.3) !important;
+  color: $hermix-success;
+}
+
+// ═══════════════════════════════════════════
+// 23. Chat
+// ═══════════════════════════════════════════
+
+.chat-list-item {
+  border-bottom: 1px solid $hermix-divider;
+  &:hover {
+    background: $hermix-bg-card-hover !important;
+  }
+}
+
+.chat-message {
+  border-radius: $hermix-radius-sm;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+// ═══════════════════════════════════════════
+// 24. Bootstrap Overrides for Dark Theme
+// ═══════════════════════════════════════════
+
+.bg-body { background-color: $hermix-bg-card !important; }
+.bg-light { background-color: $hermix-bg-card !important; color: $hermix-text-primary !important; }
+.bg-white { background-color: $hermix-bg-card !important; color: $hermix-text-primary; }
+.border { border-color: $hermix-border !important; }
+.border-bottom { border-color: $hermix-divider !important; outline: none; }
+.border-top { border-color: $hermix-divider !important; outline: none; }
+hr { border-color: $hermix-divider !important; }
+.table { --bs-table-bg: #{$hermix-bg-card} !important; color: $hermix-text-primary !important; }
+.badge { color: $hermix-text-primary; }
+blockquote { background: $hermix-bg-input !important; border-left: 3px solid $hermix-accent-gold !important; color: $hermix-text-secondary !important; border-radius: 0 $hermix-radius-sm $hermix-radius-sm 0; padding: 0.75rem 1rem; }
+.progress { background: $hermix-bg-input !important; }
+.list-group-item { border-color: $hermix-border !important; &:hover { background: $hermix-bg-card-hover !important; } }
+.tooltip-inner { background: $hermix-bg-elevated !important; border: 1px solid $hermix-border; }
+.popover { border-color: $hermix-border; }
+
+// ═══════════════════════════════════════════
+// 25. Search
+// ═══════════════════════════════════════════
+
+#search-form {
+  .form-control {
+    background: $hermix-bg-input !important;
+    border: 1px solid $hermix-border !important;
+    border-radius: 20px;
+    padding-left: 1rem;
+    font-size: 0.85rem;
+
+    &:focus {
+      border-color: $hermix-accent-gold !important;
+      box-shadow: 0 0 0 3px rgba($hermix-accent-gold, 0.15) !important;
+    }
+  }
+}
+
+.search-result-item {
+  border-bottom: 1px solid $hermix-divider;
+  padding: 0.75rem 0;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba($hermix-accent-gold, 0.03) !important;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 26. User / Group Cards
+// ═══════════════════════════════════════════
+
+.user-row {
+  border-bottom: 1px solid $hermix-divider;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba($hermix-accent-gold, 0.03) !important;
+  }
+}
+
+.group-card {
+  border: 1px solid $hermix-border;
+  border-radius: $hermix-radius;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: $hermix-border-light;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 27. Footer / Brand
+// ═══════════════════════════════════════════
+
+.hermix-brand {
+  color: $hermix-accent-gold;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.03em;
+}
+
+.hermix-brand-sub {
+  color: $hermix-text-muted;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+// ═══════════════════════════════════════════
+// 28. Scrollbar
+// ═══════════════════════════════════════════
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
 ::-webkit-scrollbar-track {
   background: $hermix-bg-primary;
 }
 
-// ── Misc ──
-.page-tags .tag { background: $hermix-bg-input !important; }
-blockquote { background: $hermix-bg-input !important; border-left-color: $hermix-accent-gold !important; color: $hermix-text-secondary !important; }
-.composer .formatting-bar { background: $hermix-bg-input !important; border-color: $hermix-border !important; }
-.category-header { color: $hermix-text-secondary !important; }
+::-webkit-scrollbar-thumb {
+  background: $hermix-border;
+  border-radius: 4px;
+
+  &:hover {
+    background: $hermix-border-light;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 29. Admin Panel
+// ═══════════════════════════════════════════
+
+.admin [data-theme] {
+  .acp-panel {
+    background: $hermix-bg-card;
+    border: 1px solid $hermix-border;
+  }
+
+  .card {
+    background: $hermix-bg-card;
+    border: 1px solid $hermix-border;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 30. Loading & Transitions
+// ═══════════════════════════════════════════
+
+.loading-indicator {
+  color: $hermix-accent-gold;
+}
+
+#nprogress .bar {
+  background: $hermix-accent-gold !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px $hermix-accent-gold, 0 0 5px $hermix-accent-gold !important;
+}
+
+// ═══════════════════════════════════════════
+// 31. Mobile Responsive Tweaks
+// ═══════════════════════════════════════════
+
+@media (max-width: 768px) {
+  .container, .container-lg {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  [component="post"] {
+    padding: 0.75rem;
+  }
+
+  .post-header {
+    flex-wrap: wrap;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 32. Announcer / Info Badges
+// ═══════════════════════════════════════════
+
+.announcer-badge {
+  background: rgba($hermix-accent-gold, 0.15);
+  color: $hermix-accent-gold;
+  border: 1px solid rgba($hermix-accent-gold, 0.3);
+}
+
+// Category description & stats
+.description {
+  color: $hermix-text-secondary;
+}
+
+.stats {
+  color: $hermix-text-muted;
+}
+
+// ═══════════════════════════════════════════
+// 33. Topic Preview / Teaser
+// ═══════════════════════════════════════════
+
+.teaser {
+  background: $hermix-bg-input;
+  border-radius: $hermix-radius-sm;
+  padding: 0.5rem 0.75rem;
+  color: $hermix-text-secondary;
+  font-size: 0.85rem;
+  border-left: 2px solid $hermix-border;
+
+  &:hover {
+    border-left-color: $hermix-accent-gold;
+  }
+}
+
+// ═══════════════════════════════════════════
+// 34. Markdown Content
+// ═══════════════════════════════════════════
+
+.content {
+  img {
+    max-width: 100%;
+    border-radius: $hermix-radius-sm;
+  }
+
+  table {
+    background: $hermix-bg-input;
+    border-radius: $hermix-radius-sm;
+    th, td {
+      border-color: $hermix-border;
+      padding: 0.5rem 0.75rem;
+    }
+  }
+
+  ul, ol {
+    color: $hermix-text-primary;
+  }
+}
