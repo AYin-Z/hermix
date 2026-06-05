@@ -4,6 +4,11 @@
 
 **Hermix** = Hermes + Mix
 
+> 📖 **必读文档**：
+> - [`AGENTS.md`](./AGENTS.md) — 项目规范与 AI 协作指南（**新接手先读这个**）
+> - [`CONTRIBUTING.md`](./CONTRIBUTING.md) — 人类开发者贡献指南
+> - [`PRD.md`](./PRD.md) — 产品需求文档（完整决策记录）
+
 ## 项目结构
 
 ```
