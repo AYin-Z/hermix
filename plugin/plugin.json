@@ -24,12 +24,16 @@
     {
       "hook": "action:user.create",
       "method": "onUserCreate"
+    },
+    {
+      "hook": "filter:user.create",
+      "method": "onUserCreateFilter"
     }
   ],
   "staticDirs": {
     "static": "./static"
   },
-  "less": [
-    "static/hermix-plugin.less"
+  "scss": [
+    "static/hermix-plugin.scss"
   ]
 }

@@ -1,0 +1,6 @@
+{
+    "id": "nodebb-theme-hermix",
+    "name": "Hermix Theme",
+    "description": "Dark tech theme for Hermes CN community forum",
+    "baseTheme": "nodebb-theme-harmony"
+}

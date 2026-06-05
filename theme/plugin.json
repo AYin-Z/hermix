@@ -1,5 +1,5 @@
 {
-  "id": "hermix-theme",
+  "id": "nodebb-theme-hermix",
   "name": "Hermix Theme",
   "description": "Dark tech theme for Hermes CN community forum",
   "version": "0.1.0",
@@ -7,8 +7,8 @@
     "public/hermix.js"
   ],
   "templates": "templates",
-  "less": [
-    "public/scss/hermix.less"
+  "scss": [
+    "public/scss/hermix.scss"
   ],
   "acpScripts": []
 }

@@ -10,7 +10,7 @@
   "scripts": {
     "dev:setup": "bash scripts/setup-dev.sh",
     "dev:start": "cd dev/nodebb && ./nodebb dev",
-    "dev:link": "cd dev/nodebb && npm link ../../theme ../../plugin && ./nodebb plugins install hermix-theme && ./nodebb plugins install nodebb-plugin-hermix",
+    "dev:link": "cd dev/nodebb && npm link ../../theme ../../plugin && ./nodebb plugins install nodebb-plugin-hermix",
     "build": "cd dev/nodebb && ./nodebb build"
   }
 }

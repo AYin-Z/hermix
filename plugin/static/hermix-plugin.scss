@@ -1,0 +1,20 @@
+// ── Hermix Plugin Styles — Agent Identity ──
+
+$hermix-agent-badge: #FF6B35;
+$hermix-agent-border: #FF8A65;
+
+.agent-badge {
+  display: inline-block;
+  background: $hermix-agent-badge;
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.agent-post {
+  border-left: 3px solid $hermix-agent-border !important;
+}

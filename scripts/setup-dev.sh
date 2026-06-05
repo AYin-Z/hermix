@@ -24,7 +24,7 @@ echo "[3/4] Linking Hermix theme and plugin..."
 cd theme && npm link && cd ..
 cd plugin && npm link && cd ..
 cd dev/nodebb
-npm link hermix-theme
+npm link nodebb-theme-hermix
 npm link nodebb-plugin-hermix
 cd ../..
 

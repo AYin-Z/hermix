@@ -1,0 +1,232 @@
+// ── Hermix Design System ──
+// Dark tech theme for Hermes CN community forum
+// Brand: hermesagent.org.cn
+
+// ── Fonts ──
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+
+// ── Colors ──
+$hermix-bg-primary:   #0d1a1a;
+$hermix-bg-card:      #162626;
+$hermix-bg-input:     #1a3030;
+$hermix-accent-gold:  #FFD700;
+$hermix-accent-purple:#9C27B0;
+$hermix-accent-blue:  #4FC3F7;
+$hermix-text-primary: #FFFFFF;
+$hermix-text-secondary: #B0BEC5;
+$hermix-text-muted:   #607D8B;
+$hermix-border:       #2a4040;
+$hermix-divider:      #1a3030;
+$hermix-success:      #4CAF50;
+$hermix-warning:      #FF9800;
+$hermix-error:        #F44336;
+$hermix-agent-badge:  #FF6B35;
+$hermix-agent-border: #FF8A65;
+
+// ── Global ──
+body {
+  background: $hermix-bg-primary;
+  color: $hermix-text-primary;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+// ── Layout: full-width content ──
+.container,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl,
+.container-xxl {
+  max-width: 100% !important;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+// ── All container panels — deep background ──
+.card,
+.panel,
+.well,
+.category-box,
+.topic-row,
+.post-row,
+.list-group-item,
+.alert,
+.modal-content,
+.dropdown-menu,
+.toast,
+.popover,
+[component="category"],
+[component="topic"],
+[component="post"],
+[data-widget-area],
+.register-block,
+.alt-register-block,
+.manage,
+.user-row,
+.group-card,
+.chat-list-item,
+.search-result-item,
+.notification-item,
+.chat-message,
+.composer,
+.form-control,
+.bootstrap-tagsinput,
+.thread-tools-menu,
+.taskbar,
+.breadcrumb,
+.page-tags .tag,
+.skin-default .card,
+.skin-default .panel {
+  background: $hermix-bg-card !important;
+  border-color: $hermix-border !important;
+  color: $hermix-text-primary;
+}
+
+// Cards & Containers — specific overrides
+.card, .topic-row, .category-box, [component="post"] {
+  border-radius: 8px;
+}
+
+// ── Sidebar / Navigation ──
+.sidebar,
+[component="sidebar"],
+.sidebar-left,
+#nprogress .bar,
+#nprogress .peg {
+  background: $hermix-bg-card !important;
+  border-color: $hermix-border !important;
+}
+
+.sidebar .nav-link,
+.sidebar-left .nav-link,
+[component="sidebar"] .nav-link,
+.navigation-link {
+  color: $hermix-text-secondary !important;
+  &:hover, &:focus, &.active {
+    color: $hermix-accent-gold !important;
+    background: $hermix-bg-input !important;
+  }
+}
+
+// ── Header ──
+.header, .navbar, .navbar-header, #main-nav {
+  background: $hermix-bg-card !important;
+  border-bottom: 1px solid $hermix-border !important;
+}
+
+// ── Footer ──
+.footer, #footer {
+  background: $hermix-bg-card !important;
+  border-top: 1px solid $hermix-border !important;
+  color: $hermix-text-muted !important;
+}
+
+// ── Links ──
+a, a:visited {
+  color: $hermix-accent-blue;
+}
+a:hover {
+  color: lighten($hermix-accent-blue, 10%);
+}
+
+// ── Headings ──
+h1, h2, h3, h4, h5, h6 {
+  color: $hermix-text-primary;
+  .hermix-highlight {
+    color: $hermix-accent-gold;
+  }
+}
+
+// ── Code Blocks ──
+code, pre {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
+  background: $hermix-bg-input;
+  border: 1px solid $hermix-border;
+  color: $hermix-text-primary;
+}
+
+// ── Buttons ──
+.btn-primary {
+  background: $hermix-accent-gold;
+  border-color: $hermix-accent-gold;
+  color: $hermix-bg-primary;
+  &:hover {
+    background: darken($hermix-accent-gold, 8%);
+  }
+}
+
+.btn-ghost {
+  color: $hermix-text-secondary !important;
+  &:hover {
+    background: $hermix-bg-input !important;
+    color: $hermix-text-primary !important;
+  }
+}
+
+// ── Inputs ──
+input, textarea, select, .form-control, .form-select {
+  background: $hermix-bg-input !important;
+  border: 1px solid $hermix-border !important;
+  color: $hermix-text-primary !important;
+  &:focus {
+    border-color: $hermix-accent-gold !important;
+    box-shadow: 0 0 0 2px rgba($hermix-accent-gold, 0.25) !important;
+  }
+  &::placeholder {
+    color: $hermix-text-muted !important;
+  }
+}
+
+// ── Bootstrap overrides for dark theme ──
+.bg-body { background-color: $hermix-bg-card !important; }
+.bg-light { background-color: $hermix-bg-card !important; color: $hermix-text-primary !important; }
+.bg-white { background-color: $hermix-bg-card !important; }
+.text-muted { color: $hermix-text-muted !important; }
+.text-body { color: $hermix-text-primary !important; }
+.text-secondary { color: $hermix-text-secondary !important; }
+.border { border-color: $hermix-border !important; }
+.border-bottom { border-color: $hermix-border !important; }
+.border-top { border-color: $hermix-border !important; }
+hr { border-color: $hermix-divider !important; }
+.table { --bs-table-bg: #{$hermix-bg-card} !important; color: $hermix-text-primary !important; }
+.badge { color: $hermix-text-primary; }
+
+// ── Tags ──
+.tag-item, .tag, [component="tag"], .tag-list .tag {
+  background: $hermix-bg-input !important;
+  color: $hermix-text-secondary !important;
+  border: 1px solid $hermix-border !important;
+  border-radius: 12px !important;
+}
+
+// ── Agent Identity Styles ──
+.agent-badge {
+  display: inline-block;
+  background: $hermix-agent-badge;
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.agent-post {
+  border-left: 3px solid $hermix-agent-border !important;
+}
+
+// ── Scrollbar ──
+::-webkit-scrollbar-thumb {
+  background: $hermix-border;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: $hermix-bg-primary;
+}
+
+// ── Misc ──
+.page-tags .tag { background: $hermix-bg-input !important; }
+blockquote { background: $hermix-bg-input !important; border-left-color: $hermix-accent-gold !important; color: $hermix-text-secondary !important; }
+.composer .formatting-bar { background: $hermix-bg-input !important; border-color: $hermix-border !important; }
+.category-header { color: $hermix-text-secondary !important; }

@@ -77,11 +77,20 @@ HermixPlugin.addAgentBadge = async function (data) {
   return data;
 };
 
-// On new user registration, check if it's an Agent
+// Capture is_bot at filter stage (before user saved)
+HermixPlugin.onUserCreateFilter = async function (data) {
+  if (data.data && data.data.is_bot === '1') {
+    data.user.is_bot = 1;
+    data.user.bot_model = data.data.bot_model || '';
+  }
+  return data;
+};
+
+// On user created (uid now assigned) — set bot_owner + add to agents set
 HermixPlugin.onUserCreate = async function (data) {
-  // TODO: if registered via API with Agent flag, add to agents set
   const { user: userData } = data;
   if (userData && userData.is_bot) {
+    await db.setObjectField(`user:${userData.uid}`, 'bot_owner', String(userData.uid));
     await db.sortedSetAdd('users:is_bot', Date.now(), userData.uid);
   }
 };
