@@ -48,11 +48,26 @@ HermixPlugin.addBotFields = async function (data) {
   return data;
 };
 
-HermixPlugin.addCustomFields = async function (data) {
-  if (data && data.uid) {
-    const isBot = await db.getObjectField(`user:${data.uid}`, 'is_bot');
-    data.is_bot = parseInt(isBot, 10) === 1;
-  }
+// Inject is_bot/bot_model/bot_owner into user data (NodeBB v4: filter:user.getFields)
+HermixPlugin.injectAgentFields = async function (data) {
+  if (!data || !data.users) return data;
+  const uids = data.uids;
+  if (!uids || !uids.length) return data;
+  
+  const agentFields = await db.getObjectsFields(
+    uids.map(uid => `user:${uid}`),
+    ['is_bot', 'bot_model', 'bot_owner']
+  );
+  
+  data.users.forEach((user, i) => {
+    const fields = agentFields[i];
+    if (fields && parseInt(fields.is_bot, 10) === 1) {
+      user.is_bot = true;
+      user.bot_model = fields.bot_model || '';
+      user.bot_owner = fields.bot_owner || '';
+    }
+  });
+  
   return data;
 };
 
@@ -93,6 +108,71 @@ HermixPlugin.onUserCreate = async function (data) {
     await db.setObjectField(`user:${userData.uid}`, 'bot_owner', String(userData.uid));
     await db.sortedSetAdd('users:is_bot', Date.now(), userData.uid);
   }
+};
+
+// ── P1-2: Agent first post → review queue ──
+HermixPlugin.shouldQueueAgentPost = async function (data) {
+  if (!data || !data.data || !data.data.uid) return data;
+  
+  const isBot = await db.getObjectField(`user:${data.data.uid}`, 'is_bot');
+  if (parseInt(isBot, 10) !== 1) return data;
+  
+  // Check if this is the agent's first post
+  const postCount = parseInt(await db.getObjectField(`user:${data.data.uid}`, 'postcount'), 10) || 0;
+  if (postCount === 0) {
+    data.shouldQueue = true;
+  }
+  return data;
+};
+
+// ── P1-3: Agent rate limiting ──
+HermixPlugin.checkAgentLimits = async function (data) {
+  if (!data || !data.data || !data.data.uid) return data;
+  
+  const isBot = await db.getObjectField(`user:${data.data.uid}`, 'is_bot');
+  if (parseInt(isBot, 10) !== 1) return data;
+  
+  // Rate limit: max 3 posts per minute
+  const key = `hermix:ratelimit:${data.data.uid}`;
+  const count = await db.incr(key);
+  if (count === 1) {
+    await db.expire(key, 60);
+  }
+  if (count > 3) {
+    throw new Error('[[hermix:rate-limit-exceeded]]');
+  }
+  
+  // Content length limit: max 10000 chars for agents
+  const content = data.data.content || '';
+  if (content.length > 10000) {
+    throw new Error('[[hermix:content-too-long]]');
+  }
+  
+  return data;
+};
+
+// ── P1-4: Agent visibility filter ──
+HermixPlugin.filterAgentTopics = async function (data) {
+  if (!data || !data.req) return data;
+  
+  const filter = data.req.query && data.req.query.agentFilter;
+  if (!filter || !data.topics || !data.topics.length) return data;
+  
+  // Get is_bot for all topic creators
+  const uids = [...new Set(data.topics.map(t => t.uid))];
+  const botStatus = {};
+  const fields = await db.getObjectsFields(uids.map(uid => `user:${uid}`), ['is_bot']);
+  uids.forEach((uid, i) => {
+    botStatus[uid] = parseInt(fields[i] ? fields[i].is_bot : 0, 10) === 1;
+  });
+  
+  if (filter === 'agent') {
+    data.topics = data.topics.filter(t => botStatus[t.uid]);
+  } else if (filter === 'human') {
+    data.topics = data.topics.filter(t => !botStatus[t.uid]);
+  }
+  
+  return data;
 };
 
 module.exports = HermixPlugin;

@@ -14,8 +14,8 @@
       "method": "addBotFields"
     },
     {
-      "hook": "filter:user.customFields",
-      "method": "addCustomFields"
+      "hook": "filter:user.getFields",
+      "method": "injectAgentFields"
     },
     {
       "hook": "filter:post.getPostSummaryByPids",
@@ -28,6 +28,18 @@
     {
       "hook": "filter:user.create",
       "method": "onUserCreateFilter"
+    },
+    {
+      "hook": "filter:post.shouldQueue",
+      "method": "shouldQueueAgentPost"
+    },
+    {
+      "hook": "filter:post.create",
+      "method": "checkAgentLimits"
+    },
+    {
+      "hook": "filter:topics.getTopics",
+      "method": "filterAgentTopics"
     }
   ],
   "staticDirs": {
