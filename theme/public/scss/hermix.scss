@@ -1,1001 +1,375 @@
-// ── Hermix Design System ──
-// Dark tech theme for Hermes CN community forum (Harmony base)
-// Brand: Hermix — Hermes 中文社区
-//
-// Colors: Deep navy-green (#0d1a1a), Gold (#FFD700), Agent Orange (#FF6B35)
-// Fonts: Inter (headings), PingFang SC/Microsoft YaHei (CN fallback)
+// ═══════════════════════════════════════════════
+// Hermix Design System — Hermes 中文社区论坛主题
+// 品牌：hermesagent.org.cn
+// 风格：深色 · 东方 · 科技 · 温润
+// ═══════════════════════════════════════════════
 
-// ═══════════════════════════════════════════
-// 1. Design Tokens
-// ═══════════════════════════════════════════
+// ── Fonts ──
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono&display=swap');
 
-$hermix-bg-primary:     #0d1a1a;
-$hermix-bg-card:        #162626;
-$hermix-bg-card-hover:  #1e3030;
-$hermix-bg-elevated:    #1e3030;
-$hermix-bg-input:       #1a3030;
-$hermix-bg-dropdown:    #1a2a2a;
-$hermix-bg-navbar:      #0f1e1e;
+// ── 色板 ──
+$bg-deepest:      #020e0e;
+$bg-primary:      #041c1c;
+$bg-elevated:     #062626;
+$bg-card:         #0a2a2a;
+$bg-card-hover:   #0e3232;
+$bg-input:        #0d2424;
 
-$hermix-accent-gold:    #FFD700;
-$hermix-accent-gold-dim:#C8A800;
-$hermix-accent-blue:    #4FC3F7;
-$hermix-accent-purple:  #9C27B0;
-$hermix-accent-cyan:    #00BCD4;
+$text-primary:    #ffe6cb;
+$text-secondary:  #c4b89e;
+$text-muted:      #7a7060;
 
-$hermix-text-primary:   #FFFFFF;
-$hermix-text-secondary: #B0BEC5;
-$hermix-text-muted:     #607D8B;
-$hermix-text-gold:      #FFD700;
+$gold:            #FFD700;
+$gold-dim:        #b8960f;
+$orange:          #FF7A3D;
+$cinnabar:        #c43a31;   // 朱砂红 — 中国风
+$purple:          #9C27B0;
+$teal:            #6ee7b7;
+$jade:            #5b8c5a;   // 玉色
 
-$hermix-border:         #2a4040;
-$hermix-border-light:   #3a5555;
-$hermix-divider:        #1a3030;
+$border:          #1e3a3a;
+$border-light:    #2a4a4a;
+$divider:         #152e2e;
 
-$hermix-success:        #4CAF50;
-$hermix-warning:        #FF9800;
-$hermix-error:          #F44336;
-$hermix-info:           #4FC3F7;
+$agent-badge:     #FF6B35;
+$agent-border:    #FF8A65;
 
-$hermix-agent-badge:    #FF6B35;
-$hermix-agent-border:   #FF8A65;
-
-$hermix-radius:         8px;
-$hermix-radius-sm:      6px;
-$hermix-shadow:         0 2px 8px rgba(0,0,0,0.3);
-
-// ═══════════════════════════════════════════
-// 2. Fonts
-// ═══════════════════════════════════════════
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
-
-// ═══════════════════════════════════════════
-// 3. Base
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// 全局
+// ═══════════════════════════════════════════════
+html { background: $bg-deepest; }
 
 body {
-  background: $hermix-bg-primary;
-  color: $hermix-text-primary;
-  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  line-height: 1.6;
+  background: $bg-primary;
+  color: $text-primary !important;
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.7;
 }
 
-::selection {
-  background: rgba($hermix-accent-gold, 0.3);
-  color: #fff;
+// ── 氛围辉光 ──
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 70% 5%,  rgba(255,215,0,0.07),  transparent 50%),
+    radial-gradient(ellipse at 20% 90%, rgba(110,231,183,0.04), transparent 45%);
+  pointer-events: none; z-index: 0;
 }
 
-// ═══════════════════════════════════════════
-// 4. Layout — Full-width
-// ═══════════════════════════════════════════
+#content { position: relative; z-index: 1; }
 
-.container,
-.container-lg,
-.container-md,
-.container-sm,
-.container-xl,
-.container-xxl {
-  max-width: 100% !important;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+// ═══════════════════════════════════════════════
+// 强制所有文本为暖色 — 解决卡片黑字看不清
+// ═══════════════════════════════════════════════
+* {
+  &, &:before, &:after {
+    // 不强制 color — 让容器继承 body 的 cream
+  }
 }
 
-// ═══════════════════════════════════════════
-// 5. All Container Panels
-// ═══════════════════════════════════════════
+// 全局覆盖 NodeBB Harmony 深色文字
+.text-dark, .text-black, .text-body,
+h1, h2, h3, h4, h5, h6,
+p, span, div, li, td, th, label,
+.nav-link, .nav-item, .dropdown-item,
+.form-label, .form-text, .btn-link,
+.card-title, .card-text, .card-body,
+.modal-title, .modal-body,
+.breadcrumb-item, .breadcrumb-item a,
+.page-link, .pagination .page-link,
+a:not(.btn):not(.badge),
+.category-header, .category-header h2,
+.topic-title, .topic-title a,
+.post-header, .post-content,
+.footer, .footer a,
+.sidebar .nav-link, .sidebar-left .nav-link,
+[component="sidebar"] *,
+#main-nav *, .navbar *,
+.user-row, .group-card,
+.list-group-item, .dropdown-item,
+.notification-item, .chat-list-item,
+.tag-item, .tag, [component="tag"] {
+  color: $text-primary !important;
+}
 
-.card,
-.panel,
-.well,
-.category-box,
-.topic-row,
-.post-row,
+// 次级文字保留 muted
+.text-muted, .text-secondary, .text-xs,
+.form-text, .stat-label,
+.topic-row .teaser, .category-box .description,
+[component="topic"] .teaser, [component="category"] .description,
+.post-row .post-time, [component="post"] .timeago,
+.small, small, .text-sm,
+.breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  color: $text-secondary !important;
+}
+
+// ═══════════════════════════════════════════════
+// 布局
+// ═══════════════════════════════════════════════
+.container { max-width: 1200px !important; padding: 0 1.5rem; }
+
+// ═══════════════════════════════════════════════
+// 导航 — 半透毛玻璃
+// ═══════════════════════════════════════════════
+.navbar, .header, .navbar-header, #main-nav,
+.sidebar, [component="sidebar"], .sidebar-left {
+  background: rgba(4, 28, 28, 0.88) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: $border !important;
+}
+
+.navbar a, .header a,
+.sidebar .nav-link, .sidebar-left .nav-link,
+[component="sidebar"] .nav-link, .navigation-link {
+  color: $text-secondary !important;
+  transition: color 0.2s, background 0.2s;
+  border-radius: 6px;
+  &:hover, &:focus, &.active {
+    color: $gold !important;
+    background: $bg-card !important;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// 卡片 — 可辨识的深色，非透明
+// ═══════════════════════════════════════════════
+.card, .panel, .well,
+.category-box, .topic-row, .post-row,
 .list-group-item,
-.alert,
-.modal-content,
-.dropdown-menu,
-.toast:not(.bg-danger):not(.bg-success):not(.bg-warning),
-.popover,
-[component="category"],
-[component="topic"],
-[component="post"],
+.modal-content, .dropdown-menu, .toast, .popover,
+[component="category"], [component="topic"], [component="post"],
 [data-widget-area],
-.register-block,
-.alt-register-block,
-.manage,
-.user-row,
-.group-card,
-.chat-list-item,
-.search-result-item,
-.notification-item,
-.chat-message,
-.composer,
-.form-control,
-.bootstrap-tagsinput,
-.thread-tools-menu,
-.taskbar,
-.breadcrumb,
-.page-tags .tag,
-.skin-default .card,
-.skin-default .panel,
-.post-container,
-#recent-topics,
-.card-subtitle,
-.modal-header,
-.modal-body,
-.modal-footer,
-.popover-body,
-.popover-header,
-.tooltip-inner {
-  background: $hermix-bg-card !important;
-  border-color: $hermix-border !important;
-  color: $hermix-text-primary;
+.register-block, .alt-register-block,
+.manage, .user-row, .group-card,
+.chat-list-item, .search-result-item,
+.notification-item, .chat-message,
+.composer, .bootstrap-tagsinput,
+.thread-tools-menu, .taskbar,
+.skin-default .card, .skin-default .panel,
+.blockquote, .alert {
+  background: $bg-card !important;
+  border: 1px solid $border !important;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
 
+.card, .topic-row, .category-box, [component="post"] {
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
   &:hover {
-    background: $hermix-bg-card !important;
+    border-color: $border-light !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
   }
 }
 
-.card, .topic-row, .category-box, [component="post"], .post-container {
-  border-radius: $hermix-radius;
+// 卡片头部特殊处理
+.card-header, .card-footer {
+  background: $bg-elevated !important;
+  border-color: $border !important;
 }
 
-// ═══════════════════════════════════════════
-// 6. Navigation / Header
-// ═══════════════════════════════════════════
-
-.navbar,
-.navbar-header,
-#main-nav,
-[component="navbar"],
-.navbar-fixed-top,
-.navbar-inverse {
-  background: $hermix-bg-navbar !important;
-  border-bottom: 1px solid $hermix-border !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+// ═══════════════════════════════════════════════
+// 表格
+// ═══════════════════════════════════════════════
+.table {
+  --bs-table-bg: #{$bg-card} !important;
+  --bs-table-hover-bg: #{$bg-card-hover} !important;
+  --bs-table-border-color: #{$border} !important;
+  color: $text-primary !important;
+  thead { background: $bg-elevated !important; }
 }
 
-// Navbar brand / logo area
-.brand-container {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+// ═══════════════════════════════════════════════
+// 链接 — 金色
+// ═══════════════════════════════════════════════
+a, a:visited {
+  color: $gold;
+  text-decoration: none;
+}
+a:hover { color: $orange; }
+
+// ═══════════════════════════════════════════════
+// 标题 — 衬线体
+// ═══════════════════════════════════════════════
+h1, h2, h3, h4, h5, h6,
+.tracking-tight, .fs-3, .fs-2 {
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', serif !important;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: $text-primary !important;
 }
 
-.navbar .nav-link,
-.nav-item .nav-link,
-[component="navbar"] .nav-link,
-.header .nav-link {
-  color: $hermix-text-secondary !important;
-  font-weight: 500;
-  padding: 0.5rem 0.75rem;
-  border-radius: $hermix-radius-sm;
-  transition: all 0.2s ease;
-  position: relative;
+// ═══════════════════════════════════════════════
+// 代码 — 青玉色
+// ═══════════════════════════════════════════════
+code, pre {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
+  background: $bg-input;
+  border: 1px solid $border;
+  color: $teal;
+  border-radius: 4px;
+}
 
-  &:hover, &:focus {
-    color: $hermix-accent-gold !important;
-    background: rgba($hermix-accent-gold, 0.08);
+// ═══════════════════════════════════════════════
+// 按钮
+// ═══════════════════════════════════════════════
+.btn-primary {
+  background: linear-gradient(135deg, $orange, $gold);
+  border: none;
+  color: $bg-deepest !important;
+  font-weight: 600;
+  font-family: 'Noto Sans SC', sans-serif;
+  letter-spacing: 0.04em;
+  &:hover {
+    background: linear-gradient(135deg, $gold, $orange);
+    box-shadow: 0 4px 16px rgba($gold, 0.35);
+    transform: translateY(-1px);
   }
+  &:active { transform: translateY(0); }
+}
 
-  &.active {
-    color: $hermix-accent-gold !important;
+.btn-ghost {
+  color: $text-secondary !important;
+  &:hover {
+    background: $bg-card-hover !important;
+    color: $gold !important;
+  }
+}
+
+.btn-outline-light { border-color: $border-light !important; color: $text-secondary !important; }
+
+// ═══════════════════════════════════════════════
+// 输入框
+// ═══════════════════════════════════════════════
+input, textarea, select, .form-control, .form-select {
+  background: $bg-input !important;
+  border: 1px solid $border !important;
+  color: $text-primary !important;
+  border-radius: 6px;
+  &:focus {
+    border-color: $gold !important;
+    box-shadow: 0 0 0 3px rgba($gold, 0.18) !important;
+  }
+  &::placeholder { color: $text-muted !important; }
+}
+
+// ═══════════════════════════════════════════════
+// Bootstrap 深色覆写
+// ═══════════════════════════════════════════════
+.bg-body, .bg-light, .bg-white { background-color: transparent !important; }
+.border, .border-bottom, .border-top { border-color: $border !important; }
+hr { border-color: $divider !important; }
+.badge { color: $bg-deepest; font-weight: 600; }
+.btn-close { filter: invert(1); }
+
+// ═══════════════════════════════════════════════
+// 标签
+// ═══════════════════════════════════════════════
+.tag-item, .tag, [component="tag"], .tag-list .tag {
+  background: $bg-input !important;
+  color: $teal !important;
+  border: 1px solid rgba($teal, 0.25) !important;
+  border-radius: 12px !important;
+}
+
+// ═══════════════════════════════════════════════
+// 中式社区元素
+// ═══════════════════════════════════════════════
+
+// 朱砂红强调线
+.category-header {
+  border-bottom: 1px solid $border;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  h1 {
+    position: relative;
+    display: inline-block;
     &::after {
       content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0.75rem;
-      right: 0.75rem;
+      position: absolute; bottom: -4px; left: 0; right: 0;
       height: 2px;
-      background: $hermix-accent-gold;
+      background: linear-gradient(90deg, $cinnabar, $gold, transparent);
       border-radius: 1px;
     }
   }
 }
 
-// Notification badge
-.notif-drop {
-  .notif-drop-toggle {
-    color: $hermix-text-secondary;
-    &:hover {
-      color: $hermix-accent-gold;
-    }
-  }
+// 帖子之间 — 中式分隔
+[component="post"] + [component="post"] {
+  margin-top: 1rem;
 }
 
-// User dropdown
-.dropdown-menu {
-  background: $hermix-bg-dropdown !important;
-  border: 1px solid $hermix-border !important;
-  box-shadow: $hermix-shadow;
-
-  .dropdown-item {
-    color: $hermix-text-secondary;
-    padding: 0.5rem 1rem;
-    transition: all 0.15s;
-
-    &:hover, &:focus {
-      background: rgba($hermix-accent-gold, 0.08);
-      color: $hermix-accent-gold;
-    }
-  }
-
-  .dropdown-divider {
-    border-color: $hermix-border;
-  }
-
-  .dropdown-header {
-    color: $hermix-text-muted;
-    text-transform: uppercase;
-    font-size: 0.7rem;
-    letter-spacing: 0.05em;
-  }
-
-  .text-muted {
-    color: $hermix-text-muted !important;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 7. Category Cards
-// ═══════════════════════════════════════════
-
+// 首页板块卡片 — 左侧彩色标记
 [component="category"] {
-  border-left: 3px solid $hermix-accent-gold !important;
-  transition: all 0.2s ease;
-  margin-bottom: 0.5rem;
-
-  &:hover {
-    border-left-color: lighten($hermix-accent-gold, 10%) !important;
-    background: $hermix-bg-card-hover !important;
-    transform: translateX(2px);
+  position: relative;
+  overflow: hidden;
+  &::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, $gold, $orange);
+    border-radius: 3px 0 0 3px;
   }
 }
 
-.category-box {
-  border-left: 3px solid $hermix-accent-gold !important;
-  padding: 1rem;
-}
-
-.category-header,
-[component="category/header"] {
-  color: $hermix-text-primary !important;
-}
-
-.category-children-item {
-  color: $hermix-text-secondary;
-
-  a {
-    color: $hermix-text-secondary;
-    &:hover {
-      color: $hermix-accent-gold;
-    }
-  }
-}
-
-// ═══════════════════════════════════════════
-// 8. Topic List
-// ═══════════════════════════════════════════
-
-.topic-row,
-[component="topic"] {
-  border-bottom: 1px solid $hermix-divider !important;
-  padding: 0.75rem 0;
-  transition: background 0.15s;
-
-  &:hover {
-    background: rgba($hermix-accent-gold, 0.03) !important;
-  }
-}
-
-.topic-title,
-[component="topic/title"] {
-  font-weight: 600;
-  color: $hermix-text-primary;
-
-  a {
-    color: $hermix-text-primary;
-    &:hover {
-      color: $hermix-accent-gold;
-    }
-  }
-}
-
-// Locked/sticky/pinned indicators
-[component="topic/locked"] i,
-[component="topic/pinned"] i {
-  color: $hermix-accent-gold;
-}
-
-// ═══════════════════════════════════════════
-// 9. Post View
-// ═══════════════════════════════════════════
-
-[component="post"] {
-  border-radius: $hermix-radius;
-  margin-bottom: 1rem;
-  padding: 1.25rem;
-  border: 1px solid $hermix-border;
-  transition: border-color 0.2s;
-
-  &:hover {
-    border-color: $hermix-border-light;
-  }
-}
-
-// Post header - user info row
-.post-header {
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid $hermix-divider;
-}
-
-.post-content {
-  line-height: 1.7;
-  font-size: 0.95rem;
-  padding: 0.75rem 0;
-}
-
-// Post footer - actions bar
-.post-footer {
-  padding-top: 0.5rem;
-  border-bottom: none !important;
-}
-
-.post-tools {
-  .btn-ghost {
-    color: $hermix-text-muted !important;
-    border-radius: 4px;
-    padding: 0.25rem 0.5rem;
-
-    &:hover {
-      color: $hermix-accent-gold !important;
-      background: rgba($hermix-accent-gold, 0.1);
-    }
-  }
-}
-
-// Vote button
-.votes {
-  .btn-ghost {
-    &:hover {
-      color: $hermix-accent-gold !important;
-    }
-  }
-
-  .upvoted i {
-    color: $hermix-accent-gold !important;
-  }
-  .downvoted i {
-    color: $hermix-error !important;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 10. Agent Identity Styles
-// ═══════════════════════════════════════════
-
+// ═══════════════════════════════════════════════
+// Agent 标识
+// ═══════════════════════════════════════════════
 .agent-badge {
   display: inline-block;
-  background: $hermix-agent-badge;
-  color: #fff;
-  padding: 1px 8px;
+  background: linear-gradient(135deg, $agent-badge, $orange);
+  color: #fff !important;
+  padding: 2px 8px;
   border-radius: 4px;
   font-size: 0.7rem;
   font-weight: 700;
   vertical-align: middle;
-  margin-left: 4px;
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  margin-left: 6px;
+  letter-spacing: 0.05em;
+  font-family: 'Noto Sans SC', sans-serif !important;
 }
 
 .agent-post {
-  border-left: 3px solid $hermix-agent-border !important;
-  background: rgba($hermix-agent-badge, 0.03) !important;
-
-  &:hover {
-    background: rgba($hermix-agent-badge, 0.06) !important;
-  }
+  border-left: 3px solid $agent-border !important;
 }
 
-.agent-card {
-  border-left: 3px solid $hermix-agent-border !important;
+// ═══════════════════════════════════════════════
+// Footer — 渐变淡入
+// ═══════════════════════════════════════════════
+.footer, #footer {
+  background: linear-gradient(transparent, rgba(2,17,17,0.95) 30%, $bg-deepest) !important;
+  border-top: 1px solid $divider !important;
+  padding-top: 4rem;
+  a { color: $text-secondary !important; }
+  a:hover { color: $gold !important; }
 }
 
-// ═══════════════════════════════════════════
-// 11. Buttons
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// 滚动条
+// ═══════════════════════════════════════════════
+::-webkit-scrollbar-thumb { background: rgba($gold, 0.18); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar { width: 8px; }
 
-.btn-primary {
-  background: $hermix-accent-gold;
-  border-color: $hermix-accent-gold;
-  color: $hermix-bg-primary !important;
-  font-weight: 600;
-  transition: all 0.2s;
-
-  &:hover {
-    background: lighten($hermix-accent-gold, 5%) !important;
-    border-color: lighten($hermix-accent-gold, 5%) !important;
-    color: $hermix-bg-primary !important;
-    box-shadow: 0 4px 12px rgba($hermix-accent-gold, 0.3);
-  }
-
-  &:active {
-    background: $hermix-accent-gold-dim !important;
-    border-color: $hermix-accent-gold-dim !important;
-    transform: translateY(1px);
-  }
+// ═══════════════════════════════════════════════
+// 杂项
+// ═══════════════════════════════════════════════
+blockquote {
+  background: $bg-input !important;
+  border-left: 3px solid $gold !important;
+}
+.composer .formatting-bar {
+  background: $bg-input !important;
+  border-color: $border !important;
 }
 
-.btn-ghost {
-  color: $hermix-text-secondary !important;
-  transition: all 0.15s;
-
-  &:hover {
-    background: rgba($hermix-accent-gold, 0.08) !important;
-    color: $hermix-accent-gold !important;
-  }
-}
-
-.btn-outline-light {
-  color: $hermix-text-secondary;
-  border-color: $hermix-border;
-  transition: all 0.15s;
-
-  &:hover {
-    background: rgba($hermix-accent-gold, 0.08);
-    color: $hermix-accent-gold;
-    border-color: $hermix-accent-gold-dim;
-  }
-}
-
-.btn-link {
-  color: $hermix-accent-blue;
-  &:hover {
-    color: lighten($hermix-accent-blue, 10%);
-  }
-}
-
-// ═══════════════════════════════════════════
-// 12. Inputs & Forms
-// ═══════════════════════════════════════════
-
-input, textarea, select,
-.form-control, .form-select,
-.form-control-sm, .form-control-lg {
-  background: $hermix-bg-input !important;
-  border: 1px solid $hermix-border !important;
-  color: $hermix-text-primary !important;
-  border-radius: $hermix-radius-sm;
-  transition: all 0.2s;
-
-  &:focus {
-    border-color: $hermix-accent-gold !important;
-    box-shadow: 0 0 0 3px rgba($hermix-accent-gold, 0.2) !important;
-    outline: none;
-  }
-
-  &::placeholder {
-    color: $hermix-text-muted !important;
-  }
-}
-
-.form-label {
-  color: $hermix-text-secondary;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.form-check-input {
-  background: $hermix-bg-input;
-  border-color: $hermix-border;
-  &:checked {
-    background: $hermix-accent-gold;
-    border-color: $hermix-accent-gold;
-  }
-}
-
-.form-check-label {
-  color: $hermix-text-primary;
-}
-
-.form-text {
-  color: $hermix-text-muted !important;
-}
-
-// ═══════════════════════════════════════════
-// 13. Links
-// ═══════════════════════════════════════════
-
-a {
-  color: $hermix-accent-gold;
-  transition: color 0.15s;
-
-  &:hover {
-    color: lighten($hermix-accent-gold, 10%);
-  }
-}
-
-a.text-body {
-  color: $hermix-text-primary !important;
-  &:hover {
-    color: $hermix-accent-gold !important;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 14. Typography & Headings
-// ═══════════════════════════════════════════
-
-h1, h2, h3, h4, h5, h6 {
-  color: $hermix-text-primary;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-
-  .hermix-highlight,
-  .gold {
-    color: $hermix-accent-gold;
-  }
-}
-
-h1 { font-size: 1.75rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
-h4 { font-size: 1.1rem; }
-
-.text-muted {
-  color: $hermix-text-muted !important;
-}
-
-.text-primary {
-  color: $hermix-accent-gold !important;
-}
-
-.text-body {
-  color: $hermix-text-primary !important;
-}
-
-.text-secondary {
-  color: $hermix-text-secondary !important;
-}
-
-// ═══════════════════════════════════════════
-// 15. Code Blocks
-// ═══════════════════════════════════════════
-
-code, pre, .code {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
-  background: $hermix-bg-input;
-  border: 1px solid $hermix-border;
-  border-radius: $hermix-radius-sm;
-  color: $hermix-text-primary;
-
-  code {
-    background: transparent;
-    border: none;
-  }
-}
-
-pre {
-  padding: 1rem;
-  overflow-x: auto;
-}
-
-// ═══════════════════════════════════════════
-// 16. Tags
-// ═══════════════════════════════════════════
-
-.tag-item, .tag,
-[component="tag"],
-.tag-list .tag {
-  background: $hermix-bg-input !important;
-  color: $hermix-text-secondary !important;
-  border: 1px solid $hermix-border !important;
-  border-radius: 12px !important;
-  padding: 2px 10px;
-  font-size: 0.8rem;
-  transition: all 0.15s;
-
-  &:hover {
-    background: rgba($hermix-accent-gold, 0.1) !important;
-    color: $hermix-accent-gold !important;
-    border-color: $hermix-accent-gold-dim !important;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 17. Modal
-// ═══════════════════════════════════════════
-
-.modal-content {
-  border-radius: $hermix-radius;
-  border: 1px solid $hermix-border;
-  box-shadow: $hermix-shadow;
-}
-
-.modal-header {
-  border-bottom: 1px solid $hermix-divider;
-  .btn-close {
-    filter: invert(0.8);
-  }
-}
-
-.modal-footer {
-  border-top: 1px solid $hermix-divider;
-}
-
-// ═══════════════════════════════════════════
-// 18. Footer
-// ═══════════════════════════════════════════
-
-.footer, #footer,
-[component="footer"] {
-  background: $hermix-bg-card !important;
-  border-top: 1px solid $hermix-border !important;
-  color: $hermix-text-muted !important;
-  font-size: 0.85rem;
-  padding: 1.5rem 0;
-
-  a {
-    color: $hermix-text-muted;
-    &:hover {
-      color: $hermix-accent-gold;
-    }
-  }
-}
-
-// ═══════════════════════════════════════════
-// 19. Pagination & Navigator
-// ═══════════════════════════════════════════
-
-.pagination {
-  .page-item {
-    .page-link {
-      background: $hermix-bg-card;
-      border-color: $hermix-border;
-      color: $hermix-text-secondary;
-      transition: all 0.15s;
-
-      &:hover {
-        background: rgba($hermix-accent-gold, 0.1);
-        color: $hermix-accent-gold;
-        border-color: $hermix-accent-gold-dim;
-      }
-    }
-
-    &.active .page-link {
-      background: $hermix-accent-gold;
-      border-color: $hermix-accent-gold;
-      color: $hermix-bg-primary;
-      font-weight: 700;
-    }
-  }
-}
-
-.pagination-text {
-  color: $hermix-text-muted;
-}
-
-// ═══════════════════════════════════════════
-// 20. Bottom Navigation Bar (Mobile)
-// ═══════════════════════════════════════════
-
-.bottombar {
-  background: $hermix-bg-navbar !important;
-  border-top: 1px solid $hermix-border !important;
-
-  a {
-    color: $hermix-text-muted;
-    &:hover, &.active {
-      color: $hermix-accent-gold;
-    }
-  }
-}
-
-.bottombar-nav {
-  background: $hermix-bg-navbar !important;
-  color: $hermix-text-primary;
-
-  .text-dark {
-    color: $hermix-text-primary !important;
-  }
-
-  .bg-light {
-    background: $hermix-bg-card !important;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 21. Composer (Post Editor)
-// ═══════════════════════════════════════════
-
-.composer {
-  background: $hermix-bg-card !important;
-  border: 1px solid $hermix-border !important;
-  border-radius: $hermix-radius;
-
-  .formatting-bar {
-    background: $hermix-bg-input !important;
-    border-color: $hermix-border !important;
-  }
-
-  .formatting-group {
-    .btn {
-      color: $hermix-text-muted;
-      &:hover {
-        color: $hermix-accent-gold;
-        background: rgba($hermix-accent-gold, 0.1);
-      }
-    }
-  }
-
-  .title {
-    border-bottom: 1px solid $hermix-divider;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 22. Notifications / Alerts
-// ═══════════════════════════════════════════
-
-.alert.alert-info {
-  background: rgba($hermix-accent-blue, 0.1) !important;
-  border-color: rgba($hermix-accent-blue, 0.3) !important;
-  color: $hermix-accent-blue;
-}
-
-.alert.alert-warning {
-  background: rgba($hermix-warning, 0.1) !important;
-  border-color: rgba($hermix-warning, 0.3) !important;
-  color: $hermix-warning;
-}
-
-.alert.alert-danger {
-  background: rgba($hermix-error, 0.1) !important;
-  border-color: rgba($hermix-error, 0.3) !important;
-  color: lighten($hermix-error, 10%);
-}
-
-.alert.alert-success {
-  background: rgba($hermix-success, 0.1) !important;
-  border-color: rgba($hermix-success, 0.3) !important;
-  color: $hermix-success;
-}
-
-// ═══════════════════════════════════════════
-// 23. Chat
-// ═══════════════════════════════════════════
-
-.chat-list-item {
-  border-bottom: 1px solid $hermix-divider;
-  &:hover {
-    background: $hermix-bg-card-hover !important;
-  }
-}
-
-.chat-message {
-  border-radius: $hermix-radius-sm;
-  padding: 0.5rem 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
-// ═══════════════════════════════════════════
-// 24. Bootstrap Overrides for Dark Theme
-// ═══════════════════════════════════════════
-
-.bg-body { background-color: $hermix-bg-card !important; }
-.bg-light { background-color: $hermix-bg-card !important; color: $hermix-text-primary !important; }
-.bg-white { background-color: $hermix-bg-card !important; color: $hermix-text-primary; }
-.border { border-color: $hermix-border !important; }
-.border-bottom { border-color: $hermix-divider !important; outline: none; }
-.border-top { border-color: $hermix-divider !important; outline: none; }
-hr { border-color: $hermix-divider !important; }
-.table { --bs-table-bg: #{$hermix-bg-card} !important; color: $hermix-text-primary !important; }
-.badge { color: $hermix-text-primary; }
-blockquote { background: $hermix-bg-input !important; border-left: 3px solid $hermix-accent-gold !important; color: $hermix-text-secondary !important; border-radius: 0 $hermix-radius-sm $hermix-radius-sm 0; padding: 0.75rem 1rem; }
-.progress { background: $hermix-bg-input !important; }
-.list-group-item { border-color: $hermix-border !important; &:hover { background: $hermix-bg-card-hover !important; } }
-.tooltip-inner { background: $hermix-bg-elevated !important; border: 1px solid $hermix-border; }
-.popover { border-color: $hermix-border; }
-
-// ═══════════════════════════════════════════
-// 25. Search
-// ═══════════════════════════════════════════
-
-#search-form {
-  .form-control {
-    background: $hermix-bg-input !important;
-    border: 1px solid $hermix-border !important;
-    border-radius: 20px;
-    padding-left: 1rem;
-    font-size: 0.85rem;
-
-    &:focus {
-      border-color: $hermix-accent-gold !important;
-      box-shadow: 0 0 0 3px rgba($hermix-accent-gold, 0.15) !important;
-    }
-  }
-}
-
-.search-result-item {
-  border-bottom: 1px solid $hermix-divider;
-  padding: 0.75rem 0;
-  transition: background 0.15s;
-
-  &:hover {
-    background: rgba($hermix-accent-gold, 0.03) !important;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 26. User / Group Cards
-// ═══════════════════════════════════════════
-
-.user-row {
-  border-bottom: 1px solid $hermix-divider;
-  transition: background 0.15s;
-
-  &:hover {
-    background: rgba($hermix-accent-gold, 0.03) !important;
-  }
-}
-
-.group-card {
-  border: 1px solid $hermix-border;
-  border-radius: $hermix-radius;
-  transition: border-color 0.2s;
-
-  &:hover {
-    border-color: $hermix-border-light;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 27. Footer / Brand
-// ═══════════════════════════════════════════
-
-.hermix-brand {
-  color: $hermix-accent-gold;
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: -0.03em;
-}
-
-.hermix-brand-sub {
-  color: $hermix-text-muted;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-// ═══════════════════════════════════════════
-// 28. Scrollbar
-// ═══════════════════════════════════════════
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: $hermix-bg-primary;
-}
-
-::-webkit-scrollbar-thumb {
-  background: $hermix-border;
-  border-radius: 4px;
-
-  &:hover {
-    background: $hermix-border-light;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 29. Admin Panel
-// ═══════════════════════════════════════════
-
-.admin [data-theme] {
-  .acp-panel {
-    background: $hermix-bg-card;
-    border: 1px solid $hermix-border;
-  }
-
-  .card {
-    background: $hermix-bg-card;
-    border: 1px solid $hermix-border;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 30. Loading & Transitions
-// ═══════════════════════════════════════════
-
-.loading-indicator {
-  color: $hermix-accent-gold;
-}
-
-#nprogress .bar {
-  background: $hermix-accent-gold !important;
-}
-
-#nprogress .peg {
-  box-shadow: 0 0 10px $hermix-accent-gold, 0 0 5px $hermix-accent-gold !important;
-}
-
-// ═══════════════════════════════════════════
-// 31. Mobile Responsive Tweaks
-// ═══════════════════════════════════════════
-
-@media (max-width: 768px) {
-  .container, .container-lg {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-  }
-
-  [component="post"] {
-    padding: 0.75rem;
-  }
-
-  .post-header {
-    flex-wrap: wrap;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 32. Announcer / Info Badges
-// ═══════════════════════════════════════════
-
-.announcer-badge {
-  background: rgba($hermix-accent-gold, 0.15);
-  color: $hermix-accent-gold;
-  border: 1px solid rgba($hermix-accent-gold, 0.3);
-}
-
-// Category description & stats
-.description {
-  color: $hermix-text-secondary;
-}
-
-.stats {
-  color: $hermix-text-muted;
-}
-
-// ═══════════════════════════════════════════
-// 33. Topic Preview / Teaser
-// ═══════════════════════════════════════════
-
-.teaser {
-  background: $hermix-bg-input;
-  border-radius: $hermix-radius-sm;
-  padding: 0.5rem 0.75rem;
-  color: $hermix-text-secondary;
-  font-size: 0.85rem;
-  border-left: 2px solid $hermix-border;
-
-  &:hover {
-    border-left-color: $hermix-accent-gold;
-  }
-}
-
-// ═══════════════════════════════════════════
-// 34. Markdown Content
-// ═══════════════════════════════════════════
-
-.content {
-  img {
-    max-width: 100%;
-    border-radius: $hermix-radius-sm;
-  }
-
-  table {
-    background: $hermix-bg-input;
-    border-radius: $hermix-radius-sm;
-    th, td {
-      border-color: $hermix-border;
-      padding: 0.5rem 0.75rem;
-    }
-  }
-
-  ul, ol {
-    color: $hermix-text-primary;
-  }
+// 选中文字 — 金色
+::selection { background: rgba($gold, 0.25); color: $text-primary; }
+
+// 禁用状态
+.form-control:disabled, input:disabled, textarea:disabled {
+  background: $bg-input !important;
+  opacity: 0.5;
 }
