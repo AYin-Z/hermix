@@ -110,11 +110,15 @@ a:not(.btn):not(.badge),
 .container { max-width: 1200px !important; padding: 0 1.5rem; }
 
 // ═══════════════════════════════════════════════
-// 导航 — 半透毛玻璃
+// 导航 — 半透毛玻璃（覆盖 Bootstrap bg-light）
 // ═══════════════════════════════════════════════
 .navbar, .header, .navbar-header, #main-nav,
-.sidebar, [component="sidebar"], .sidebar-left {
-  background: rgba(4, 28, 28, 0.88) !important;
+.sidebar, [component="sidebar"],
+.sidebar-left, .sidebar-right,
+.bg-light.sidebar-left, .bg-light.sidebar,
+.sidebar-left.bg-light, .sidebar.bg-light,
+.text-dark.bg-light.sidebar-left {
+  background: rgba(4, 28, 28, 0.92) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-color: $border !important;
@@ -126,20 +130,30 @@ a:not(.btn):not(.badge),
   color: $text-secondary !important;
   transition: color 0.2s, background 0.2s;
   border-radius: 6px;
+  margin: 2px 4px;
   &:hover, &:focus, &.active {
     color: $gold !important;
     background: $bg-card !important;
   }
 }
 
+// Sidebar toggle button
+.sidebar-toggle, .sidebar-toggle-container button {
+  color: $text-secondary !important;
+  background: transparent !important;
+  border: none !important;
+  &:hover { color: $gold !important; }
+}
+
 // ═══════════════════════════════════════════════
-// 卡片 — 可辨识的深色，非透明
+// 卡片 — 可辨识的深色
 // ═══════════════════════════════════════════════
 .card, .panel, .well,
 .category-box, .topic-row, .post-row,
 .list-group-item,
 .modal-content, .dropdown-menu, .toast, .popover,
 [component="category"], [component="topic"], [component="post"],
+[component="categories/category"], [data-cid],
 [data-widget-area],
 .register-block, .alt-register-block,
 .manage, .user-row, .group-card,
@@ -155,7 +169,7 @@ a:not(.btn):not(.badge),
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
-.card, .topic-row, .category-box, [component="post"] {
+.card, .topic-row, .category-box, [component="post"], [data-cid] {
   border-radius: 8px;
   transition: border-color 0.2s, box-shadow 0.2s;
   &:hover {
@@ -164,10 +178,26 @@ a:not(.btn):not(.badge),
   }
 }
 
-// 卡片头部特殊处理
 .card-header, .card-footer {
   background: $bg-elevated !important;
   border-color: $border !important;
+}
+
+// ── 分页 ──
+.pagination .page-link, .page-link {
+  background: $bg-card !important;
+  border-color: $border !important;
+  color: $text-secondary !important;
+  &:hover { background: $bg-card-hover !important; color: $gold !important; }
+}
+.pagination .active .page-link {
+  background: $gold !important;
+  border-color: $gold !important;
+  color: $bg-deepest !important;
+}
+.pagination .disabled .page-link {
+  background: transparent !important;
+  color: $text-muted !important;
 }
 
 // ═══════════════════════════════════════════════
@@ -258,11 +288,28 @@ input, textarea, select, .form-control, .form-select {
 // ═══════════════════════════════════════════════
 // Bootstrap 深色覆写
 // ═══════════════════════════════════════════════
-.bg-body, .bg-light, .bg-white { background-color: transparent !important; }
-.border, .border-bottom, .border-top { border-color: $border !important; }
+.bg-body, .bg-light, .bg-white { background-color: $bg-card !important; }
+.border, .border-bottom, .border-top, .border-end, .border-start { border-color: $border !important; }
 hr { border-color: $divider !important; }
 .badge { color: $bg-deepest; font-weight: 600; }
 .btn-close { filter: invert(1); }
+.text-dark { color: $text-primary !important; }
+
+// ── 下拉菜单 ──
+.dropdown-menu { background: $bg-card !important; border-color: $border !important; }
+.dropdown-item { color: $text-secondary !important; }
+.dropdown-item:hover { background: $bg-card-hover !important; color: $gold !important; }
+.dropdown-divider { border-color: $border !important; }
+
+// ── 弹窗 ──
+.modal-content { background: $bg-card !important; border-color: $border !important; }
+.modal-header, .modal-footer { border-color: $border !important; }
+
+// ── 工具提示 ──
+.tooltip .tooltip-inner { background: $bg-elevated !important; color: $text-primary !important; }
+
+// ── 进度条 ──
+.progress { background: $bg-input !important; }
 
 // ═══════════════════════════════════════════════
 // 标签
