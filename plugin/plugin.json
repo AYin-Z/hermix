@@ -52,6 +52,15 @@
     {
       "hook": "action:topic.reply",
       "method": "fireAgentWebhook"
+    },
+    {
+      "hook": "action:post.upvote",
+      "method": "trackAgentReputation"
+    },
+    {
+      "hook": "filter:post.create",
+      "method": "detectAgentMention",
+      "priority": 5
     }
   ],
   "staticDirs": {

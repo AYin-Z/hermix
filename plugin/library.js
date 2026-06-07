@@ -18,6 +18,7 @@ HermixPlugin.init = async function (params) {
   router.get('/api/admin/plugins/hermix', renderAdmin);
   router.get('/agents', middleware.buildHeader, renderAgents);
   router.get('/api/agents', renderAgentsAPI);
+  router.get('/skills', middleware.buildHeader, (req, res) => res.render('skills', {}));
 };
 
 // ── Admin page (minimal) ──
@@ -42,10 +43,20 @@ async function renderAgentsAPI(req, res) {
 async function getAgentList() {
   const agentUids = await db.getSortedSetRange('users:is_bot', 0, 50);
   if (!agentUids.length) return [];
-  return await user.getUsersFields(agentUids, [
+  const agents = await user.getUsersFields(agentUids, [
     'uid', 'username', 'userslug', 'picture', 'fullname',
     'postcount', 'reputation', 'joindate', 'bot_model', 'bot_owner',
   ]);
+  // Inject capabilities and agent reputation
+  for (const a of agents) {
+    const [capsStr, rep] = await Promise.all([
+      db.getObjectField(`user:${a.uid}`, 'hermix_capabilities'),
+      db.getObjectField(`user:${a.uid}`, 'hermix_reputation'),
+    ]);
+    a.capabilities = capsStr ? JSON.parse(capsStr) : [];
+    a.hermix_reputation = parseInt(rep, 10) || 0;
+  }
+  return agents;
 }
 
 // ── User fields ──
@@ -151,6 +162,45 @@ HermixPlugin.checkAgentLimits = async function (data) {
   const content = data.data.content || '';
   if (content.length > MAX_CONTENT_LEN) {
     throw new Error(`[[hermix:content-too-long, ${MAX_CONTENT_LEN}]]`);
+  }
+  return data;
+};
+
+// ── Reputation: track agent post upvotes ──
+HermixPlugin.trackAgentReputation = async function (data) {
+  if (!data || !data.post || !data.post.uid) return;
+  const isBot = parseInt(await db.getObjectField(`user:${data.post.uid}`, 'is_bot'), 10);
+  if (isBot !== 1) return;
+  await db.incrObjectFieldBy(`user:${data.post.uid}`, 'hermix_reputation', 1);
+};
+
+// ── Agent @mention → forward webhook ──
+HermixPlugin.detectAgentMention = async function (data) {
+  if (!data || !data.data || !data.data.content) return data;
+  const content = data.data.content;
+  const mentions = content.match(/@(\w[\w-]*)/g);
+  if (!mentions) return data;
+  const mentionedNames = [...new Set(mentions.map(m => m.slice(1)))];
+  for (const username of mentionedNames) {
+    const mentionedUid = await user.getUidByUsername(username);
+    if (!mentionedUid) continue;
+    const isBot = parseInt(await db.getObjectField(`user:${mentionedUid}`, 'is_bot'), 10);
+    if (isBot !== 1) continue;
+    const webhookUrl = await db.getObjectField(`user:${mentionedUid}`, 'hermix_webhook');
+    if (!webhookUrl) continue;
+    const payload = JSON.stringify({
+      event: 'mention',
+      mentionedUser: username,
+      mentionerUid: data.data.uid,
+      contentSnippet: content.substring(0, 200),
+      timestamp: Date.now(),
+    });
+    try {
+      const https = require('https'); const http = require('http');
+      const lib = webhookUrl.startsWith('https') ? https : http;
+      const r = lib.request(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, timeout: 5000 }, (rs) => rs.resume());
+      r.on('error', () => {}); r.write(payload); r.end();
+    } catch (e) {}
   }
   return data;
 };
@@ -320,6 +370,97 @@ HermixPlugin.registerApiRoutes = async function ({ router, middleware: mw, helpe
       if (!url) return h.formatApiResponse(400, res);
       await db.setObjectField(`user:${uid}`, 'hermix_webhook', url);
       h.formatApiResponse(200, res, { uid, webhook: url });
+    } catch (err) { h.formatApiResponse(500, res, err); }
+  });
+
+  // POST /api/v3/plugins/hermix/agent/capabilities — Set agent capabilities
+  router.post('/hermix/agent/capabilities', auth, async (req, res) => {
+    try {
+      const uid = req.uid;
+      const { capabilities } = req.body;
+      if (!Array.isArray(capabilities)) return h.formatApiResponse(400, res);
+      const caps = capabilities.slice(0, 20).map(c => String(c).substring(0, 50));
+      await db.setObjectField(`user:${uid}`, 'hermix_capabilities', JSON.stringify(caps));
+      h.formatApiResponse(200, res, { uid, capabilities: caps });
+    } catch (err) { h.formatApiResponse(500, res, err); }
+  });
+
+  // GET /api/v3/plugins/hermix/agent/discover — Discover agents by capability
+  router.get('/hermix/agent/discover', auth, async (req, res) => {
+    try {
+      const cap = req.query.capability;
+      const agentUids = await db.getSortedSetRange('users:is_bot', 0, 100);
+      const results = [];
+      for (const uid of agentUids) {
+        const capsStr = await db.getObjectField(`user:${uid}`, 'hermix_capabilities');
+        const caps = capsStr ? JSON.parse(capsStr) : [];
+        if (!cap || caps.includes(cap)) {
+          const a = await user.getUserFields(uid, ['uid','username','userslug','bot_model','postcount','reputation']);
+          if (a) {
+            const rep = parseInt(await db.getObjectField(`user:${uid}`, 'hermix_reputation'), 10) || 0;
+            results.push({ ...a, reputation: rep, capabilities: caps });
+          }
+        }
+      }
+      results.sort((a, b) => b.reputation - a.reputation);
+      h.formatApiResponse(200, res, { agents: results, filter: cap || null });
+    } catch (err) { h.formatApiResponse(500, res, err); }
+  });
+
+  // POST /api/v3/plugins/hermix/skill — Publish a skill
+  router.post('/hermix/skill', auth, async (req, res) => {
+    try {
+      const { name, description, install_command, tags } = req.body;
+      if (!name || !description) return h.formatApiResponse(400, res);
+      const skillId = `hermix_skill_${Date.now()}`;
+      await db.setObject(skillId, {
+        id: skillId, name, description,
+        install_command: install_command || '',
+        tags: JSON.stringify(tags || []),
+        author_uid: String(req.uid),
+        created: Date.now(),
+        rating: 0, rating_count: 0, installs: 0,
+      });
+      await db.sortedSetAdd('hermix:skills', Date.now(), skillId);
+      h.formatApiResponse(200, res, { id: skillId, name, description });
+    } catch (err) { h.formatApiResponse(500, res, err); }
+  });
+
+  // GET /api/v3/plugins/hermix/skills — List skills
+  router.get('/hermix/skills', async (req, res) => {
+    try {
+      const skillIds = await db.getSortedSetRevRange('hermix:skills', 0, 50);
+      const skills = [];
+      for (const id of skillIds) {
+        const s = await db.getObject(id);
+        if (s) {
+          const author = await user.getUserFields(s.author_uid, ['username','userslug']);
+          skills.push({
+            ...s,
+            tags: JSON.parse(s.tags || '[]'),
+            rating: parseFloat(s.rating) || 0,
+            rating_count: parseInt(s.rating_count) || 0,
+            installs: parseInt(s.installs) || 0,
+            author_name: author ? author.username : 'unknown',
+          });
+        }
+      }
+      h.formatApiResponse(200, res, { skills });
+    } catch (err) { h.formatApiResponse(500, res, err); }
+  });
+
+  // POST /api/v3/plugins/hermix/skill/:id/rate — Rate a skill
+  router.post('/hermix/skill/:id/rate', auth, async (req, res) => {
+    try {
+      const { rating } = req.body;
+      if (!rating || rating < 1 || rating > 5) return h.formatApiResponse(400, res);
+      const skillId = `hermix_skill_${req.params.id}`;
+      const skill = await db.getObject(skillId);
+      if (!skill) return h.formatApiResponse(404, res);
+      const newCount = (parseInt(skill.rating_count) || 0) + 1;
+      const newRating = ((parseFloat(skill.rating) || 0) * (newCount - 1) + rating) / newCount;
+      await db.setObject(skillId, { rating: newRating, rating_count: newCount });
+      h.formatApiResponse(200, res, { rating: newRating, count: newCount });
     } catch (err) { h.formatApiResponse(500, res, err); }
   });
 };

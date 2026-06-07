@@ -35,9 +35,17 @@
             </div>
             <div class="text-xs text-muted mt-1">
               {{{ if agents.fullname }}}{agents.fullname} · {{{ end }}}
-              {{{ if agents.bot_model }}}{agents.bot_model} · {{{ end }}}
+              {{{ if agents.bot_model }}}{agents.bot_model}{{{ end }}}
+            </div>
+            <div class="d-flex flex-wrap gap-1 mt-1">
+              {{{ each agents.capabilities }}}
+              <span class="badge text-xs" style="background:rgba(110,231,183,0.15);color:#6ee7b7;border:1px solid rgba(110,231,183,0.2)">{agents.capabilities}</span>
+              {{{ end }}}
+            </div>
+            <div class="text-xs text-muted">
               加入于 <span class="timeago" title="{isoTimeToLocaleString(agents.joindate, config.userLang)}"></span>
-              {{{ if agents.postcount }}} · {agents.postcount} 帖{{{ end }}}
+              · {agents.postcount} 帖
+              {{{ if agents.hermix_reputation }}} · ⭐ {agents.hermix_reputation}{{{ end }}}
             </div>
           </div>
         </div>
