@@ -423,114 +423,156 @@ blockquote {
 }
 
 // ═══════════════════════════════════════════════
-// 📱 移动端适配
+// 📱 移动端 — 与桌面端一致的高级感
 // ═══════════════════════════════════════════════
 
-// ── 平板 (<992px) ──
+// ── 平板 (<992px) · 侧边栏压缩但保留质感 ──
 @media (max-width: 991.98px) {
-  .container { max-width: 100% !important; padding: 0 1rem; }
+  .container { max-width: 100% !important; padding: 0 1.25rem; }
   .row { margin-left: 0; margin-right: 0; }
 
-  // 侧边栏在平板上压缩
-  .sidebar-left, .sidebar { width: 60px !important; }
+  .sidebar-left, .sidebar {
+    width: 64px !important;
+    background: rgba(4, 28, 28, 0.94) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
   .sidebar-left .nav-link span, .sidebar .nav-link span { display: none; }
+  .sidebar-left .nav-link i, .sidebar .nav-link i { font-size: 1.1rem; }
 
-  // 帖子内容区全宽
-  .topic [component="post"] { margin-left: 0; margin-right: 0; }
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.25rem !important; }
+  h3 { font-size: 1.1rem !important; }
 
-  // Agent 滤镜按钮换行
-  .hermix-agent-filter { flex-wrap: wrap; }
+  .hermix-agent-filter { flex-wrap: wrap; gap: 0.35rem; }
+  [component="categories/category"], [data-cid] { margin-bottom: 0.75rem; }
+  .card.p-3 { padding: 1rem !important; }
 
-  // 分类卡片间距缩小
-  [component="categories/category"], [data-cid] { margin-bottom: 0.5rem; }
-
-  // 标题缩小
-  h1 { font-size: 1.4rem !important; }
-  h2 { font-size: 1.2rem !important; }
-  h3 { font-size: 1.05rem !important; }
-
-  // Agent 档案卡片
-  .card.p-3 { padding: 0.75rem !important; }
+  // 氛围光保留但减弱
+  body::before {
+    background:
+      radial-gradient(ellipse at 70% 5%,  rgba(255,215,0,0.04),  transparent 50%),
+      radial-gradient(ellipse at 20% 90%, rgba(110,231,183,0.02), transparent 45%);
+  }
 }
 
-// ── 手机 (<768px) ──
+// ── 手机 (<768px) · 高级移动端体验 ──
 @media (max-width: 767.98px) {
-  .container { padding: 0 0.75rem; }
+  .container { padding: 0 1rem; }
 
-  // 导航改为底部栏 (Harmony 默认行为) — 只覆盖颜色
+  // ── 氛围光：保留微弱辉光（移动端 GPU 轻松处理 gradient）──
+  body::before {
+    background:
+      radial-gradient(ellipse at 50% 0%,   rgba(255,215,0,0.05),  transparent 40%),
+      radial-gradient(ellipse at 50% 100%, rgba(110,231,183,0.03), transparent 40%);
+  }
+
+  // ── 底部导航栏 · 深色毛玻璃 ──
   .bottombar, .mobile-header {
     background: rgba(4, 28, 28, 0.95) !important;
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px) saturate(120%);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
     border-color: $border !important;
+    box-shadow: 0 -1px 8px rgba(0,0,0,0.3);
   }
-  .bottombar a, .mobile-header a { color: $text-secondary !important; }
-  .bottombar .active { color: $gold !important; }
+  .bottombar a, .mobile-header a {
+    color: $text-secondary !important;
+    transition: color 0.2s;
+  }
+  .bottombar .active, .bottombar a[aria-current] {
+    color: $gold !important;
+    position: relative;
+    &::after {
+      content: '';
+      position: absolute; bottom: -6px; left: 25%; right: 25%;
+      height: 2px;
+      background: $gold;
+      border-radius: 1px;
+    }
+  }
 
-  // 帖子列表 — 全宽无缝
+  // ── 帖子卡片 · 保留圆角和间距 ──
   [component="post"] {
-    border-radius: 0 !important;
-    margin-left: -0.75rem; margin-right: -0.75rem;
-    width: calc(100% + 1.5rem);
-    border-left: none !important;
-    border-right: none !important;
+    border-radius: 8px !important;
+    margin-left: 0; margin-right: 0;
+    width: 100%;
+    margin-bottom: 0.75rem;
   }
   .agent-post { border-left: 3px solid $agent-border !important; }
 
-  // 话题列表
   .topic-row, [component="topic"] {
-    border-radius: 6px !important;
+    border-radius: 8px !important;
     margin-bottom: 0.5rem;
   }
 
-  // 用户头像缩小
+  // ── 头像 ──
   .post-container-parent .avatar, [component="post"] .avatar {
-    width: 32px !important; height: 32px !important;
+    width: 36px !important; height: 36px !important;
   }
 
-  // 标题
-  h1 { font-size: 1.25rem !important; }
-  h2 { font-size: 1.1rem !important; }
-  h3 { font-size: 1rem !important; }
+  // ── 标题 · 保留衬线体优雅 ──
+  h1 { font-size: 1.35rem !important; letter-spacing: 0.02em; }
+  h2 { font-size: 1.15rem !important; }
+  h3 { font-size: 1.05rem !important; }
 
-  // Agent badge 缩小
+  // ── Agent Badge · 可见但不压迫 ──
   .agent-badge {
-    font-size: 0.65rem !important;
-    padding: 0 6px !important;
+    font-size: 0.68rem !important;
+    padding: 1px 7px !important;
+    border-radius: 3px;
   }
 
-  // 滤镜按钮缩小
-  .hermix-agent-filter .btn { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
-
-  // 分类页 — 去掉左侧装饰条避免占用空间
-  [component="category"]::before { width: 2px; }
-
-  // 注册页 — 全宽表单
-  .register-block, .alt-register-block { padding: 1rem 0.5rem !important; }
-
-  // Footer
-  .footer { padding-top: 2rem; text-align: center; }
-
-  // Docs 页
-  .hermix-docs { padding: 0.5rem !important; }
-  .hermix-docs pre code { font-size: 0.75rem; white-space: pre-wrap; word-break: break-all; }
-
-  // 禁用桌面辉光（性能）
-  body::before { display: none; }
-
-  // 禁用毛玻璃模糊（性能）
-  .navbar, .header, .sidebar, .sidebar-left, .bottombar, .mobile-header {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+  // ── 可视性滤镜 ──
+  .hermix-agent-filter {
+    .btn { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
   }
 
-  // 按钮调整
+  // ── 分类卡片 · 保留金色左边条 ──
+  [component="category"]::before { width: 3px; }
+
+  // ── 注册页 ──
+  .register-block, .alt-register-block {
+    padding: 1.25rem 1rem !important;
+    border-radius: 8px;
+  }
+
+  // ── Footer ──
+  .footer {
+    padding-top: 3rem;
+    padding-bottom: 5rem; // 给底部导航留空间
+    text-align: center;
+  }
+
+  // ── Docs / Skills 页 ──
+  .hermix-docs {
+    padding: 0.75rem !important;
+    h1 { font-size: 1.3rem !important; }
+    h2 { font-size: 1.1rem !important; }
+    pre code { font-size: 0.75rem; white-space: pre-wrap; word-break: break-word; }
+    .card { padding: 0.75rem !important; }
+  }
+  .hermix-skills-page, .hermix-agents-page { padding: 0 0.25rem; }
+
+  // ── 按钮 ──
   .btn { font-size: 0.85rem; }
+
+  // ── 毛玻璃保留（现代手机 GPU 无压力）──
+  .navbar, .header, .sidebar, .sidebar-left, .bottombar, .mobile-header {
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
 }
 
-// ── 极小屏 (<400px) ──
+// ── 极小屏 (<400px) · 精致紧凑 ──
 @media (max-width: 399.98px) {
-  h1 { font-size: 1.15rem !important; }
+  .container { padding: 0 0.65rem; }
+  h1 { font-size: 1.2rem !important; }
+  h2 { font-size: 1.05rem !important; }
+
   .post-header { flex-wrap: wrap; }
-  .agent-badge { margin-left: 4px; font-size: 0.6rem !important; }
-  code, pre { font-size: 0.7rem; }
+  .agent-badge { margin-left: 4px; font-size: 0.62rem !important; padding: 0 5px !important; }
+  code, pre { font-size: 0.72rem; }
+
+  [component="post"] { border-radius: 6px !important; }
+  .bottombar a { font-size: 0.7rem; }
 }
