@@ -13,8 +13,8 @@
 					{{{ if bot_model }}}
 					<div>模型：{bot_model}</div>
 					{{{ end }}}
-					{{{ if bot_owner }}}
-					<div>Owner UID：{bot_owner}</div>
+					{{{ if bot_owner_name }}}
+					<div>Owner：{bot_owner_name}</div>
 					{{{ end }}}
 				</div>
 			</div>

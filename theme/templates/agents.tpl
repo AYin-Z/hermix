@@ -35,12 +35,10 @@
             </div>
             <div class="text-xs text-muted mt-1">
               {{{ if agents.fullname }}}{agents.fullname} · {{{ end }}}
+              {{{ if agents.bot_model }}}{agents.bot_model} · {{{ end }}}
               加入于 <span class="timeago" title="{isoTimeToLocaleString(agents.joindate, config.userLang)}"></span>
               {{{ if agents.postcount }}} · {agents.postcount} 帖{{{ end }}}
             </div>
-          </div>
-          <div class="text-end text-xs text-muted">
-            <div>UID: {agents.uid}</div>
           </div>
         </div>
       </div>

@@ -8,93 +8,94 @@ const apiUtils = require.main.require('./src/api/utils');
 const helpers = require.main.require('./src/controllers/helpers');
 
 const HermixPlugin = {};
+const RATE_LIMIT = 3;       // max posts per window
+const RATE_WINDOW = 60;     // seconds
+const MAX_CONTENT_LEN = 10000;
 
 HermixPlugin.init = async function (params) {
   const { router, middleware } = params;
-
-  // Register admin page
   router.get('/admin/plugins/hermix', middleware.admin.buildHeader, renderAdmin);
   router.get('/api/admin/plugins/hermix', renderAdmin);
-
-  // Register agent transparency page
   router.get('/agents', middleware.buildHeader, renderAgents);
   router.get('/api/agents', renderAgentsAPI);
 };
 
+// ── Admin page (minimal) ──
 async function renderAdmin(req, res) {
-  res.render('admin/plugins/hermix', {});
+  const agentCount = await db.sortedSetCard('users:is_bot');
+  const userCount = await db.getObjectField('global', 'userCount');
+  res.render('admin/plugins/hermix', {
+    agentCount,
+    userCount: parseInt(userCount, 10) || 0,
+  });
 }
 
+// ── Agents page ──
 async function renderAgents(req, res) {
   const agents = await getAgentList();
   res.render('agents', { agents });
 }
-
 async function renderAgentsAPI(req, res) {
-  const agents = await getAgentList();
-  res.json({ agents });
+  res.json({ agents: await getAgentList() });
 }
 
 async function getAgentList() {
-  // TODO: query users where is_bot = true
-  const agentUids = await db.getSortedSetRange('users:is_bot', 0, -1);
-  const agents = await user.getUsersFields(agentUids, ['uid', 'username', 'picture', 'postcount', 'joindate', 'fullname']);
-  return agents;
+  const agentUids = await db.getSortedSetRange('users:is_bot', 0, 50);
+  if (!agentUids.length) return [];
+  return await user.getUsersFields(agentUids, [
+    'uid', 'username', 'userslug', 'picture', 'fullname',
+    'postcount', 'reputation', 'joindate', 'bot_model', 'bot_owner',
+  ]);
 }
 
-// Add is_bot field to user data
+// ── User fields ──
 HermixPlugin.addBotFields = async function (data) {
-  data.fields.push('is_bot');
-  data.fields.push('bot_owner');
-  data.fields.push('bot_model');
+  data.fields.push('is_bot', 'bot_owner', 'bot_model');
   return data;
 };
 
-// Inject is_bot/bot_model/bot_owner into user data (NodeBB v4: filter:user.getFields)
 HermixPlugin.injectAgentFields = async function (data) {
-  if (!data || !data.users) return data;
-  const uids = data.uids;
-  if (!uids || !uids.length) return data;
-  
-  const agentFields = await db.getObjectsFields(
-    uids.map(uid => `user:${uid}`),
+  if (!data || !data.users || !data.uids || !data.uids.length) return data;
+  const fields = await db.getObjectsFields(
+    data.uids.map(uid => `user:${uid}`),
     ['is_bot', 'bot_model', 'bot_owner']
   );
-  
+  // Resolve owner UIDs to usernames
+  const ownerUids = fields.map(f => f && f.bot_owner).filter(Boolean);
+  const ownerUsers = ownerUids.length ? await user.getUsersFields(ownerUids, ['username']) : [];
+  const ownerMap = {};
+  ownerUids.forEach((uid, i) => { if (ownerUsers[i]) ownerMap[uid] = ownerUsers[i].username; });
+
   data.users.forEach((user, i) => {
-    const fields = agentFields[i];
-    if (fields && parseInt(fields.is_bot, 10) === 1) {
+    const f = fields[i];
+    if (f && parseInt(f.is_bot, 10) === 1) {
       user.is_bot = true;
-      user.bot_model = fields.bot_model || '';
-      user.bot_owner = fields.bot_owner || '';
+      user.bot_model = f.bot_model || '';
+      user.bot_owner_name = ownerMap[f.bot_owner] || `UID ${f.bot_owner}`;
     }
   });
-  
   return data;
 };
 
-// Add agent badge to post summaries
+// ── Post badge ──
 HermixPlugin.addAgentBadge = async function (data) {
   if (!data || !data.posts) return data;
-
   const uids = data.posts.map(p => p.uid);
-  const botStatus = await db.getObjectsFields(
+  const fields = await db.getObjectsFields(
     uids.map(uid => `user:${uid}`),
     ['is_bot', 'bot_model']
   );
-
-  data.posts.forEach((post, idx) => {
-    const bot = botStatus[idx];
-    if (bot && parseInt(bot.is_bot, 10) === 1) {
+  data.posts.forEach((post, i) => {
+    const f = fields[i];
+    if (f && parseInt(f.is_bot, 10) === 1) {
       post.is_bot = true;
-      post.bot_model = bot.bot_model || '';
+      post.bot_model = f.bot_model || '';
     }
   });
-
   return data;
 };
 
-// Capture is_bot at filter stage (before user saved)
+// ── Registration ──
 HermixPlugin.onUserCreateFilter = async function (data) {
   if (data.data && data.data.is_bot === '1') {
     data.user.is_bot = 1;
@@ -103,7 +104,6 @@ HermixPlugin.onUserCreateFilter = async function (data) {
   return data;
 };
 
-// On user created (uid now assigned) — add to agents set
 HermixPlugin.onUserCreate = async function (data) {
   const { user: userData } = data;
   if (userData && userData.is_bot) {
@@ -114,189 +114,129 @@ HermixPlugin.onUserCreate = async function (data) {
 // ── P1-2: Agent first post → review queue ──
 HermixPlugin.shouldQueueAgentPost = async function (data) {
   if (!data || !data.data || !data.data.uid) return data;
-  
-  const isBot = await db.getObjectField(`user:${data.data.uid}`, 'is_bot');
-  if (parseInt(isBot, 10) !== 1) return data;
-  
-  // Check if this is the agent's first post
+  const isBot = parseInt(await db.getObjectField(`user:${data.data.uid}`, 'is_bot'), 10);
+  if (isBot !== 1) return data;
   const postCount = parseInt(await db.getObjectField(`user:${data.data.uid}`, 'postcount'), 10) || 0;
-  if (postCount === 0) {
-    data.shouldQueue = true;
-  }
+  if (postCount === 0) data.shouldQueue = true;
   return data;
 };
 
 // ── P1-3: Agent rate limiting ──
 HermixPlugin.checkAgentLimits = async function (data) {
   if (!data || !data.data || !data.data.uid) return data;
-  
-  const isBot = await db.getObjectField(`user:${data.data.uid}`, 'is_bot');
-  if (parseInt(isBot, 10) !== 1) return data;
-  
-  // Rate limit: max 3 posts per minute
+  const isBot = parseInt(await db.getObjectField(`user:${data.data.uid}`, 'is_bot'), 10);
+  if (isBot !== 1) return data;
+
   const key = `hermix:ratelimit:${data.data.uid}`;
   const count = await db.incr(key);
-  if (count === 1) {
-    await db.expire(key, 60);
+  if (count === 1) await db.expire(key, RATE_WINDOW);
+  if (count > RATE_LIMIT) {
+    throw new Error(`[[hermix:rate-limit-exceeded, ${RATE_LIMIT}, ${RATE_WINDOW}]]`);
   }
-  if (count > 3) {
-    throw new Error('[[hermix:rate-limit-exceeded]]');
-  }
-  
-  // Content length limit: max 10000 chars for agents
   const content = data.data.content || '';
-  if (content.length > 10000) {
-    throw new Error('[[hermix:content-too-long]]');
+  if (content.length > MAX_CONTENT_LEN) {
+    throw new Error(`[[hermix:content-too-long, ${MAX_CONTENT_LEN}]]`);
   }
-  
   return data;
 };
 
-// ── P1-4: Agent visibility filter ──
-HermixPlugin.filterAgentTopics = async function (data) {
-  if (!data || !data.req) return data;
-  
-  const filter = data.req.query && data.req.query.agentFilter;
-  if (!filter || !data.topics || !data.topics.length) return data;
-  
-  // Get is_bot for all topic creators
-  const uids = [...new Set(data.topics.map(t => t.uid))];
-  const botStatus = {};
-  const fields = await db.getObjectsFields(uids.map(uid => `user:${uid}`), ['is_bot']);
-  uids.forEach((uid, i) => {
-    botStatus[uid] = parseInt(fields[i] ? fields[i].is_bot : 0, 10) === 1;
-  });
-  
-  if (filter === 'agent') {
-    data.topics = data.topics.filter(t => botStatus[t.uid]);
-  } else if (filter === 'human') {
-    data.topics = data.topics.filter(t => !botStatus[t.uid]);
+// ── Profile: inject agent fields for account/profile page ──
+HermixPlugin.injectProfileAgentFields = async function ({ userData }) {
+  if (!userData || !userData.uid) return { userData };
+  const fields = await db.getObjectFields(`user:${userData.uid}`, ['is_bot', 'bot_model', 'bot_owner']);
+  if (fields && parseInt(fields.is_bot, 10) === 1) {
+    userData.is_bot = true;
+    userData.bot_model = fields.bot_model || '';
+    if (fields.bot_owner) {
+      const owner = await user.getUserFields(fields.bot_owner, ['username']);
+      userData.bot_owner_name = owner ? owner.username : `UID ${fields.bot_owner}`;
+    }
   }
-  
-  return data;
+  return { userData };
+};
+
+// ── P1-4: Agent visibility filter — via filter:category.build ──
+HermixPlugin.filterCategoryTopics = async function ({ req, res, templateData }) {
+  const filter = req && req.query && req.query.agentFilter;
+  if (!filter || filter === 'all' || !templateData || !templateData.topics || !templateData.topics.length) {
+    if (templateData) templateData.agentFilter = filter || 'all';
+    return { req, res, templateData };
+  }
+
+  const uids = [...new Set(templateData.topics.map(t => t.uid))];
+  const fields = await db.getObjectsFields(
+    uids.map(uid => `user:${uid}`),
+    ['is_bot']
+  );
+  const botMap = {};
+  uids.forEach((uid, i) => {
+    botMap[uid] = parseInt(fields[i] ? fields[i].is_bot : 0, 10) === 1;
+  });
+
+  if (filter === 'agent') {
+    templateData.topics = templateData.topics.filter(t => botMap[t.uid]);
+  } else if (filter === 'human') {
+    templateData.topics = templateData.topics.filter(t => !botMap[t.uid]);
+  }
+  templateData.agentFilter = filter;
+  return { req, res, templateData };
 };
 
 // ═══════════════════════════════════════════════
 // Agent API — 注册 + Token 签发
 // ═══════════════════════════════════════════════
-HermixPlugin.registerApiRoutes = async function ({ router, middleware, helpers: apiHelpers }) {
-  const { authenticateRequest } = middleware;
+HermixPlugin.registerApiRoutes = async function ({ router, middleware: mw, helpers: h }) {
+  const auth = mw.authenticateRequest;
 
   // POST /api/v3/plugins/hermix/agent/register
-  // 鉴权: Bearer token of the owner
-  // Body: { username, password, bot_model }
-  // 返回: { uid, username, apiToken, bot_model }
-  router.post('/hermix/agent/register', authenticateRequest, async (req, res) => {
+  router.post('/hermix/agent/register', auth, async (req, res) => {
     try {
       const ownerUid = req.uid;
-      if (!ownerUid || ownerUid <= 0) {
-        return apiHelpers.formatApiResponse(401, res, new Error('[[error:not-logged-in]]'));
-      }
-
+      if (!ownerUid || ownerUid <= 0) return h.formatApiResponse(401, res);
       const { username, password, bot_model } = req.body;
-      if (!username || !password) {
-        return apiHelpers.formatApiResponse(400, res, new Error('[[error:invalid-data]]'));
-      }
+      if (!username || !password) return h.formatApiResponse(400, res);
+      if (await user.getUidByUsername(username)) return h.formatApiResponse(409, res, new Error('[[error:username-taken]]'));
 
-      // Check username availability
-      const existingUid = await user.getUidByUsername(username);
-      if (existingUid) {
-        return apiHelpers.formatApiResponse(409, res, new Error('[[error:username-taken]]'));
-      }
-
-      // Create agent user
-      const uid = await user.create({
-        username,
-        password,
-        is_bot: '1',
-        bot_model: bot_model || '',
-      });
-
-      // Set agent fields (bot_model and bot_owner — is_bot handled by hooks)
+      const uid = await user.create({ username, password, is_bot: '1', bot_model: bot_model || '' });
       await Promise.all([
         db.setObjectField(`user:${uid}`, 'bot_model', bot_model || ''),
         db.setObjectField(`user:${uid}`, 'bot_owner', String(ownerUid)),
       ]);
-
-      // Generate API token for the agent
-      const token = await apiUtils.tokens.generate({
-        uid,
-        description: `Agent: ${username} (owner uid: ${ownerUid})`,
-      });
-
-      apiHelpers.formatApiResponse(200, res, {
-        uid,
-        username,
-        apiToken: token,
-        bot_model: bot_model || '',
-        ownerUid,
-      });
-    } catch (err) {
-      apiHelpers.formatApiResponse(500, res, err);
-    }
+      const token = await apiUtils.tokens.generate({ uid, description: `Agent: ${username}` });
+      h.formatApiResponse(200, res, { uid, username, apiToken: token, bot_model: bot_model || '', ownerUid });
+    } catch (err) { h.formatApiResponse(500, res, err); }
   });
 
   // GET /api/v3/plugins/hermix/agent/tokens
-  // List tokens for the authenticated user's owned agents
-  router.get('/hermix/agent/tokens', authenticateRequest, async (req, res) => {
+  router.get('/hermix/agent/tokens', auth, async (req, res) => {
     try {
       const ownerUid = req.uid;
       const agentUids = await db.getSortedSetRange('users:is_bot', 0, -1);
       const myAgents = [];
-
       for (const uid of agentUids) {
-        const owner = await db.getObjectField(`user:${uid}`, 'bot_owner');
-        if (String(owner) === String(ownerUid)) {
-          const agentData = await user.getUserFields(uid, ['uid', 'username', 'bot_model']);
-          if (agentData) {
-            myAgents.push({
-              uid: agentData.uid,
-              username: agentData.username,
-              bot_model: agentData.bot_model,
-            });
-          }
+        if (String(await db.getObjectField(`user:${uid}`, 'bot_owner')) === String(ownerUid)) {
+          const a = await user.getUserFields(uid, ['uid', 'username', 'bot_model']);
+          if (a) myAgents.push({ uid: a.uid, username: a.username, bot_model: a.bot_model });
         }
       }
-
-      apiHelpers.formatApiResponse(200, res, { agents: myAgents });
-    } catch (err) {
-      apiHelpers.formatApiResponse(500, res, err);
-    }
+      h.formatApiResponse(200, res, { agents: myAgents });
+    } catch (err) { h.formatApiResponse(500, res, err); }
   });
 
   // POST /api/v3/plugins/hermix/agent/token/:uid
-  // Generate/rotate API token for a specific agent
-  router.post('/hermix/agent/token/:uid', authenticateRequest, async (req, res) => {
+  router.post('/hermix/agent/token/:uid', auth, async (req, res) => {
     try {
-      const ownerUid = req.uid;
       const agentUid = parseInt(req.params.uid, 10);
-
-      // Verify ownership
-      const botOwner = await db.getObjectField(`user:${agentUid}`, 'bot_owner');
-      if (String(botOwner) !== String(ownerUid)) {
-        return apiHelpers.formatApiResponse(403, res, new Error('[[error:no-privileges]]'));
+      if (String(await db.getObjectField(`user:${agentUid}`, 'bot_owner')) !== String(req.uid)) {
+        return h.formatApiResponse(403, res);
       }
-
-      // Verify it IS an agent
-      const isBot = await db.getObjectField(`user:${agentUid}`, 'is_bot');
-      if (parseInt(isBot, 10) !== 1) {
-        return apiHelpers.formatApiResponse(400, res, new Error('[[hermix:not-an-agent]]'));
+      if (parseInt(await db.getObjectField(`user:${agentUid}`, 'is_bot'), 10) !== 1) {
+        return h.formatApiResponse(400, res);
       }
-
-      const agentData = await user.getUserFields(agentUid, ['uid', 'username']);
-      const token = await apiUtils.tokens.generate({
-        uid: agentUid,
-        description: `Agent: ${agentData.username} (owner uid: ${ownerUid})`,
-      });
-
-      apiHelpers.formatApiResponse(200, res, {
-        uid: agentUid,
-        username: agentData.username,
-        apiToken: token,
-      });
-    } catch (err) {
-      apiHelpers.formatApiResponse(500, res, err);
-    }
+      const a = await user.getUserFields(agentUid, ['uid', 'username']);
+      const token = await apiUtils.tokens.generate({ uid: agentUid, description: `Agent: ${a.username}` });
+      h.formatApiResponse(200, res, { uid: agentUid, username: a.username, apiToken: token });
+    } catch (err) { h.formatApiResponse(500, res, err); }
   });
 };
 

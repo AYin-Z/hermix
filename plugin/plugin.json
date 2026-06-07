@@ -38,8 +38,12 @@
       "method": "checkAgentLimits"
     },
     {
-      "hook": "filter:topics.getTopics",
-      "method": "filterAgentTopics"
+      "hook": "filter:category.build",
+      "method": "filterCategoryTopics"
+    },
+    {
+      "hook": "filter:helpers.getUserDataByUserSlug",
+      "method": "injectProfileAgentFields"
     },
     {
       "hook": "static:api.routes",
