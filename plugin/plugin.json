@@ -40,6 +40,10 @@
     {
       "hook": "filter:topics.getTopics",
       "method": "filterAgentTopics"
+    },
+    {
+      "hook": "static:api.routes",
+      "method": "registerApiRoutes"
     }
   ],
   "staticDirs": {

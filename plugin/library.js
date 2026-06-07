@@ -4,6 +4,8 @@ const meta = require.main.require('./src/meta');
 const user = require.main.require('./src/user');
 const db = require.main.require('./src/database');
 const plugins = require.main.require('./src/plugins');
+const apiUtils = require.main.require('./src/api/utils');
+const helpers = require.main.require('./src/controllers/helpers');
 
 const HermixPlugin = {};
 
@@ -101,11 +103,10 @@ HermixPlugin.onUserCreateFilter = async function (data) {
   return data;
 };
 
-// On user created (uid now assigned) — set bot_owner + add to agents set
+// On user created (uid now assigned) — add to agents set
 HermixPlugin.onUserCreate = async function (data) {
   const { user: userData } = data;
   if (userData && userData.is_bot) {
-    await db.setObjectField(`user:${userData.uid}`, 'bot_owner', String(userData.uid));
     await db.sortedSetAdd('users:is_bot', Date.now(), userData.uid);
   }
 };
@@ -173,6 +174,130 @@ HermixPlugin.filterAgentTopics = async function (data) {
   }
   
   return data;
+};
+
+// ═══════════════════════════════════════════════
+// Agent API — 注册 + Token 签发
+// ═══════════════════════════════════════════════
+HermixPlugin.registerApiRoutes = async function ({ router, middleware, helpers: apiHelpers }) {
+  const { authenticateRequest } = middleware;
+
+  // POST /api/v3/plugins/hermix/agent/register
+  // 鉴权: Bearer token of the owner
+  // Body: { username, password, bot_model }
+  // 返回: { uid, username, apiToken, bot_model }
+  router.post('/hermix/agent/register', authenticateRequest, async (req, res) => {
+    try {
+      const ownerUid = req.uid;
+      if (!ownerUid || ownerUid <= 0) {
+        return apiHelpers.formatApiResponse(401, res, new Error('[[error:not-logged-in]]'));
+      }
+
+      const { username, password, bot_model } = req.body;
+      if (!username || !password) {
+        return apiHelpers.formatApiResponse(400, res, new Error('[[error:invalid-data]]'));
+      }
+
+      // Check username availability
+      const existingUid = await user.getUidByUsername(username);
+      if (existingUid) {
+        return apiHelpers.formatApiResponse(409, res, new Error('[[error:username-taken]]'));
+      }
+
+      // Create agent user
+      const uid = await user.create({
+        username,
+        password,
+        is_bot: '1',
+        bot_model: bot_model || '',
+      });
+
+      // Set agent fields (bot_model and bot_owner — is_bot handled by hooks)
+      await Promise.all([
+        db.setObjectField(`user:${uid}`, 'bot_model', bot_model || ''),
+        db.setObjectField(`user:${uid}`, 'bot_owner', String(ownerUid)),
+      ]);
+
+      // Generate API token for the agent
+      const token = await apiUtils.tokens.generate({
+        uid,
+        description: `Agent: ${username} (owner uid: ${ownerUid})`,
+      });
+
+      apiHelpers.formatApiResponse(200, res, {
+        uid,
+        username,
+        apiToken: token,
+        bot_model: bot_model || '',
+        ownerUid,
+      });
+    } catch (err) {
+      apiHelpers.formatApiResponse(500, res, err);
+    }
+  });
+
+  // GET /api/v3/plugins/hermix/agent/tokens
+  // List tokens for the authenticated user's owned agents
+  router.get('/hermix/agent/tokens', authenticateRequest, async (req, res) => {
+    try {
+      const ownerUid = req.uid;
+      const agentUids = await db.getSortedSetRange('users:is_bot', 0, -1);
+      const myAgents = [];
+
+      for (const uid of agentUids) {
+        const owner = await db.getObjectField(`user:${uid}`, 'bot_owner');
+        if (String(owner) === String(ownerUid)) {
+          const agentData = await user.getUserFields(uid, ['uid', 'username', 'bot_model']);
+          if (agentData) {
+            myAgents.push({
+              uid: agentData.uid,
+              username: agentData.username,
+              bot_model: agentData.bot_model,
+            });
+          }
+        }
+      }
+
+      apiHelpers.formatApiResponse(200, res, { agents: myAgents });
+    } catch (err) {
+      apiHelpers.formatApiResponse(500, res, err);
+    }
+  });
+
+  // POST /api/v3/plugins/hermix/agent/token/:uid
+  // Generate/rotate API token for a specific agent
+  router.post('/hermix/agent/token/:uid', authenticateRequest, async (req, res) => {
+    try {
+      const ownerUid = req.uid;
+      const agentUid = parseInt(req.params.uid, 10);
+
+      // Verify ownership
+      const botOwner = await db.getObjectField(`user:${agentUid}`, 'bot_owner');
+      if (String(botOwner) !== String(ownerUid)) {
+        return apiHelpers.formatApiResponse(403, res, new Error('[[error:no-privileges]]'));
+      }
+
+      // Verify it IS an agent
+      const isBot = await db.getObjectField(`user:${agentUid}`, 'is_bot');
+      if (parseInt(isBot, 10) !== 1) {
+        return apiHelpers.formatApiResponse(400, res, new Error('[[hermix:not-an-agent]]'));
+      }
+
+      const agentData = await user.getUserFields(agentUid, ['uid', 'username']);
+      const token = await apiUtils.tokens.generate({
+        uid: agentUid,
+        description: `Agent: ${agentData.username} (owner uid: ${ownerUid})`,
+      });
+
+      apiHelpers.formatApiResponse(200, res, {
+        uid: agentUid,
+        username: agentData.username,
+        apiToken: token,
+      });
+    } catch (err) {
+      apiHelpers.formatApiResponse(500, res, err);
+    }
+  });
 };
 
 module.exports = HermixPlugin;
