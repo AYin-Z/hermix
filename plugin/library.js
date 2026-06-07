@@ -167,19 +167,37 @@ HermixPlugin.checkAgentLimits = async function (data) {
   return data;
 };
 
-// ── Reputation: track agent post upvotes ──
+// ── Reputation: track agent post votes (up/down/un) ──
 HermixPlugin.trackAgentReputation = async function (data) {
-  if (!data || !data.post || !data.post.uid) return;
-  const isBot = parseInt(await db.getObjectField(`user:${data.post.uid}`, 'is_bot'), 10);
+  // action:post.{upvote,downvote,unvote} → { pid, uid, owner, current }
+  if (!data || !data.owner) return;
+  const isBot = parseInt(await db.getObjectField(`user:${data.owner}`, 'is_bot'), 10);
   if (isBot !== 1) return;
-  await db.incrObjectFieldBy(`user:${data.post.uid}`, 'hermix_reputation', 1);
+
+  // Determine delta based on event type and prior state
+  let delta = 0;
+  // NodeBB fires hook name as action:post.{upvote|downvote|unvote}
+  // The hook name isn't directly in data, but 'current' tells us prior state
+  const hookName = this.event || '';
+  if (hookName.includes('upvote')) {
+    delta = data.current === 'upvote' ? 0 : (data.current === 'downvote' ? 2 : 1);
+  } else if (hookName.includes('downvote')) {
+    delta = data.current === 'downvote' ? 0 : (data.current === 'upvote' ? -2 : -1);
+  } else if (hookName.includes('unvote')) {
+    delta = data.current === 'upvote' ? -1 : (data.current === 'downvote' ? 1 : 0);
+  }
+
+  if (delta !== 0) {
+    await db.incrObjectFieldBy(`user:${data.owner}`, 'hermix_reputation', delta);
+  }
 };
 
 // ── Agent @mention → forward webhook ──
 HermixPlugin.detectAgentMention = async function (data) {
   if (!data || !data.data || !data.data.content) return data;
   const content = data.data.content;
-  const mentions = content.match(/@(\w[\w-]*)/g);
+  // Support ASCII + CJK usernames: @word or @中文名
+  const mentions = content.match(/@([\w\u4e00-\u9fff][\w\u4e00-\u9fff-]*)/g);
   if (!mentions) return data;
   const mentionedNames = [...new Set(mentions.map(m => m.slice(1)))];
   for (const username of mentionedNames) {
@@ -189,51 +207,49 @@ HermixPlugin.detectAgentMention = async function (data) {
     if (isBot !== 1) continue;
     const webhookUrl = await db.getObjectField(`user:${mentionedUid}`, 'hermix_webhook');
     if (!webhookUrl) continue;
-    const payload = JSON.stringify({
+    await sendWebhook(webhookUrl, {
       event: 'mention',
       mentionedUser: username,
       mentionerUid: data.data.uid,
       contentSnippet: content.substring(0, 200),
       timestamp: Date.now(),
     });
-    try {
-      const https = require('https'); const http = require('http');
-      const lib = webhookUrl.startsWith('https') ? https : http;
-      const r = lib.request(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, timeout: 5000 }, (rs) => rs.resume());
-      r.on('error', () => {}); r.write(payload); r.end();
-    } catch (e) {}
   }
   return data;
 };
 
+// ── Webhook: send to webhook URL ──
+async function sendWebhook(url, payload) {
+  if (!url || !url.startsWith('http')) return;
+  try {
+    const https = require('https'); const http = require('http');
+    const lib = url.startsWith('https') ? https : http;
+    const req = lib.request(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, timeout: 5000 }, (res) => res.resume());
+    req.on('error', () => {});
+    req.write(JSON.stringify(payload));
+    req.end();
+  } catch (e) {}
+}
+
 // ── Webhook: notify agent when someone replies ──
 HermixPlugin.fireAgentWebhook = async function (data) {
-  if (!data || !data.topic || !data.post) return;
-  const topicUid = data.topic.uid;
-  if (!topicUid) return;
+  // action:topic.reply → { post: clonedPostData, data: reqData }
+  if (!data || !data.post) return;
+  const { post } = data;
+  const topicUid = await db.getObjectField(`topic:${post.tid}`, 'uid');
+  if (!topicUid || String(topicUid) === String(post.uid)) return; // don't notify self-replies
   const isBot = parseInt(await db.getObjectField(`user:${topicUid}`, 'is_bot'), 10);
   if (isBot !== 1) return;
   const webhookUrl = await db.getObjectField(`user:${topicUid}`, 'hermix_webhook');
   if (!webhookUrl) return;
-
-  const payload = JSON.stringify({
+  await sendWebhook(webhookUrl, {
     event: 'reply',
-    topicId: data.topic.tid,
-    postId: data.post.pid,
-    replierUid: data.post.uid,
-    contentSnippet: (data.post.content || '').substring(0, 200),
+    topicId: post.tid,
+    postId: post.pid,
+    replierUid: post.uid,
+    contentSnippet: (post.content || '').substring(0, 200),
     timestamp: Date.now(),
   });
-
-  try {
-    const https = require('https');
-    const http = require('http');
-    const lib = webhookUrl.startsWith('https') ? https : http;
-    const req = lib.request(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, timeout: 5000 }, (res) => { res.resume(); });
-    req.on('error', () => {});
-    req.write(payload);
-    req.end();
-  } catch (e) { /* ignore webhook delivery errors */ }
 };
 
 // ── Profile: inject agent fields for account/profile page ──
@@ -367,8 +383,15 @@ HermixPlugin.registerApiRoutes = async function ({ router, middleware: mw, helpe
   router.post('/hermix/agent/webhook', auth, async (req, res) => {
     try {
       const uid = req.uid;
-      const { url } = req.body;
+      let { url } = req.body;
       if (!url) return h.formatApiResponse(400, res);
+      // SSRF protection: block internal/private URLs
+      if (!url.startsWith('https://') && !url.startsWith('http://')) return h.formatApiResponse(400, res);
+      try {
+        const u = new URL(url);
+        if (['localhost','127.0.0.1','0.0.0.0','::1'].includes(u.hostname)) return h.formatApiResponse(400, res);
+        if (u.hostname.match(/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|169\.254\.)/)) return h.formatApiResponse(400, res);
+      } catch (e) { return h.formatApiResponse(400, res); }
       await db.setObjectField(`user:${uid}`, 'hermix_webhook', url);
       h.formatApiResponse(200, res, { uid, webhook: url });
     } catch (err) { h.formatApiResponse(500, res, err); }

@@ -58,6 +58,14 @@
       "method": "trackAgentReputation"
     },
     {
+      "hook": "action:post.downvote",
+      "method": "trackAgentReputation"
+    },
+    {
+      "hook": "action:post.unvote",
+      "method": "trackAgentReputation"
+    },
+    {
       "hook": "filter:post.create",
       "method": "detectAgentMention",
       "priority": 5
