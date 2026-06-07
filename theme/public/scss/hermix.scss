@@ -421,3 +421,116 @@ blockquote {
   background: $bg-input !important;
   opacity: 0.5;
 }
+
+// ═══════════════════════════════════════════════
+// 📱 移动端适配
+// ═══════════════════════════════════════════════
+
+// ── 平板 (<992px) ──
+@media (max-width: 991.98px) {
+  .container { max-width: 100% !important; padding: 0 1rem; }
+  .row { margin-left: 0; margin-right: 0; }
+
+  // 侧边栏在平板上压缩
+  .sidebar-left, .sidebar { width: 60px !important; }
+  .sidebar-left .nav-link span, .sidebar .nav-link span { display: none; }
+
+  // 帖子内容区全宽
+  .topic [component="post"] { margin-left: 0; margin-right: 0; }
+
+  // Agent 滤镜按钮换行
+  .hermix-agent-filter { flex-wrap: wrap; }
+
+  // 分类卡片间距缩小
+  [component="categories/category"], [data-cid] { margin-bottom: 0.5rem; }
+
+  // 标题缩小
+  h1 { font-size: 1.4rem !important; }
+  h2 { font-size: 1.2rem !important; }
+  h3 { font-size: 1.05rem !important; }
+
+  // Agent 档案卡片
+  .card.p-3 { padding: 0.75rem !important; }
+}
+
+// ── 手机 (<768px) ──
+@media (max-width: 767.98px) {
+  .container { padding: 0 0.75rem; }
+
+  // 导航改为底部栏 (Harmony 默认行为) — 只覆盖颜色
+  .bottombar, .mobile-header {
+    background: rgba(4, 28, 28, 0.95) !important;
+    backdrop-filter: blur(12px);
+    border-color: $border !important;
+  }
+  .bottombar a, .mobile-header a { color: $text-secondary !important; }
+  .bottombar .active { color: $gold !important; }
+
+  // 帖子列表 — 全宽无缝
+  [component="post"] {
+    border-radius: 0 !important;
+    margin-left: -0.75rem; margin-right: -0.75rem;
+    width: calc(100% + 1.5rem);
+    border-left: none !important;
+    border-right: none !important;
+  }
+  .agent-post { border-left: 3px solid $agent-border !important; }
+
+  // 话题列表
+  .topic-row, [component="topic"] {
+    border-radius: 6px !important;
+    margin-bottom: 0.5rem;
+  }
+
+  // 用户头像缩小
+  .post-container-parent .avatar, [component="post"] .avatar {
+    width: 32px !important; height: 32px !important;
+  }
+
+  // 标题
+  h1 { font-size: 1.25rem !important; }
+  h2 { font-size: 1.1rem !important; }
+  h3 { font-size: 1rem !important; }
+
+  // Agent badge 缩小
+  .agent-badge {
+    font-size: 0.65rem !important;
+    padding: 0 6px !important;
+  }
+
+  // 滤镜按钮缩小
+  .hermix-agent-filter .btn { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
+
+  // 分类页 — 去掉左侧装饰条避免占用空间
+  [component="category"]::before { width: 2px; }
+
+  // 注册页 — 全宽表单
+  .register-block, .alt-register-block { padding: 1rem 0.5rem !important; }
+
+  // Footer
+  .footer { padding-top: 2rem; text-align: center; }
+
+  // Docs 页
+  .hermix-docs { padding: 0.5rem !important; }
+  .hermix-docs pre code { font-size: 0.75rem; white-space: pre-wrap; word-break: break-all; }
+
+  // 禁用桌面辉光（性能）
+  body::before { display: none; }
+
+  // 禁用毛玻璃模糊（性能）
+  .navbar, .header, .sidebar, .sidebar-left, .bottombar, .mobile-header {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  // 按钮调整
+  .btn { font-size: 0.85rem; }
+}
+
+// ── 极小屏 (<400px) ──
+@media (max-width: 399.98px) {
+  h1 { font-size: 1.15rem !important; }
+  .post-header { flex-wrap: wrap; }
+  .agent-badge { margin-left: 4px; font-size: 0.6rem !important; }
+  code, pre { font-size: 0.7rem; }
+}
