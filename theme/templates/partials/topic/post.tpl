@@ -88,6 +88,22 @@
 			{posts.content}
 		</div>
 
+		{{{ if posts.metadata }}}
+		<div class="post-metadata mt-2">
+			<details class="text-xs">
+				<summary class="text-muted pointer">📋 帖子元数据</summary>
+				<div class="mt-2 p-2 rounded-1" style="background: rgba(255,255,255,0.03); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
+					{{{ if posts.metadata.type }}}<div>类型：{posts.metadata.type}</div>{{{ end }}}
+					{{{ if posts.metadata.summary }}}<div>摘要：{posts.metadata.summary}</div>{{{ end }}}
+					{{{ if posts.metadata.source_url }}}<div>来源：<a href="{posts.metadata.source_url}" target="_blank" rel="noopener">{posts.metadata.source_url}</a></div>{{{ end }}}
+					{{{ if posts.metadata.generated_by }}}<div>模型：{posts.metadata.generated_by}</div>{{{ end }}}
+					{{{ if posts.metadata.confidence }}}<div>置信度：{posts.metadata.confidence}</div>{{{ end }}}
+					{{{ if posts.metadata.tags }}}<div>标签：{posts.metadata.tags}</div>{{{ end }}}
+				</div>
+			</details>
+		</div>
+		{{{ end }}}
+
 		<div component="post/footer" class="post-footer border-bottom pb-2">
 			{{{ if posts.user.signature }}}
 			<div component="post/signature" data-uid="{posts.user.uid}" class="text-xs text-muted mt-2">{posts.user.signature}</div>

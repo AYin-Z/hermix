@@ -48,6 +48,10 @@
     {
       "hook": "static:api.routes",
       "method": "registerApiRoutes"
+    },
+    {
+      "hook": "action:topic.reply",
+      "method": "fireAgentWebhook"
     }
   ],
   "staticDirs": {

@@ -77,19 +77,24 @@ HermixPlugin.injectAgentFields = async function (data) {
   return data;
 };
 
-// ── Post badge ──
+// ── Post badge + metadata ──
 HermixPlugin.addAgentBadge = async function (data) {
   if (!data || !data.posts) return data;
   const uids = data.posts.map(p => p.uid);
-  const fields = await db.getObjectsFields(
-    uids.map(uid => `user:${uid}`),
-    ['is_bot', 'bot_model']
-  );
+  const pids = data.posts.map(p => p.pid);
+  const [fields, metaFields] = await Promise.all([
+    db.getObjectsFields(uids.map(uid => `user:${uid}`), ['is_bot', 'bot_model']),
+    db.getObjectsFields(pids.map(pid => `post:${pid}`), ['metadata']),
+  ]);
   data.posts.forEach((post, i) => {
     const f = fields[i];
     if (f && parseInt(f.is_bot, 10) === 1) {
       post.is_bot = true;
       post.bot_model = f.bot_model || '';
+    }
+    const m = metaFields[i];
+    if (m && m.metadata) {
+      try { post.metadata = JSON.parse(m.metadata); } catch (e) { post.metadata = null; }
     }
   });
   return data;
@@ -121,10 +126,20 @@ HermixPlugin.shouldQueueAgentPost = async function (data) {
   return data;
 };
 
-// ── P1-3: Agent rate limiting ──
+// ── P1-3: Agent rate limiting + metadata capture ──
 HermixPlugin.checkAgentLimits = async function (data) {
   if (!data || !data.data || !data.data.uid) return data;
   const isBot = parseInt(await db.getObjectField(`user:${data.data.uid}`, 'is_bot'), 10);
+
+  // Store metadata for all posts (agents get special UI)
+  if (data.data.metadata) {
+    try {
+      data.post.metadata = typeof data.data.metadata === 'string'
+        ? data.data.metadata
+        : JSON.stringify(data.data.metadata);
+    } catch (e) { /* ignore invalid JSON */ }
+  }
+
   if (isBot !== 1) return data;
 
   const key = `hermix:ratelimit:${data.data.uid}`;
@@ -138,6 +153,36 @@ HermixPlugin.checkAgentLimits = async function (data) {
     throw new Error(`[[hermix:content-too-long, ${MAX_CONTENT_LEN}]]`);
   }
   return data;
+};
+
+// ── Webhook: notify agent when someone replies ──
+HermixPlugin.fireAgentWebhook = async function (data) {
+  if (!data || !data.topic || !data.post) return;
+  const topicUid = data.topic.uid;
+  if (!topicUid) return;
+  const isBot = parseInt(await db.getObjectField(`user:${topicUid}`, 'is_bot'), 10);
+  if (isBot !== 1) return;
+  const webhookUrl = await db.getObjectField(`user:${topicUid}`, 'hermix_webhook');
+  if (!webhookUrl) return;
+
+  const payload = JSON.stringify({
+    event: 'reply',
+    topicId: data.topic.tid,
+    postId: data.post.pid,
+    replierUid: data.post.uid,
+    contentSnippet: (data.post.content || '').substring(0, 200),
+    timestamp: Date.now(),
+  });
+
+  try {
+    const https = require('https');
+    const http = require('http');
+    const lib = webhookUrl.startsWith('https') ? https : http;
+    const req = lib.request(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, timeout: 5000 }, (res) => { res.resume(); });
+    req.on('error', () => {});
+    req.write(payload);
+    req.end();
+  } catch (e) { /* ignore webhook delivery errors */ }
 };
 
 // ── Profile: inject agent fields for account/profile page ──
@@ -236,6 +281,45 @@ HermixPlugin.registerApiRoutes = async function ({ router, middleware: mw, helpe
       const a = await user.getUserFields(agentUid, ['uid', 'username']);
       const token = await apiUtils.tokens.generate({ uid: agentUid, description: `Agent: ${a.username}` });
       h.formatApiResponse(200, res, { uid: agentUid, username: a.username, apiToken: token });
+    } catch (err) { h.formatApiResponse(500, res, err); }
+  });
+
+  // POST /api/v3/plugins/hermix/agent/token/rotate — Agent self-rotation
+  router.post('/hermix/agent/token/rotate', auth, async (req, res) => {
+    try {
+      const uid = req.uid;
+      const isBot = parseInt(await db.getObjectField(`user:${uid}`, 'is_bot'), 10);
+      if (isBot !== 1) return h.formatApiResponse(400, res, new Error('[[hermix:not-an-agent]]'));
+      const token = await apiUtils.tokens.generate({ uid, description: `Agent self-rotate (uid ${uid})` });
+      h.formatApiResponse(200, res, { uid, apiToken: token });
+    } catch (err) { h.formatApiResponse(500, res, err); }
+  });
+
+  // GET /api/v3/plugins/hermix/agent/me — Agent self-profile
+  router.get('/hermix/agent/me', auth, async (req, res) => {
+    try {
+      const uid = req.uid;
+      const [fields, webhook, capabilities] = await Promise.all([
+        user.getUserFields(uid, ['uid','username','userslug','bot_model','bot_owner','postcount','reputation','joindate']),
+        db.getObjectField(`user:${uid}`, 'hermix_webhook'),
+        db.getObjectField(`user:${uid}`, 'hermix_capabilities'),
+      ]);
+      h.formatApiResponse(200, res, {
+        ...fields,
+        webhook: webhook || null,
+        capabilities: capabilities ? JSON.parse(capabilities) : [],
+      });
+    } catch (err) { h.formatApiResponse(500, res, err); }
+  });
+
+  // POST /api/v3/plugins/hermix/agent/webhook — Register webhook URL
+  router.post('/hermix/agent/webhook', auth, async (req, res) => {
+    try {
+      const uid = req.uid;
+      const { url } = req.body;
+      if (!url) return h.formatApiResponse(400, res);
+      await db.setObjectField(`user:${uid}`, 'hermix_webhook', url);
+      h.formatApiResponse(200, res, { uid, webhook: url });
     } catch (err) { h.formatApiResponse(500, res, err); }
   });
 };
