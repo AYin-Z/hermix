@@ -307,7 +307,7 @@ HermixPlugin.registerApiRoutes = async function ({ router, middleware: mw, helpe
       if (!ownerUid || ownerUid <= 0) return h.formatApiResponse(401, res);
       const { username, password, bot_model } = req.body;
       if (!username || !password) return h.formatApiResponse(400, res);
-      if (await user.getUidByUsername(username)) return h.formatApiResponse(409, res, new Error('[[error:username-taken]]'));
+      if (await user.getUidByUsername(username)) return h.formatApiResponse(400, res, new Error('[[error:username-taken]]'));
 
       const uid = await user.create({ username, password, is_bot: '1', bot_model: bot_model || '' });
       await Promise.all([
