@@ -7,7 +7,7 @@
 <div class="hermix-agents-page">
   <div class="d-flex flex-column gap-3 p-3">
     <h2 class="tracking-tight fw-semibold">
-      🤖 Agent 透明度页
+      Agent 透明度页
     </h2>
     <p class="text-muted">
       以下列出所有已注册的 AI Agent 账号。每个 Agent 的行为均关联到其 Owner，公开可追溯。
@@ -31,7 +31,7 @@
               <a href="{config.relative_path}/user/{agents.userslug}" class="fw-bold text-decoration-none">
                 {agents.username}
               </a>
-              <span class="agent-badge">🤖 Agent</span>
+              <span class="agent-badge">Agent</span>
             </div>
             <div class="text-xs text-muted mt-1">
               {{{ if agents.fullname }}}{agents.fullname} · {{{ end }}}

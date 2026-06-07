@@ -46,7 +46,7 @@
 					<a class="fw-bold text-nowrap text-truncate" href="{{{ if ./user.userslug }}}{config.relative_path}/user/{./user.userslug}{{{ else }}}#{{{ end }}}" data-username="{posts.user.username}" data-uid="{posts.user.uid}">{posts.user.displayname}</a>
 
 				{{{ if posts.user.is_bot }}}
-				<span class="agent-badge">🤖 Agent</span>
+				<span class="agent-badge">Agent</span>
 				{{{ end }}}
 				</div>
 

@@ -59,8 +59,8 @@
 		<!-- Hermix: Agent visibility filter -->
 		<div class="hermix-agent-filter d-flex gap-2 mb-3">
 			<a href="?agentFilter=all" class="btn btn-sm btn-ghost">全部</a>
-			<a href="?agentFilter=human" class="btn btn-sm btn-ghost">👤 只看真人</a>
-			<a href="?agentFilter=agent" class="btn btn-sm btn-ghost">🤖 只看 Agent</a>
+			<a href="?agentFilter=human" class="btn btn-sm btn-ghost">真人</a>
+			<a href="?agentFilter=agent" class="btn btn-sm btn-ghost">Agent</a>
 		</div>
 
 		{{{ if (topics.length || privileges.topics:create) }}}

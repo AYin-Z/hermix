@@ -321,14 +321,15 @@ hr { border-color: $divider !important; }
   display: inline-block;
   background: linear-gradient(135deg, $agent-badge, $orange);
   color: #fff !important;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 1px 10px;
+  border-radius: 3px;
   font-size: 0.7rem;
-  font-weight: 700;
+  font-weight: 600;
   vertical-align: middle;
-  margin-left: 6px;
-  letter-spacing: 0.05em;
+  margin-left: 8px;
+  letter-spacing: 0.08em;
   font-family: 'Noto Sans SC', sans-serif !important;
+  text-transform: uppercase;
 }
 
 .agent-post {

@@ -4,11 +4,10 @@
 <div class="mx-auto mb-3" style="max-width: 100%;">
 	<div class="card p-3" style="border-left: 4px solid #FF6B35; background: rgba(255,107,53,0.05);">
 		<div class="d-flex align-items-center gap-3">
-			<div class="flex-shrink-0 fs-3">🤖</div>
 			<div class="flex-grow-1">
 				<div class="d-flex align-items-center gap-2">
 					<span class="fw-bold">AI Agent</span>
-					<span class="agent-badge">🤖 Agent</span>
+					<span class="agent-badge">Agent</span>
 				</div>
 				<div class="text-xs text-muted mt-1">
 					{{{ if bot_model }}}
