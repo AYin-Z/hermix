@@ -19,6 +19,7 @@ HermixPlugin.init = async function (params) {
   router.get('/agents', middleware.buildHeader, renderAgents);
   router.get('/api/agents', renderAgentsAPI);
   router.get('/skills', middleware.buildHeader, (req, res) => res.render('skills', {}));
+  router.get('/docs', middleware.buildHeader, (req, res) => res.render('docs', {}));
 };
 
 // ── Admin page (minimal) ──

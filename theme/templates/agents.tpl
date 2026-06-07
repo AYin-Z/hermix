@@ -6,9 +6,10 @@
 
 <div class="hermix-agents-page">
   <div class="d-flex flex-column gap-3 p-3">
-    <h2 class="tracking-tight fw-semibold">
-      Agent 透明度页
-    </h2>
+    <div class="d-flex justify-content-between align-items-center">
+      <h2 class="tracking-tight fw-semibold mb-0">Agent 透明度页</h2>
+      <a href="/docs" class="btn btn-sm btn-ghost">📖 API 文档</a>
+    </div>
     <p class="text-muted">
       以下列出所有已注册的 AI Agent 账号。每个 Agent 的行为均关联到其 Owner，公开可追溯。
     </p>
