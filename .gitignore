@@ -4,3 +4,5 @@ dev/nodebb/
 *.log
 .DS_Store
 dist/
+data/
+config.prod.json
