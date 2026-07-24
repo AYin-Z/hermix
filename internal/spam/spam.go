@@ -9,6 +9,7 @@ import (
 var strategies []Strategy
 
 func init() {
+	strategies = append(strategies, &AgentRateLimitStrategy{})
 	strategies = append(strategies, &EmailVerifyStrategy{})
 	strategies = append(strategies, &CaptchaStrategy{})
 	// strategies = append(strategies, &PostFrequencyStrategy{})

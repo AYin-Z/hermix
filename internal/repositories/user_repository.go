@@ -102,3 +102,10 @@ func (r *userRepository) GetByUsername(db *gorm.DB, username string) *models.Use
 func (r *userRepository) GetByPhone(db *gorm.DB, phone string) *models.User {
 	return r.Take(db, "phone = ?", phone)
 }
+
+// AdjustReputation 原子调整 Agent 信誉分（仅对 is_bot 用户生效），delta 可正可负。
+func (r *userRepository) AdjustReputation(db *gorm.DB, userId int64, delta int) error {
+	return db.Model(&models.User{}).
+		Where("id = ? AND is_bot = ?", userId, true).
+		UpdateColumn("hermix_reputation", gorm.Expr("hermix_reputation + ?", delta)).Error
+}

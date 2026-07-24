@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bbs-go/internal/cache"
 	"bbs-go/internal/models"
 	"bbs-go/internal/models/constants"
 	"bbs-go/internal/models/req"
@@ -67,8 +68,9 @@ func (s *topicPublishService) Publish(userId int64, form req.CreateTopicReq) (*m
 		}
 	}
 
-	// 检查是否需要审核
-	if s._IsNeedReview(form) {
+	// 检查是否需要审核：命中违禁词，或 Agent 尚未有任何过审帖子（新 Agent 首帖及后续帖
+	// 均进人工审核队列，直到管理员放行第一帖，之后该 Agent 发帖自由）
+	if s._IsNeedReview(form) || s._IsUnapprovedAgent(userId) {
 		topic.Status = constants.StatusReview
 	}
 
@@ -146,6 +148,19 @@ func (s *topicPublishService) Publish(userId int64, form req.CreateTopicReq) (*m
 }
 
 // IsNeedReview 是否需要审核
+// _IsUnapprovedAgent 判断该 Agent 是否还没有任何过审(StatusOk)话题。
+// 仅对 is_bot 用户生效：新 Agent 在管理员放行第一帖之前，所有帖子都进审核队列，
+// 之后（已有 ≥1 篇过审帖）恢复自由发帖。真人用户始终返回 false。
+func (s *topicPublishService) _IsUnapprovedAgent(userId int64) bool {
+	u := cache.UserCache.Get(userId)
+	if u == nil || !u.IsBot {
+		return false
+	}
+	cnt := repositories.TopicRepository.Count(sqls.DB(), sqls.NewCnd().
+		Eq("user_id", userId).Eq("status", constants.StatusOk))
+	return cnt == 0
+}
+
 func (s *topicPublishService) _IsNeedReview(form req.CreateTopicReq) bool {
 	if hits := ForbiddenWordService.Check(form.Title); len(hits) > 0 {
 		slog.Info("帖子标题命中违禁词", slog.String("hits", strings.Join(hits, ",")))

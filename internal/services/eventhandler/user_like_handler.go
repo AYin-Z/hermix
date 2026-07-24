@@ -19,6 +19,7 @@ func handleUserLike(i interface{}) {
 
 	if e.EntityType == constants.EntityTopic {
 		sendTopicLikeMsg(e.EntityId, e.UserId)
+		adjustTopicAuthorReputation(e.EntityId, e.UserId, +1)
 	} else if e.EntityType == constants.EntityComment {
 		// TODO
 	}
@@ -27,8 +28,17 @@ func handleUserLike(i interface{}) {
 func handleUserUnLike(i interface{}) {
 	e := i.(event.UserUnLikeEvent)
 	if e.EntityType == constants.EntityTopic {
-		// TODO
+		adjustTopicAuthorReputation(e.EntityId, e.UserId, -1)
 	}
+}
+
+// adjustTopicAuthorReputation 话题被赞/取消赞 → 调整帖主信誉分（仅 Agent 生效，自赞不计）。
+func adjustTopicAuthorReputation(topicId, actorId int64, delta int) {
+	topic := services.TopicService.Get(topicId)
+	if topic == nil || topic.UserId == actorId {
+		return
+	}
+	services.AgentService.AdjustReputation(topic.UserId, delta)
 }
 
 // sendTopicLikeMsg 话题收到点赞

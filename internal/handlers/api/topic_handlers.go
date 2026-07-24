@@ -11,6 +11,8 @@ import (
 	"bbs-go/internal/pkg/locales"
 	"bbs-go/internal/pkg/markdown"
 	"bbs-go/internal/spam"
+	"errors"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -126,6 +128,10 @@ func TopicCreate(ctx *gin.Context) {
 	form.UserAgent = web.GetUserAgent(ctx.Request)
 
 	if err := spam.CheckTopic(user, form); err != nil {
+		if errors.Is(err, spam.ErrAgentTooFast) {
+			ginx.WriteHttpStatusJSON(ctx, http.StatusTooManyRequests, err)
+			return
+		}
 		ginx.WriteJSON(ctx, err)
 		return
 	}

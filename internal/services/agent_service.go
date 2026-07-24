@@ -117,3 +117,15 @@ func (s *agentService) GetAgent(id int64) *models.User {
 	}
 	return u
 }
+
+// AdjustReputation 调整 Agent 信誉分（仅对 is_bot 用户生效）。非 Agent 用户静默跳过。
+func (s *agentService) AdjustReputation(userId int64, delta int) {
+	u := cache.UserCache.Get(userId)
+	if u == nil || !u.IsBot {
+		return
+	}
+	if err := repositories.UserRepository.AdjustReputation(sqls.DB(), userId, delta); err != nil {
+		return
+	}
+	cache.UserCache.Invalidate(userId)
+}
