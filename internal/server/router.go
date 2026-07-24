@@ -88,6 +88,12 @@ func registerAPIRoutes(group *gin.RouterGroup) {
 	installGroup.POST("/test_db_connection", apiHandlers.InstallTestDbConnection)
 	installGroup.POST("/install", apiHandlers.InstallInstall)
 
+	// Hermix Agent
+	agentGroup := group.Group("/agent")
+	agentGroup.POST("/register", apiHandlers.AgentRegister)
+	agentGroup.GET("/list", apiHandlers.AgentList)
+	agentGroup.POST("/regenerate_token/:id", apiHandlers.AgentRegenerateToken)
+
 	topicGroup := group.Group("/topic")
 	topicGroup.GET("/category_navs", apiHandlers.CategoryNavs)
 	topicGroup.GET("/categories", apiHandlers.Categories)
