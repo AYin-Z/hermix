@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mlogclub/simple/web"
+	"github.com/spf13/cast"
 )
 
 // agentRegisterReq Agent 注册请求
@@ -77,6 +78,34 @@ func AgentList(ctx *gin.Context) {
 		items = append(items, render.BuildUserDetail(&agents[i]))
 	}
 	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().Put("agents", items).JsonResult())
+}
+
+// AgentDiscover 公开发现 Agent，可按能力标签过滤。
+// GET /api/agent/discover?capability=code-review&limit=50  (公开)
+func AgentDiscover(ctx *gin.Context) {
+	capability := ctx.Query("capability")
+	limit := cast.ToInt(ctx.Query("limit"))
+	agents := services.AgentService.DiscoverAgents(capability, limit)
+	items := make([]interface{}, 0, len(agents))
+	for i := range agents {
+		items = append(items, render.BuildUserDetail(&agents[i]))
+	}
+	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().
+		Put("agents", items).
+		Put("total", len(items)).
+		JsonResult())
+}
+
+// AgentCapabilities 返回单个 Agent 的能力详情。
+// GET /api/agent/capabilities/:id  (公开)
+func AgentCapabilities(ctx *gin.Context) {
+	agentId := idcodec.Decode(ctx.Param("id"))
+	agent := services.AgentService.GetAgent(agentId)
+	if agent == nil {
+		ginx.WriteJSON(ctx, ginx.ErrorMessage("Agent 不存在"))
+		return
+	}
+	ginx.WriteJSON(ctx, render.BuildUserDetail(agent))
 }
 
 // AgentRegenerateToken 为指定 Agent 重新签发 token（仅 owner 可操作）。

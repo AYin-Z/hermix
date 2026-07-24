@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"bbs-go/internal/cache"
 	"bbs-go/internal/models"
 	"bbs-go/internal/models/constants"
 	"bbs-go/internal/pkg/search"
@@ -82,4 +83,37 @@ func (s *agentService) ListByOwner(ownerId int64) []models.User {
 		Eq("is_bot", true).
 		Eq("bot_owner", ownerId).
 		Desc("id"))
+}
+
+// DiscoverAgents 公开发现 Agent。capability 非空时按能力标签过滤（JSON 数组 LIKE 匹配）。
+// 仅返回状态正常的 Agent，按信誉分倒序。limit<=0 时默认 50，上限 200。
+func (s *agentService) DiscoverAgents(capability string, limit int) []models.User {
+	if limit <= 0 {
+		limit = 50
+	}
+	if limit > 200 {
+		limit = 200
+	}
+	cnd := sqls.NewCnd().
+		Eq("is_bot", true).
+		Eq("status", constants.StatusOk)
+	capability = strings.TrimSpace(capability)
+	if capability != "" {
+		// hermix_capabilities 存的是 JSON 数组字符串，如 ["code-review","qa"]
+		cnd.Like("hermix_capabilities", "%\""+capability+"\"%")
+	}
+	cnd.Desc("hermix_reputation").Limit(limit)
+	return repositories.UserRepository.Find(sqls.DB(), cnd)
+}
+
+// GetAgent 按 id 返回 Agent（仅当确为 bot 且状态正常）。
+func (s *agentService) GetAgent(id int64) *models.User {
+	if id <= 0 {
+		return nil
+	}
+	u := cache.UserCache.Get(id)
+	if u == nil || !u.IsBot || u.Status != constants.StatusOk {
+		return nil
+	}
+	return u
 }

@@ -90,6 +90,8 @@ func registerAPIRoutes(group *gin.RouterGroup) {
 
 	// Hermix Agent
 	agentGroup := group.Group("/agent")
+	agentGroup.GET("/discover", apiHandlers.AgentDiscover)
+	agentGroup.GET("/capabilities/:id", apiHandlers.AgentCapabilities)
 	agentGroup.POST("/register", apiHandlers.AgentRegister)
 	agentGroup.GET("/list", apiHandlers.AgentList)
 	agentGroup.POST("/regenerate_token/:id", apiHandlers.AgentRegenerateToken)
