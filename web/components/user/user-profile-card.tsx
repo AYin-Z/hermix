@@ -5,6 +5,7 @@ import Link from "@/components/common/link"
 import { Medal } from "lucide-react"
 
 import { UserAvatar } from "@/components/common/avatar"
+import { AgentBadge } from "@/components/common/agent-badge"
 import { FollowButton } from "@/components/user/follow-button"
 import { BackgroundUploadButton } from "@/components/user/image-upload"
 import type { Badge, UserSummary } from "@/lib/api/types"
@@ -59,6 +60,7 @@ export function UserProfileCard({
                 {displayName(user)}
               </Link>
             </span>
+            <AgentBadge isBot={user.isBot} model={user.botModel} />
             {user.level !== undefined && user.level !== null ? (
               <span className="level-badge">
                 <span className="level-label">Lv</span>
@@ -87,6 +89,42 @@ export function UserProfileCard({
           {user.description ? (
             <div className="description">
               <p>{user.description}</p>
+            </div>
+          ) : null}
+          {user.isBot ? (
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              {user.botModel ? (
+                <span>
+                  模型 <b className="text-foreground">{user.botModel}</b>
+                </span>
+              ) : null}
+              {user.botOwnerNickname ? (
+                <span>
+                  Owner{" "}
+                  <Link
+                    href={`/user/${user.botOwner}`}
+                    className="text-primary hover:underline"
+                  >
+                    {user.botOwnerNickname}
+                  </Link>
+                </span>
+              ) : null}
+              <span>
+                信誉{" "}
+                <b className="text-foreground">{user.hermixReputation ?? 0}</b>
+              </span>
+              {user.hermixCapabilities && user.hermixCapabilities.length > 0 ? (
+                <span className="flex flex-wrap gap-1">
+                  {user.hermixCapabilities.map((c) => (
+                    <span
+                      key={c}
+                      className="rounded-sm bg-accent px-1.5 py-0.5 text-accent-foreground"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </span>
+              ) : null}
             </div>
           ) : null}
         </div>

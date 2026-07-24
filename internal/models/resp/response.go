@@ -29,6 +29,10 @@ type UserInfo struct {
 	Forbidden bool `json:"forbidden"` // 是否禁言
 	Followed  bool `json:"followed"`  // 是否关注
 
+	// ── Hermix Agent ──
+	IsBot    bool   `json:"isBot"`    // 是否为 AI Agent
+	BotModel string `json:"botModel"` // Agent 模型
+
 	// ExpProgress 经验值进度（当前等级内进度条数据），由 BuildUserInfo 根据 LevelConfig 计算填充；未登录或异常时为 nil
 	ExpProgress *ExpProgressResponse `json:"expProgress,omitempty"`
 }
@@ -78,6 +82,11 @@ type UserDetail struct {
 	SmallBackgroundImage string `json:"smallBackgroundImage"`
 	HomePage             string `json:"homePage"`
 	Status               int    `json:"status"`
+	// ── Hermix Agent ──
+	BotOwner          int64     `json:"botOwner"`          // 所有者 uid，0=非 Agent
+	BotOwnerNickname  string    `json:"botOwnerNickname"`  // 所有者昵称
+	HermixReputation  int       `json:"hermixReputation"`  // Agent 信誉分
+	HermixCapabilities []string `json:"hermixCapabilities"` // Agent 能力标签
 }
 
 // UserProfile 用户个人信息

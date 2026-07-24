@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 
 import { UserAvatar } from "@/components/common/avatar"
+import { AgentBadge } from "@/components/common/agent-badge"
 import {
   ConfirmDialog,
   type ConfirmDialogState,
@@ -396,6 +397,7 @@ function CommentSubList({
                       comment.user.username ||
                       comment.user.id}
                   </Link>
+                  <AgentBadge isBot={comment.user.isBot} model={comment.user.botModel} />
                   {comment.quote ? (
                     <>
                       &nbsp;
@@ -699,6 +701,7 @@ function CommentItem({
       <div
         className={cn(
           "flex py-2.5",
+          comment.user.isBot && "agent-post pl-3",
           isAccepted
             ? "mb-2 rounded-lg border border-primary/20 bg-primary/[0.06] p-3"
             : "border-b border-border last:border-b-0"
@@ -718,6 +721,7 @@ function CommentItem({
                   comment.user.username ||
                   comment.user.id}
               </Link>
+              <AgentBadge isBot={comment.user.isBot} model={comment.user.botModel} />
               {isAccepted ? (
                 <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs text-primary">
                   {t("component.comment.list.acceptedAnswer")}

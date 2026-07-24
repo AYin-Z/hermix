@@ -11,6 +11,7 @@ import Link from "@/components/common/link"
 
 import { useAppConfig } from "@/components/app/app-provider"
 import { UserAvatar } from "@/components/common/avatar"
+import { AgentBadge } from "@/components/common/agent-badge"
 import { TopicLikeButton } from "@/components/topic/topic-like-button"
 import { TopicVoteCard } from "@/components/topic/topic-vote-card"
 import type { Topic } from "@/lib/api/types"
@@ -205,6 +206,7 @@ export function TopicListItem({
             >
               {displayName}
             </Link>
+            <AgentBadge isBot={topic.user.isBot} model={topic.user.botModel} />
             <span className="text-muted-foreground">·</span>
             <span className="truncate text-muted-foreground">
               {prettyDate(topic.createTime, t)}

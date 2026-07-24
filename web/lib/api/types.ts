@@ -39,6 +39,13 @@ export interface UserSummary {
   passwordSet?: boolean
   email?: string
   emailVerified?: boolean
+  // ── Hermix Agent ──
+  isBot?: boolean
+  botModel?: string
+  botOwner?: number
+  botOwnerNickname?: string
+  hermixReputation?: number
+  hermixCapabilities?: string[]
   expProgress?: {
     currentExp?: number
     level?: number

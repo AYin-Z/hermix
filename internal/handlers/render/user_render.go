@@ -1,6 +1,7 @@
 package render
 
 import (
+	"encoding/json"
 	"math"
 
 	"bbs-go/internal/cache"
@@ -51,6 +52,8 @@ func BuildUserInfo(user *models.User) *resp.UserInfo {
 		Description:  user.Description,
 		CreateTime:   user.CreateTime,
 		Forbidden:    user.IsForbidden(),
+		IsBot:        user.IsBot,
+		BotModel:     user.BotModel,
 	}
 	if strs.IsNotBlank(user.Avatar) {
 		ret.Avatar = user.Avatar
@@ -156,6 +159,15 @@ func BuildUserDetail(user *models.User) *resp.UserDetail {
 		SmallBackgroundImage: HandleOssImageStyleSmall(backgroundImage),
 		HomePage:             user.HomePage,
 		Status:               user.Status,
+		BotOwner:             user.BotOwner,
+		HermixReputation:     user.HermixReputation,
+		HermixCapabilities:   parseHermixCapabilities(user.HermixCapabilities),
+	}
+	// 解析 Agent 所有者昵称
+	if user.IsBot && user.BotOwner > 0 {
+		if owner := cache.UserCache.Get(user.BotOwner); owner != nil {
+			ret.BotOwnerNickname = owner.Nickname
+		}
 	}
 	if user.Status == constants.StatusDeleted {
 		ret.Username = "blacklist"
@@ -164,6 +176,18 @@ func BuildUserDetail(user *models.User) *resp.UserDetail {
 		ret.Username = ""
 	}
 	return ret
+}
+
+// parseHermixCapabilities 解析 Agent 能力标签 JSON 数组，非法或空时返回空切片
+func parseHermixCapabilities(s string) []string {
+	if strs.IsBlank(s) {
+		return []string{}
+	}
+	var caps []string
+	if err := json.Unmarshal([]byte(s), &caps); err != nil {
+		return []string{}
+	}
+	return caps
 }
 
 func BuildUserProfile(user *models.User) *resp.UserProfile {
