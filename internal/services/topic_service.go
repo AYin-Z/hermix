@@ -270,7 +270,7 @@ func (s *topicService) GetTopicTags(topicId int64) []models.Tag {
 }
 
 // GetTopics 帖子列表（最新、推荐、关注、节点）
-func (s *topicService) GetTopics(user *models.User, categoryId, cursor int64, qaStatus, sort string) (topics []models.Topic, nextCursor int64, hasMore bool) {
+func (s *topicService) GetTopics(user *models.User, categoryId, cursor int64, qaStatus, sort, visibility string) (topics []models.Topic, nextCursor int64, hasMore bool) {
 	limit := constants.TopicListPageSize
 	if categoryId == constants.CategoryIdFollow {
 		if user != nil {
@@ -278,13 +278,25 @@ func (s *topicService) GetTopics(user *models.User, categoryId, cursor int64, qa
 		}
 		return
 	} else {
-		return s._GetCategoryTopics(categoryId, cursor, limit, qaStatus, sort)
+		return s._GetCategoryTopics(categoryId, cursor, limit, qaStatus, sort, visibility)
+	}
+}
+
+// applyVisibility 按作者身份过滤：human=仅真人，agent=仅 Agent，其它=全部。
+// 用子查询匹配 t_user.is_bot，避免把 bot id 列表拉进内存。
+func applyVisibility(cnd *sqls.Cnd, visibility string) {
+	switch visibility {
+	case "human":
+		cnd.Where("user_id IN (SELECT id FROM t_user WHERE is_bot = ?)", false)
+	case "agent":
+		cnd.Where("user_id IN (SELECT id FROM t_user WHERE is_bot = ?)", true)
 	}
 }
 
 // _GetCategoryTopics 帖子列表（最新、推荐、节点）
-func (s *topicService) _GetCategoryTopics(categoryId, cursor int64, limit int, qaStatus, sort string) (topics []models.Topic, nextCursor int64, hasMore bool) {
+func (s *topicService) _GetCategoryTopics(categoryId, cursor int64, limit int, qaStatus, sort, visibility string) (topics []models.Topic, nextCursor int64, hasMore bool) {
 	cnd := sqls.NewCnd()
+	applyVisibility(cnd, visibility)
 	if categoryId > 0 {
 		categoryIds := CategoryService.GetCategoryIdsForList(categoryId)
 		if len(categoryIds) > 0 {
@@ -504,8 +516,9 @@ func (s *topicService) GetUserTopics(userId, cursor int64) (topics []models.Topi
 	return
 }
 
-func (s *topicService) GetStickyTopics(categoryId int64, limit int, qaStatus string) []models.Topic {
+func (s *topicService) GetStickyTopics(categoryId int64, limit int, qaStatus, visibility string) []models.Topic {
 	cnd := sqls.NewCnd().Eq("sticky", true).Eq("status", constants.StatusOk).Desc("sticky_time").Limit(limit)
+	applyVisibility(cnd, visibility)
 	if categoryId > 0 {
 		categoryIds := CategoryService.GetCategoryIdsForList(categoryId)
 		if len(categoryIds) > 0 {

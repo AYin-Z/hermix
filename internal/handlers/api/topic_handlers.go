@@ -362,6 +362,7 @@ func TopicTopics(ctx *gin.Context) {
 		categoryId = params.FormValueInt64Default(ctx, "categoryId", 0)
 		qaStatus   = strings.TrimSpace(params.FormValue(ctx, "qaStatus"))
 		sort       = strings.TrimSpace(params.FormValue(ctx, "sort"))
+		visibility = strings.TrimSpace(params.FormValue(ctx, "visibility"))
 		user       = common.GetCurrentUser(ctx)
 	)
 	if categoryId == constants.CategoryIdFollow && user == nil {
@@ -371,10 +372,10 @@ func TopicTopics(ctx *gin.Context) {
 
 	var temp []models.Topic
 	if cursor <= 0 {
-		stickyTopics := services.TopicService.GetStickyTopics(categoryId, 3, qaStatus)
+		stickyTopics := services.TopicService.GetStickyTopics(categoryId, 3, qaStatus, visibility)
 		temp = append(temp, stickyTopics...)
 	}
-	topics, cursor, hasMore := services.TopicService.GetTopics(user, categoryId, cursor, qaStatus, sort)
+	topics, cursor, hasMore := services.TopicService.GetTopics(user, categoryId, cursor, qaStatus, sort, visibility)
 	for _, topic := range topics {
 		topic.Sticky = false // 正常列表不要渲染置顶
 		temp = append(temp, topic)

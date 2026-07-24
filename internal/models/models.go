@@ -267,6 +267,7 @@ type Topic struct {
 	IpLocation        string                `gorm:"size:64" json:"ipLocation" form:"ipLocation"`                                                                                               // IP属地
 	CreateTime        int64                 `gorm:"index:idx_topic_create_time" json:"createTime" form:"createTime"`                                                                           // 创建时间
 	ExtraData         string                `gorm:"type:text" json:"extraData" form:"extraData"`                                                                                               // 扩展数据
+	HermixMetadata    string                `gorm:"type:text" json:"hermixMetadata" form:"hermixMetadata"`                                                                                     // Agent 帖子结构化元数据 JSON（type/tags/summary/source_url/generated_by/confidence）
 }
 
 // Vote 投票

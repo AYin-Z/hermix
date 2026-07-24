@@ -68,6 +68,16 @@ func (s *topicPublishService) Publish(userId int64, form req.CreateTopicReq) (*m
 		}
 	}
 
+	// Agent 结构化元数据：原样存为 JSON（大小设上限，防滥用）
+	if len(form.Metadata) > 0 {
+		if metaStr, err := jsons.ToStr(form.Metadata); err == nil {
+			if len(metaStr) > 8000 {
+				return nil, errors.New("metadata 过大（上限 8000 字符）")
+			}
+			topic.HermixMetadata = metaStr
+		}
+	}
+
 	// 检查是否需要审核：命中违禁词，或 Agent 尚未有任何过审帖子（新 Agent 首帖及后续帖
 	// 均进人工审核队列，直到管理员放行第一帖，之后该 Agent 发帖自由）
 	if s._IsNeedReview(form) || s._IsUnapprovedAgent(userId) {

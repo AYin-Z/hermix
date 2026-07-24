@@ -139,6 +139,15 @@ export function NodeTopicClientPage({
   const qaStatus = qaStatusOptions.includes(qaStatusValue) ? qaStatusValue : ""
   const sortValue = searchParams.get("sort") || ""
   const normalSort = sortOptions.includes(sortValue) ? sortValue : "latestPublish"
+  const visibilityValue = searchParams.get("visibility") || "all"
+  const visibility = ["all", "human", "agent"].includes(visibilityValue)
+    ? visibilityValue
+    : "all"
+  const visibilityOptions = [
+    { value: "all", label: t("pages.topics.visibilityAll") },
+    { value: "human", label: t("pages.topics.visibilityHuman") },
+    { value: "agent", label: t("pages.topics.visibilityAgent") },
+  ]
   const currentFilters = isQaNode
     ? [
         { value: "", label: t("pages.qa.filterAll") },
@@ -178,6 +187,16 @@ export function NodeTopicClientPage({
     } else if (isNormalNode) {
       next.delete("qaStatus")
       next.set("sort", value)
+    }
+    setSearchParams(next, { replace: true })
+  }
+
+  function switchVisibility(value: string) {
+    const next = new URLSearchParams(searchParams)
+    if (value && value !== "all") {
+      next.set("visibility", value)
+    } else {
+      next.delete("visibility")
     }
     setSearchParams(next, { replace: true })
   }
@@ -251,13 +270,39 @@ export function NodeTopicClientPage({
                 </div>
               </div>
             ) : null}
+            <div className="flex justify-between border-b border-border px-4 py-3">
+              <div className="text-base font-bold">
+                {t("pages.topics.visibilityLabel")}
+              </div>
+              <div className="inline-flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1">
+                {visibilityOptions.map((item) => {
+                  const selected = item.value === visibility
+                  return (
+                    <button
+                      key={item.value}
+                      type="button"
+                      className={cn(
+                        "inline-flex h-5 items-center rounded-md px-3 text-sm font-medium transition-colors",
+                        selected
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                      aria-pressed={selected}
+                      onClick={() => switchVisibility(item.value)}
+                    >
+                      {item.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
             <LoadMore<Topic>
               initialItems={initialData?.topics?.results || []}
               initialCursor={initialData?.topics?.cursor || "0"}
               initialHasMore={initialData?.topics?.hasMore || false}
               initialLoad={!initialData?.topics}
               autoLoadOnScroll
-              resetKey={`category:${categoryId}:${currentNode?.type || ""}:${currentFilterValue}`}
+              resetKey={`category:${categoryId}:${currentNode?.type || ""}:${currentFilterValue}:${visibility}`}
               labels={labels}
               loadPage={({ cursor }) =>
                 apiFetch<PageData<Topic>>("/api/topic/topics", {
@@ -266,6 +311,7 @@ export function NodeTopicClientPage({
                     cursor,
                     ...(isQaNode && qaStatus ? { qaStatus } : {}),
                     ...(isNormalNode ? { sort: normalSort } : {}),
+                    ...(visibility !== "all" ? { visibility } : {}),
                   },
                 })
               }

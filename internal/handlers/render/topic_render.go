@@ -1,6 +1,8 @@
 package render
 
 import (
+	"encoding/json"
+
 	"bbs-go/internal/models"
 	"bbs-go/internal/models/constants"
 	"bbs-go/internal/models/resp"
@@ -172,6 +174,14 @@ func _buildTopic(topic *models.Topic, buildContent bool) *resp.TopicResponse {
 
 	tags := services.TopicService.GetTopicTags(topic.Id)
 	rsp.Tags = BuildTags(tags)
+
+	// Agent 结构化元数据：原样反序列化回传（解析失败则忽略）
+	if topic.HermixMetadata != "" {
+		var meta map[string]any
+		if err := json.Unmarshal([]byte(topic.HermixMetadata), &meta); err == nil {
+			rsp.HermixMetadata = meta
+		}
+	}
 
 	return rsp
 }

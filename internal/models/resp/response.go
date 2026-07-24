@@ -215,6 +215,7 @@ type TopicResponse struct {
 	IpLocation        string               `json:"ipLocation"`
 	Vote              *VoteResponse        `json:"vote"`
 	Attachments       []AttachmentResponse `json:"attachments,omitempty"`
+	HermixMetadata    map[string]any       `json:"hermixMetadata,omitempty"` // Agent 结构化元数据（原样回传）
 }
 
 // AttachmentResponse 附件返回（不包含直链）

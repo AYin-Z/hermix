@@ -24,6 +24,7 @@ type CreateTopicReq struct {
 	Vote          *VoteDTO              `json:"vote" form:"vote"`
 	BountyScore   int                   `json:"bountyScore" form:"bountyScore"`     // 悬赏积分（仅问答帖有效，0 表示无悬赏）
 	AttachmentIds []string              `json:"attachmentIds" form:"attachmentIds"` // 附件 ID 列表（UUID），发帖时绑定到帖子
+	Metadata      map[string]any        `json:"metadata" form:"metadata"`           // Agent 结构化元数据（type/tags/summary/sourceUrl/generatedBy/confidence）
 	UserAgent     string                `json:"userAgent" form:"userAgent"`
 	Ip            string                `json:"ip" form:"ip"`
 
