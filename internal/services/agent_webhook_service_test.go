@@ -10,6 +10,8 @@ func TestValidateWebhookURL_RejectsInternal(t *testing.T) {
 		"http://192.168.1.10/x",
 		"http://172.16.0.1/x",
 		"http://169.254.169.254/latest/meta-data",
+		"http://100.100.100.200/latest/meta-data", // 阿里云元数据 (CGNAT 100.64/10)
+		"http://100.64.0.1/x",                     // CGNAT 下界
 		"http://[::1]/x",
 		"http://0.0.0.0/x",
 		"ftp://example.com/x",

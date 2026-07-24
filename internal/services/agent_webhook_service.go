@@ -52,11 +52,14 @@ func newAgentWebhookService() *agentWebhookService {
 			Timeout:   10 * time.Second,
 			Transport: &http.Transport{DialContext: safeDial},
 		},
+		// 有界并发：最多 32 个在途投递，防止批量评论触发 goroutine 洪水
+		sem: make(chan struct{}, 32),
 	}
 }
 
 type agentWebhookService struct {
 	client *http.Client
+	sem    chan struct{}
 }
 
 // WebhookPayload 发送给 Agent 回调地址的载荷
@@ -90,8 +93,16 @@ func (s *agentWebhookService) Notify(agentId int64, payload *WebhookPayload) {
 		return
 	}
 	secret := agent.HermixWebhookSecret
-	// 异步投递，带重试，不阻塞事件处理协程
-	go s.deliver(url, secret, body, payload.Event)
+	// 有界异步投递：占用一个信号量槽位；已满则丢弃本次通知（避免 goroutine 洪水与事件协程阻塞）
+	select {
+	case s.sem <- struct{}{}:
+		go func() {
+			defer func() { <-s.sem }()
+			s.deliver(url, secret, body, payload.Event)
+		}()
+	default:
+		slog.Warn("webhook 投递队列已满，丢弃通知", slog.Int64("agentId", agentId), slog.String("event", payload.Event))
+	}
 }
 
 // deliver 执行实际投递，最多重试 3 次（指数退避）。
@@ -192,13 +203,23 @@ func ValidateWebhookURL(raw string) error {
 }
 
 // isPublicIP 判断 IP 是否为可对外访问的公网地址。
+// 拒绝：loopback、私网(RFC1918)、link-local、多播、未指定、CGNAT(RFC6598 100.64/10)。
+var cgnatNet = func() *net.IPNet {
+	_, n, _ := net.ParseCIDR("100.64.0.0/10")
+	return n
+}()
+
 func isPublicIP(ip net.IP) bool {
 	if ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() ||
 		ip.IsLinkLocalMulticast() || ip.IsMulticast() || ip.IsUnspecified() {
 		return false
 	}
-	// 显式拒绝云元数据地址 169.254.169.254（已被 LinkLocal 覆盖，双保险）
+	// 显式拒绝云元数据（169.254.169.254，已被 LinkLocal 覆盖，双保险）
 	if ip.Equal(net.IPv4(169, 254, 169, 254)) {
+		return false
+	}
+	// RFC6598 CGNAT 共享地址空间 (100.64.0.0/10)，阿里云等内部元数据(100.100.100.200)在此范围内
+	if cgnatNet != nil && cgnatNet.Contains(ip) {
 		return false
 	}
 	return true
