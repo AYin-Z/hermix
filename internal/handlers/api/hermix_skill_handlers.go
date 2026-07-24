@@ -53,7 +53,7 @@ func SkillList(ctx *gin.Context) {
 	for i := range skills {
 		items = append(items, buildSkill(&skills[i]))
 	}
-	ginx.WriteJSON(ctx, web.JsonPageData(items, paging))
+	ginx.WriteJSON(ctx, ginx.PageData(items, paging))
 }
 
 // skillPublishReq 发布请求体
@@ -83,7 +83,7 @@ func SkillPublish(ctx *gin.Context) {
 		Tags:           r.Tags,
 	})
 	if err != nil {
-		ginx.WriteJSON(ctx, web.JsonErrorMsg(err.Error()))
+		ginx.WriteJSON(ctx, ginx.ErrorMessage(err.Error()))
 		return
 	}
 	ginx.WriteJSON(ctx, buildSkill(skill))
@@ -108,10 +108,10 @@ func SkillRate(ctx *gin.Context) {
 		return
 	}
 	if err := services.HermixSkillService.Rate(skillId, user.Id, r.Score); err != nil {
-		ginx.WriteJSON(ctx, web.JsonErrorMsg(err.Error()))
+		ginx.WriteJSON(ctx, ginx.ErrorMessage(err.Error()))
 		return
 	}
-	ginx.WriteJSON(ctx, web.JsonSuccess())
+	ginx.WriteJSON(ctx, nil)
 }
 
 // SkillInstall POST /api/skills/install/:id 记录安装（公开计数）
@@ -119,11 +119,10 @@ func SkillInstall(ctx *gin.Context) {
 	skillId := idcodec.Decode(ctx.Param("id"))
 	skill := services.HermixSkillService.Get(skillId)
 	if skill == nil || skill.Status != constants.StatusOk {
-		ginx.WriteJSON(ctx, web.JsonErrorMsg("技能不存在"))
+		ginx.WriteJSON(ctx, ginx.ErrorMessage("技能不存在"))
 		return
 	}
 	_ = services.HermixSkillService.IncrInstall(skillId)
 	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().
-		Put("installCommand", skill.InstallCommand).
-		JsonResult())
+		Put("installCommand", skill.InstallCommand))
 }

@@ -50,15 +50,14 @@ func AgentRegister(ctx *gin.Context) {
 
 	token, err := services.UserTokenService.Generate(agent.Id)
 	if err != nil {
-		ginx.WriteJSON(ctx, web.JsonError(err))
+		ginx.WriteJSON(ctx, err)
 		return
 	}
 
 	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().
 		Put("token", token).
 		Put("agentId", idcodec.Encode(agent.Id)).
-		Put("agent", render.BuildUserDetail(agent)).
-		JsonResult())
+		Put("agent", render.BuildUserDetail(agent)))
 }
 
 // AgentList 列出当前登录用户拥有的 Agent。
@@ -77,7 +76,7 @@ func AgentList(ctx *gin.Context) {
 		}
 		items = append(items, render.BuildUserDetail(&agents[i]))
 	}
-	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().Put("agents", items).JsonResult())
+	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().Put("agents", items))
 }
 
 // AgentDiscover 公开发现 Agent，可按能力标签过滤。
@@ -92,8 +91,7 @@ func AgentDiscover(ctx *gin.Context) {
 	}
 	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().
 		Put("agents", items).
-		Put("total", len(items)).
-		JsonResult())
+		Put("total", len(items)))
 }
 
 // AgentCapabilities 返回单个 Agent 的能力详情。
@@ -134,13 +132,12 @@ func AgentSetWebhook(ctx *gin.Context) {
 	}
 	secret, err := services.AgentWebhookService.SetWebhook(agentId, r.Url)
 	if err != nil {
-		ginx.WriteJSON(ctx, web.JsonError(err))
+		ginx.WriteJSON(ctx, err)
 		return
 	}
 	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().
 		Put("secret", secret).
-		Put("url", r.Url).
-		JsonResult())
+		Put("url", r.Url))
 }
 
 // AgentRegenerateToken 为指定 Agent 重新签发 token（仅 owner 可操作）。
@@ -159,8 +156,8 @@ func AgentRegenerateToken(ctx *gin.Context) {
 	}
 	token, err := services.UserTokenService.Generate(agent.Id)
 	if err != nil {
-		ginx.WriteJSON(ctx, web.JsonError(err))
+		ginx.WriteJSON(ctx, err)
 		return
 	}
-	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().Put("token", token).JsonResult())
+	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().Put("token", token))
 }
