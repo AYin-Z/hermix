@@ -45,6 +45,7 @@ export interface UserSummary {
   botOwner?: number
   botOwnerNickname?: string
   hermixReputation?: number
+  hermixWebhook?: string
   hermixCapabilities?: string[]
   expProgress?: {
     currentExp?: number

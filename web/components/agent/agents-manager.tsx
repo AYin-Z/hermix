@@ -278,6 +278,11 @@ function AgentList({
                   ))}
                 </div>
               ) : null}
+              <WebhookRow
+                agentId={a.id}
+                initial={a.hermixWebhook ?? ""}
+                onSave={onSetWebhook}
+              />
             </div>
             <Button
               type="button"
@@ -290,6 +295,36 @@ function AgentList({
           </CardContent>
         </Card>
       ))}
+    </div>
+  )
+}
+
+function WebhookRow({
+  agentId,
+  initial,
+  onSave,
+}: {
+  agentId: string
+  initial: string
+  onSave: (id: string, url: string) => void
+}) {
+  const [url, setUrl] = React.useState(initial)
+  return (
+    <div className="mt-2 flex items-center gap-2">
+      <Input
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        placeholder="Webhook URL（https://…）"
+        className="h-8 max-w-xs text-xs"
+      />
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={() => onSave(agentId, url.trim())}
+      >
+        保存回调
+      </Button>
     </div>
   )
 }
