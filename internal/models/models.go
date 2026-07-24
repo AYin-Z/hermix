@@ -20,6 +20,7 @@ var Models = []interface{}{
 	&OperateLog{}, &EmailLog{}, &EmailCode{}, &SmsCode{}, &CheckIn{}, &UserFollow{}, &UserFeed{}, &UserReport{},
 	&ForbiddenWord{},
 	&Attachment{}, &AttachmentDownloadLog{},
+	&HermixSkill{}, &HermixSkillRating{},
 }
 
 type Model struct {
@@ -598,4 +599,29 @@ type AttachmentDownloadLog struct {
 	UserId       int64  `gorm:"not null;uniqueIndex:uk_attachment_download_log_ua" json:"userId" form:"userId"`                     // 下载用户 ID
 	AttachmentId string `gorm:"not null;size:64;uniqueIndex:uk_attachment_download_log_ua" json:"attachmentId" form:"attachmentId"` // 附件 ID（UUID）
 	CreateTime   int64  `gorm:"not null;default:0" json:"createTime" form:"createTime"`                                             // 首次下载（支付）时间（毫秒）
+}
+
+// HermixSkill Agent 技能市场条目：可复用的 Agent 能力/指令包
+type HermixSkill struct {
+	Model
+	AuthorId       int64  `gorm:"not null;index:idx_hermix_skill_author" json:"authorId" form:"authorId"`     // 发布者 uid
+	Name           string `gorm:"not null;size:128;index:idx_hermix_skill_name" json:"name" form:"name"`      // 技能名称
+	Description    string `gorm:"type:text" json:"description" form:"description"`                            // 描述
+	InstallCommand string `gorm:"type:text" json:"installCommand" form:"installCommand"`                     // 安装/接入命令
+	Tags           string `gorm:"size:512;default:''" json:"tags" form:"tags"`                               // 标签 JSON 数组
+	RatingSum      int64  `gorm:"not null;default:0" json:"ratingSum" form:"ratingSum"`                      // 评分总和
+	RatingCount    int64  `gorm:"not null;default:0" json:"ratingCount" form:"ratingCount"`                  // 评分人数
+	InstallCount   int64  `gorm:"not null;default:0" json:"installCount" form:"installCount"`                // 安装次数
+	Status         int    `gorm:"type:int;not null;default:0;index:idx_hermix_skill_status" json:"status"`   // 状态：0 正常
+	CreateTime     int64  `gorm:"not null;default:0" json:"createTime" form:"createTime"`                    // 创建时间
+	UpdateTime     int64  `gorm:"not null;default:0" json:"updateTime" form:"updateTime"`                    // 更新时间
+}
+
+// HermixSkillRating 技能评分记录（每人每技能一条，防重复刷分）
+type HermixSkillRating struct {
+	Model
+	SkillId    int64 `gorm:"not null;uniqueIndex:uk_hermix_skill_rating" json:"skillId" form:"skillId"` // 技能 ID
+	UserId     int64 `gorm:"not null;uniqueIndex:uk_hermix_skill_rating" json:"userId" form:"userId"`   // 评分用户
+	Score      int   `gorm:"not null;default:0" json:"score" form:"score"`                             // 1-5 分
+	CreateTime int64 `gorm:"not null;default:0" json:"createTime" form:"createTime"`                   // 创建时间
 }

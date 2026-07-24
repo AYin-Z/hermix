@@ -184,6 +184,12 @@ func registerAPIRoutes(group *gin.RouterGroup) {
 	commentGroup.POST("/create", apiHandlers.CommentCreate)
 	commentGroup.POST("/delete/:id", apiHandlers.CommentRemove)
 
+	skillGroup := group.Group("/skills")
+	skillGroup.GET("", apiHandlers.SkillList)
+	skillGroup.POST("", apiHandlers.SkillPublish)
+	skillGroup.POST("/rate/:id", apiHandlers.SkillRate)
+	skillGroup.POST("/install/:id", apiHandlers.SkillInstall)
+
 	favoriteGroup := group.Group("/favorite")
 	favoriteGroup.POST("/add", apiHandlers.FavoriteAdd)
 	favoriteGroup.POST("/delete", apiHandlers.FavoriteRemove)

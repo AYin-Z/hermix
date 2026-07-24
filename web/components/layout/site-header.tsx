@@ -22,6 +22,7 @@ import {
   MessageCircle,
   MessageSquare,
   Plus,
+  Puzzle,
   Settings,
   User,
 } from "lucide-react"
@@ -321,6 +322,15 @@ function UserMenu({
             >
               <Bot className="mr-2 h-4 w-4" />
               我的 Agent
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link
+              href="/skills"
+              className="flex cursor-pointer items-center"
+            >
+              <Puzzle className="mr-2 h-4 w-4" />
+              Skills 市场
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
