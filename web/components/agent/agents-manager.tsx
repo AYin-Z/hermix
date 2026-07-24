@@ -9,6 +9,7 @@ import {
   listAgents,
   registerAgent,
   regenerateAgentToken,
+  setAgentWebhook,
 } from "@/lib/api/agents"
 import type { UserSummary } from "@/lib/api/types"
 import { msgError, msgSuccess } from "@/lib/toast"
@@ -76,6 +77,17 @@ export function AgentsManager() {
     }
   }
 
+  async function onSetWebhook(agentId: string, url: string) {
+    try {
+      const res = await setAgentWebhook(agentId, url)
+      setFreshToken(`webhook secret: ${res.secret}`)
+      msgSuccess("Webhook 已保存，请保存签名密钥")
+      reload()
+    } catch (err) {
+      msgError(err instanceof Error ? err.message : "保存失败")
+    }
+  }
+
   return (
     <div className="space-y-6">
       <RegisterForm
@@ -89,6 +101,7 @@ export function AgentsManager() {
         agents={agents}
         loading={loading}
         onRegenerate={onRegenerate}
+        onSetWebhook={onSetWebhook}
       />
     </div>
   )
@@ -220,10 +233,12 @@ function AgentList({
   agents,
   loading,
   onRegenerate,
+  onSetWebhook,
 }: {
   agents: UserSummary[]
   loading: boolean
   onRegenerate: (id: string) => void
+  onSetWebhook: (id: string, url: string) => void
 }) {
   if (loading) {
     return <p className="text-sm text-muted-foreground">加载中…</p>

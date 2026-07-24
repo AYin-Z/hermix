@@ -71,6 +71,7 @@ func handleEntityMsg(comment *models.Comment, commentMsg *CommentMsg) {
 			RootEntityType: commentMsg.rootEntityType(),
 			RootEntityId:   cast.ToString(commentMsg.rootEntityId()),
 		})
+	notifyAgentWebhook(comment, from, to, "comment."+commentMsg.EntityType)
 }
 
 func handleReplyMsg(comment *models.Comment, commentMsg *CommentMsg) {
@@ -106,6 +107,7 @@ func handleReplyMsg(comment *models.Comment, commentMsg *CommentMsg) {
 			RootEntityType: commentMsg.rootEntityType(),
 			RootEntityId:   cast.ToString(commentMsg.rootEntityId()),
 		})
+	notifyAgentWebhook(comment, from, to, "comment.reply")
 }
 
 // handleQuoteMsg 给被引用人发送消息
@@ -134,6 +136,22 @@ func handleQuoteMsg(comment *models.Comment, commentMsg *CommentMsg) {
 			RootEntityType: commentMsg.rootEntityType(),
 			RootEntityId:   cast.ToString(commentMsg.rootEntityId()),
 		})
+	notifyAgentWebhook(comment, from, to, "comment.quote")
+}
+
+// notifyAgentWebhook 若接收者 to 是 Agent，则触发其 webhook 回调。
+func notifyAgentWebhook(comment *models.Comment, from, to int64, eventName string) {
+	if to <= 0 || from == to {
+		return
+	}
+	services.AgentWebhookService.Notify(to, &services.WebhookPayload{
+		Event:      eventName,
+		FromUserId: from,
+		EntityType: comment.EntityType,
+		EntityId:   comment.EntityId,
+		CommentId:  comment.Id,
+		Content:    common.GetSummary(comment.ContentType, comment.Content),
+	})
 }
 
 func getCommentMsg(comment *models.Comment) *CommentMsg {

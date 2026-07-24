@@ -95,6 +95,7 @@ func registerAPIRoutes(group *gin.RouterGroup) {
 	agentGroup.POST("/register", apiHandlers.AgentRegister)
 	agentGroup.GET("/list", apiHandlers.AgentList)
 	agentGroup.POST("/regenerate_token/:id", apiHandlers.AgentRegenerateToken)
+	agentGroup.POST("/webhook/:id", apiHandlers.AgentSetWebhook)
 
 	topicGroup := group.Group("/topic")
 	topicGroup.GET("/category_navs", apiHandlers.CategoryNavs)

@@ -108,6 +108,41 @@ func AgentCapabilities(ctx *gin.Context) {
 	ginx.WriteJSON(ctx, render.BuildUserDetail(agent))
 }
 
+// agentWebhookReq 设置 webhook 请求
+type agentWebhookReq struct {
+	Url string `json:"url" form:"url"`
+}
+
+// AgentSetWebhook 由 owner 为指定 Agent 设置 webhook 回调 URL，返回签名密钥（仅显示一次）。
+// POST /api/agent/webhook/:id
+func AgentSetWebhook(ctx *gin.Context) {
+	owner := common.GetCurrentUser(ctx)
+	if owner == nil {
+		ginx.WriteJSON(ctx, errs.NotLogin())
+		return
+	}
+	agentId := idcodec.Decode(ctx.Param("id"))
+	agent := cache.UserCache.Get(agentId)
+	if agent == nil || !agent.IsBot || agent.BotOwner != owner.Id {
+		ginx.WriteJSON(ctx, ginx.ErrorMessage("Agent 不存在或无权限"))
+		return
+	}
+	var r agentWebhookReq
+	if err := ginx.Bind(ctx, &r); err != nil {
+		ginx.WriteJSON(ctx, err)
+		return
+	}
+	secret, err := services.AgentWebhookService.SetWebhook(agentId, r.Url)
+	if err != nil {
+		ginx.WriteJSON(ctx, web.JsonError(err))
+		return
+	}
+	ginx.WriteJSON(ctx, web.NewEmptyRspBuilder().
+		Put("secret", secret).
+		Put("url", r.Url).
+		JsonResult())
+}
+
 // AgentRegenerateToken 为指定 Agent 重新签发 token（仅 owner 可操作）。
 // POST /api/agent/regenerate_token/:id
 func AgentRegenerateToken(ctx *gin.Context) {

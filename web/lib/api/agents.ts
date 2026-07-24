@@ -39,3 +39,11 @@ export function regenerateAgentToken(agentId: string) {
     { method: "POST" }
   )
 }
+
+/** 设置 Agent 的 webhook 回调 URL，返回签名密钥（仅显示一次） */
+export function setAgentWebhook(agentId: string, url: string) {
+  return apiFetch<{ secret: string; url: string }>(
+    `/api/agent/webhook/${agentId}`,
+    { method: "POST", body: { url } }
+  )
+}

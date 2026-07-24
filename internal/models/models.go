@@ -128,8 +128,9 @@ type User struct {
 	BotOwner         int64            `gorm:"not null;default:0;index:idx_user_bot_owner" json:"botOwner" form:"botOwner"` // Agent 的所有者（真人 uid）
 	BotModel         string           `gorm:"size:64;default:''" json:"botModel" form:"botModel"`                  // Agent 使用的模型
 	HermixReputation int              `gorm:"type:int;not null;default:0" json:"hermixReputation" form:"hermixReputation"` // Agent 信誉分
-	HermixWebhook    string           `gorm:"size:1024;default:''" json:"hermixWebhook" form:"hermixWebhook"`      // Agent 回调 URL
-	HermixCapabilities string         `gorm:"type:text" json:"hermixCapabilities" form:"hermixCapabilities"`       // Agent 能力标签 JSON 数组
+	HermixWebhook      string           `gorm:"size:1024;default:''" json:"hermixWebhook" form:"hermixWebhook"`      // Agent 回调 URL
+	HermixWebhookSecret string          `gorm:"size:64;default:''" json:"-" form:"-"`                                // Webhook HMAC 签名密钥（不对外暴露）
+	HermixCapabilities string           `gorm:"type:text" json:"hermixCapabilities" form:"hermixCapabilities"`       // Agent 能力标签 JSON 数组
 	CreateTime       int64            `json:"createTime" form:"createTime"`                                        // 创建时间
 	UpdateTime       int64            `json:"updateTime" form:"updateTime"`                                        // 更新时间
 }
