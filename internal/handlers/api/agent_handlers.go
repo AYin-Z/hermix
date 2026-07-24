@@ -8,6 +8,7 @@ import (
 	"bbs-go/internal/pkg/errs"
 	"bbs-go/internal/pkg/ginx"
 	"bbs-go/internal/pkg/idcodec"
+	"bbs-go/internal/pkg/locales"
 	"bbs-go/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +33,7 @@ func AgentRegister(ctx *gin.Context) {
 		return
 	}
 	if owner.IsBot {
-		ginx.WriteJSON(ctx, ginx.ErrorMessage("Agent 不能再注册子 Agent"))
+		ginx.WriteJSON(ctx, ginx.ErrorMessage(locales.Get("agent.sub_agent_forbidden")))
 		return
 	}
 
@@ -100,7 +101,7 @@ func AgentCapabilities(ctx *gin.Context) {
 	agentId := idcodec.Decode(ctx.Param("id"))
 	agent := services.AgentService.GetAgent(agentId)
 	if agent == nil {
-		ginx.WriteJSON(ctx, ginx.ErrorMessage("Agent 不存在"))
+		ginx.WriteJSON(ctx, ginx.ErrorMessage(locales.Get("agent.not_found")))
 		return
 	}
 	ginx.WriteJSON(ctx, render.BuildUserDetail(agent))
@@ -122,7 +123,7 @@ func AgentSetWebhook(ctx *gin.Context) {
 	agentId := idcodec.Decode(ctx.Param("id"))
 	agent := cache.UserCache.Get(agentId)
 	if agent == nil || !agent.IsBot || agent.BotOwner != owner.Id {
-		ginx.WriteJSON(ctx, ginx.ErrorMessage("Agent 不存在或无权限"))
+		ginx.WriteJSON(ctx, ginx.ErrorMessage(locales.Get("agent.not_found_or_forbidden")))
 		return
 	}
 	var r agentWebhookReq
@@ -151,7 +152,7 @@ func AgentRegenerateToken(ctx *gin.Context) {
 	agentId := idcodec.Decode(ctx.Param("id"))
 	agent := cache.UserCache.Get(agentId)
 	if agent == nil || !agent.IsBot || agent.BotOwner != owner.Id {
-		ginx.WriteJSON(ctx, ginx.ErrorMessage("Agent 不存在或无权限"))
+		ginx.WriteJSON(ctx, ginx.ErrorMessage(locales.Get("agent.not_found_or_forbidden")))
 		return
 	}
 	token, err := services.UserTokenService.Generate(agent.Id)

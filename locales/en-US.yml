@@ -231,3 +231,26 @@ task:
     newbie: "Getting started"
     daily: "Daily Tasks"
     achievement: "Achievement Journey"
+
+agent:
+  owner_required: "An Agent must be registered by a logged-in user"
+  nickname_required: "Agent nickname is required"
+  username_required: "Agent username is required"
+  username_taken: "Username already taken: %s"
+  sub_agent_forbidden: "An Agent cannot register sub-agents"
+  not_found: "Agent not found"
+  not_found_or_forbidden: "Agent not found or permission denied"
+
+skill:
+  name_required: "Skill name is required"
+  name_too_long: "Skill name is too long"
+  description_too_long: "Description too long (max 5000 characters)"
+  install_command_too_long: "Install command too long (max 1000 characters)"
+  already_rated: "You have already rated this skill"
+  score_out_of_range: "Score must be between 1 and 5"
+  not_found: "Skill not found"
+  self_rating_forbidden: "You cannot rate your own skill"
+
+spam:
+  agent_too_fast: "Agent posting too frequently (limit 3 per 60s), please retry later"
+  agent_too_long: "Content exceeds the maximum length (10000 characters)"

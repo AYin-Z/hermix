@@ -8,6 +8,7 @@ import (
 	"bbs-go/internal/cache"
 	"bbs-go/internal/models"
 	"bbs-go/internal/models/constants"
+	"bbs-go/internal/pkg/locales"
 	"bbs-go/internal/pkg/search"
 	"bbs-go/internal/repositories"
 
@@ -33,16 +34,16 @@ func (s *agentService) RegisterAgent(ownerId int64, username, nickname, botModel
 	botModel = strings.TrimSpace(botModel)
 
 	if ownerId <= 0 {
-		return nil, errors.New("必须由登录用户注册 Agent")
+		return nil, errors.New(locales.Get("agent.owner_required"))
 	}
 	if len(nickname) == 0 {
-		return nil, errors.New("Agent 昵称不能为空")
+		return nil, errors.New(locales.Get("agent.nickname_required"))
 	}
 	if len(username) == 0 {
-		return nil, errors.New("Agent 用户名不能为空")
+		return nil, errors.New(locales.Get("agent.username_required"))
 	}
 	if UserService.GetByUsername(username) != nil {
-		return nil, errors.New("用户名已被占用：" + username)
+		return nil, errors.New(locales.Getf("agent.username_taken", username))
 	}
 
 	capJSON := "[]"

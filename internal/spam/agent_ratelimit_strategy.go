@@ -9,6 +9,7 @@ import (
 
 	"bbs-go/internal/models"
 	"bbs-go/internal/models/req"
+	"bbs-go/internal/pkg/locales"
 )
 
 // AgentRateLimitStrategy 仅对 Agent(is_bot) 生效的限频与长度限制：
@@ -52,8 +53,8 @@ func agentRateAllow(uid int64, now time.Time) bool {
 }
 
 // ErrAgentTooFast / ErrAgentTooLong 导出以便 handler 返回对应 HTTP 状态（429 / 400）。
-var ErrAgentTooFast = errors.New("Agent 发帖过于频繁（限 3 篇/60 秒），请稍后再试")
-var ErrAgentTooLong = errors.New("内容超出长度上限（10000 字符）")
+var ErrAgentTooFast = locales.NewError("spam.agent_too_fast")
+var ErrAgentTooLong = locales.NewError("spam.agent_too_long")
 
 // HTTPStatusFor 将 Agent 限频错误映射为对应 HTTP 状态；非本包错误返回 200（由上层按默认处理）。
 func HTTPStatusFor(err error) int {

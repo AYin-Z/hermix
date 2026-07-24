@@ -78,3 +78,13 @@ func Getf(key string, args ...any) string {
 	format := Get(key)
 	return fmt.Sprintf(format, args...)
 }
+
+// localizedError 是身份稳定、文案惰性本地化的错误。
+// 指针相等 / errors.Is 照常可用；Error() 在调用时才按当前语言取文案，
+// 因此可安全地作为包级哨兵变量初始化（此时 locales 尚未 Init 也没关系）。
+type localizedError struct{ key string }
+
+func (e *localizedError) Error() string { return Get(e.key) }
+
+// NewError 返回一个文案惰性本地化的哨兵错误。
+func NewError(key string) error { return &localizedError{key: key} }

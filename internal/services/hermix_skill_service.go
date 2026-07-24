@@ -11,6 +11,7 @@ import (
 
 	"bbs-go/internal/models"
 	"bbs-go/internal/models/constants"
+	"bbs-go/internal/pkg/locales"
 	"bbs-go/internal/repositories"
 )
 
@@ -38,18 +39,18 @@ func (s *hermixSkillService) Get(id int64) *models.HermixSkill {
 func (s *hermixSkillService) Publish(authorId int64, in SkillPublishInput) (*models.HermixSkill, error) {
 	name := strings.TrimSpace(in.Name)
 	if name == "" {
-		return nil, errors.New("技能名称不能为空")
+		return nil, errors.New(locales.Get("skill.name_required"))
 	}
 	if len(name) > 128 {
-		return nil, errors.New("技能名称过长")
+		return nil, errors.New(locales.Get("skill.name_too_long"))
 	}
 	description := strings.TrimSpace(in.Description)
 	if len(description) > 5000 {
-		return nil, errors.New("描述过长（上限 5000 字符）")
+		return nil, errors.New(locales.Get("skill.description_too_long"))
 	}
 	installCommand := strings.TrimSpace(in.InstallCommand)
 	if len(installCommand) > 1000 {
-		return nil, errors.New("安装命令过长（上限 1000 字符）")
+		return nil, errors.New(locales.Get("skill.install_command_too_long"))
 	}
 	// 规整标签：去空、去重、限制数量与单个长度
 	tags := normalizeTags(in.Tags)
@@ -96,21 +97,21 @@ func (s *hermixSkillService) List(tag, keyword string, page, limit int) ([]model
 }
 
 // ErrAlreadyRated 表示该用户已对此技能评过分（含并发命中唯一索引的情况）。
-var ErrAlreadyRated = errors.New("你已经评过分了")
+var ErrAlreadyRated = locales.NewError("skill.already_rated")
 
 // Rate 给技能评分（1-5），每个用户每个技能仅记一次，防重复刷分。
 // 评分记录与聚合累加放在同一事务，避免崩溃导致计数漂移；
 // 并发下依赖 (skill_id,user_id) 唯一索引兜底，重复插入映射为 ErrAlreadyRated。
 func (s *hermixSkillService) Rate(skillId, userId int64, score int) error {
 	if score < 1 || score > 5 {
-		return errors.New("评分必须在 1-5 之间")
+		return errors.New(locales.Get("skill.score_out_of_range"))
 	}
 	skill := repositories.HermixSkillRepository.Get(sqls.DB(), skillId)
 	if skill == nil || skill.Status != constants.StatusOk {
-		return errors.New("技能不存在")
+		return errors.New(locales.Get("skill.not_found"))
 	}
 	if skill.AuthorId == userId {
-		return errors.New("不能给自己发布的技能评分")
+		return errors.New(locales.Get("skill.self_rating_forbidden"))
 	}
 	if existing := repositories.HermixSkillRatingRepository.FindBySkillAndUser(sqls.DB(), skillId, userId); existing != nil {
 		return ErrAlreadyRated

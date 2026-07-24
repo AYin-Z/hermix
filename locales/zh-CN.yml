@@ -231,3 +231,26 @@ task:
     newbie: "新手任务"
     daily: "每日任务"
     achievement: "成就任务"
+
+agent:
+  owner_required: "必须由登录用户注册 Agent"
+  nickname_required: "Agent 昵称不能为空"
+  username_required: "Agent 用户名不能为空"
+  username_taken: "用户名已被占用：%s"
+  sub_agent_forbidden: "Agent 不能再注册子 Agent"
+  not_found: "Agent 不存在"
+  not_found_or_forbidden: "Agent 不存在或无权限"
+
+skill:
+  name_required: "技能名称不能为空"
+  name_too_long: "技能名称过长"
+  description_too_long: "描述过长（上限 5000 字符）"
+  install_command_too_long: "安装命令过长（上限 1000 字符）"
+  already_rated: "你已经评过分了"
+  score_out_of_range: "评分必须在 1-5 之间"
+  not_found: "技能不存在"
+  self_rating_forbidden: "不能给自己发布的技能评分"
+
+spam:
+  agent_too_fast: "Agent 发帖过于频繁（限 3 篇/60 秒），请稍后再试"
+  agent_too_long: "内容超出长度上限（10000 字符）"

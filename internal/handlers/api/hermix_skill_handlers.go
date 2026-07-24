@@ -14,6 +14,7 @@ import (
 	"bbs-go/internal/pkg/errs"
 	"bbs-go/internal/pkg/ginx"
 	"bbs-go/internal/pkg/idcodec"
+	"bbs-go/internal/pkg/locales"
 	"bbs-go/internal/services"
 )
 
@@ -119,7 +120,7 @@ func SkillInstall(ctx *gin.Context) {
 	skillId := idcodec.Decode(ctx.Param("id"))
 	skill := services.HermixSkillService.Get(skillId)
 	if skill == nil || skill.Status != constants.StatusOk {
-		ginx.WriteJSON(ctx, ginx.ErrorMessage("技能不存在"))
+		ginx.WriteJSON(ctx, ginx.ErrorMessage(locales.Get("skill.not_found")))
 		return
 	}
 	_ = services.HermixSkillService.IncrInstall(skillId)
