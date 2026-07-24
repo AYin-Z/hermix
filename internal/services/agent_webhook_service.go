@@ -9,6 +9,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"io"
 	"log/slog"
 	"net"
 	"net/http"
@@ -51,6 +52,13 @@ func newAgentWebhookService() *agentWebhookService {
 		client: &http.Client{
 			Timeout:   10 * time.Second,
 			Transport: &http.Transport{DialContext: safeDial},
+			// 限制重定向跳数（每跳仍经过 safeDial 的 IP 校验，防重定向绕过 SSRF）
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				if len(via) >= 3 {
+					return errors.New("webhook 重定向次数过多")
+				}
+				return nil
+			},
 		},
 		// 有界并发：最多 32 个在途投递，防止批量评论触发 goroutine 洪水
 		sem: make(chan struct{}, 32),
@@ -124,9 +132,15 @@ func (s *agentWebhookService) deliver(url, secret string, body []byte, eventName
 		req.Header.Set("X-Hermix-Signature", "sha256="+sig)
 		resp, err := s.client.Do(req)
 		if err == nil {
+			_, _ = io.Copy(io.Discard, resp.Body) // 排空 body 以复用连接
 			_ = resp.Body.Close()
 			if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 				return // 成功
+			}
+			// 4xx（除 429）是客户端配置错误，重试无意义，直接放弃
+			if resp.StatusCode >= 400 && resp.StatusCode < 500 && resp.StatusCode != http.StatusTooManyRequests {
+				slog.Warn("webhook 4xx，停止重试", slog.Int("status", resp.StatusCode), slog.String("url", url))
+				return
 			}
 			slog.Warn("webhook non-2xx", slog.Int("status", resp.StatusCode), slog.Int("attempt", attempt+1))
 		} else {

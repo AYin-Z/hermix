@@ -43,9 +43,19 @@ func (s *hermixSkillService) Publish(authorId int64, in SkillPublishInput) (*mod
 	if len(name) > 128 {
 		return nil, errors.New("技能名称过长")
 	}
+	description := strings.TrimSpace(in.Description)
+	if len(description) > 5000 {
+		return nil, errors.New("描述过长（上限 5000 字符）")
+	}
+	installCommand := strings.TrimSpace(in.InstallCommand)
+	if len(installCommand) > 1000 {
+		return nil, errors.New("安装命令过长（上限 1000 字符）")
+	}
+	// 规整标签：去空、去重、限制数量与单个长度
+	tags := normalizeTags(in.Tags)
 	tagsJSON := "[]"
-	if len(in.Tags) > 0 {
-		if b, err := json.Marshal(in.Tags); err == nil {
+	if len(tags) > 0 {
+		if b, err := json.Marshal(tags); err == nil {
 			tagsJSON = string(b)
 		}
 	}
@@ -53,8 +63,8 @@ func (s *hermixSkillService) Publish(authorId int64, in SkillPublishInput) (*mod
 	skill := &models.HermixSkill{
 		AuthorId:       authorId,
 		Name:           name,
-		Description:    strings.TrimSpace(in.Description),
-		InstallCommand: strings.TrimSpace(in.InstallCommand),
+		Description:    description,
+		InstallCommand: installCommand,
 		Tags:           tagsJSON,
 		Status:         constants.StatusOk,
 		CreateTime:     now,
@@ -85,7 +95,12 @@ func (s *hermixSkillService) List(tag, keyword string, page, limit int) ([]model
 	return repositories.HermixSkillRepository.FindPageByCnd(sqls.DB(), cnd)
 }
 
+// ErrAlreadyRated 表示该用户已对此技能评过分（含并发命中唯一索引的情况）。
+var ErrAlreadyRated = errors.New("你已经评过分了")
+
 // Rate 给技能评分（1-5），每个用户每个技能仅记一次，防重复刷分。
+// 评分记录与聚合累加放在同一事务，避免崩溃导致计数漂移；
+// 并发下依赖 (skill_id,user_id) 唯一索引兜底，重复插入映射为 ErrAlreadyRated。
 func (s *hermixSkillService) Rate(skillId, userId int64, score int) error {
 	if score < 1 || score > 5 {
 		return errors.New("评分必须在 1-5 之间")
@@ -94,22 +109,28 @@ func (s *hermixSkillService) Rate(skillId, userId int64, score int) error {
 	if skill == nil || skill.Status != constants.StatusOk {
 		return errors.New("技能不存在")
 	}
+	if skill.AuthorId == userId {
+		return errors.New("不能给自己发布的技能评分")
+	}
 	if existing := repositories.HermixSkillRatingRepository.FindBySkillAndUser(sqls.DB(), skillId, userId); existing != nil {
-		return errors.New("你已经评过分了")
+		return ErrAlreadyRated
 	}
-	err := repositories.HermixSkillRatingRepository.Create(sqls.DB(), &models.HermixSkillRating{
-		SkillId:    skillId,
-		UserId:     userId,
-		Score:      score,
-		CreateTime: dates.NowTimestamp(),
-	})
-	if err != nil {
-		return err
-	}
-	// 原子累加评分总和/人数
-	return repositories.HermixSkillRepository.Updates(sqls.DB(), skillId, map[string]interface{}{
-		"rating_sum":   gorm.Expr("rating_sum + ?", score),
-		"rating_count": gorm.Expr("rating_count + 1"),
+	return sqls.DB().Transaction(func(tx *gorm.DB) error {
+		if err := repositories.HermixSkillRatingRepository.Create(tx, &models.HermixSkillRating{
+			SkillId:    skillId,
+			UserId:     userId,
+			Score:      score,
+			CreateTime: dates.NowTimestamp(),
+		}); err != nil {
+			if isDuplicateKeyErr(err) {
+				return ErrAlreadyRated
+			}
+			return err
+		}
+		return repositories.HermixSkillRepository.Updates(tx, skillId, map[string]interface{}{
+			"rating_sum":   gorm.Expr("rating_sum + ?", score),
+			"rating_count": gorm.Expr("rating_count + 1"),
+		})
 	})
 }
 
@@ -118,4 +139,39 @@ func (s *hermixSkillService) IncrInstall(skillId int64) error {
 	return repositories.HermixSkillRepository.Updates(sqls.DB(), skillId, map[string]interface{}{
 		"install_count": gorm.Expr("install_count + 1"),
 	})
+}
+
+// normalizeTags 去空白、去重、限制标签数量(≤10)与单标签长度(≤32)。
+func normalizeTags(in []string) []string {
+	seen := make(map[string]struct{})
+	out := make([]string, 0, len(in))
+	for _, t := range in {
+		t = strings.TrimSpace(t)
+		if t == "" || len(t) > 32 {
+			continue
+		}
+		if _, ok := seen[t]; ok {
+			continue
+		}
+		seen[t] = struct{}{}
+		out = append(out, t)
+		if len(out) >= 10 {
+			break
+		}
+	}
+	return out
+}
+
+// isDuplicateKeyErr 判断是否为唯一索引冲突（跨 MySQL/Postgres）。
+func isDuplicateKeyErr(err error) bool {
+	if err == nil {
+		return false
+	}
+	if errors.Is(err, gorm.ErrDuplicatedKey) {
+		return true
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "duplicate") ||
+		strings.Contains(msg, "unique constraint") ||
+		strings.Contains(msg, "1062")
 }

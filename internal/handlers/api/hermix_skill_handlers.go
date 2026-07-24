@@ -9,6 +9,7 @@ import (
 
 	"bbs-go/internal/handlers/render"
 	"bbs-go/internal/models"
+	"bbs-go/internal/models/constants"
 	"bbs-go/internal/pkg/common"
 	"bbs-go/internal/pkg/errs"
 	"bbs-go/internal/pkg/ginx"
@@ -117,7 +118,7 @@ func SkillRate(ctx *gin.Context) {
 func SkillInstall(ctx *gin.Context) {
 	skillId := idcodec.Decode(ctx.Param("id"))
 	skill := services.HermixSkillService.Get(skillId)
-	if skill == nil {
+	if skill == nil || skill.Status != constants.StatusOk {
 		ginx.WriteJSON(ctx, web.JsonErrorMsg("技能不存在"))
 		return
 	}
