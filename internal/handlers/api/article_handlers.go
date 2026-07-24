@@ -99,7 +99,7 @@ func ArticleCreate(ctx *gin.Context) {
 	form.Content = strings.TrimSpace(form.Content)
 
 	if err := spam.CheckArticle(user, form); err != nil {
-		ginx.WriteJSON(ctx, err)
+		ginx.WriteHttpStatusJSON(ctx, spam.HTTPStatusFor(err), err)
 		return
 	}
 

@@ -2,8 +2,10 @@ package spam
 
 import (
 	"errors"
+	"net/http"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"bbs-go/internal/models"
 	"bbs-go/internal/models/req"
@@ -53,41 +55,40 @@ func agentRateAllow(uid int64, now time.Time) bool {
 var ErrAgentTooFast = errors.New("Agent 发帖过于频繁（限 3 篇/60 秒），请稍后再试")
 var ErrAgentTooLong = errors.New("内容超出长度上限（10000 字符）")
 
-func (AgentRateLimitStrategy) CheckTopic(user *models.User, form req.CreateTopicReq) error {
+// HTTPStatusFor 将 Agent 限频错误映射为对应 HTTP 状态；非本包错误返回 200（由上层按默认处理）。
+func HTTPStatusFor(err error) int {
+	switch {
+	case errors.Is(err, ErrAgentTooFast):
+		return http.StatusTooManyRequests
+	case errors.Is(err, ErrAgentTooLong):
+		return http.StatusBadRequest
+	default:
+		return http.StatusOK
+	}
+}
+
+// check 对 is_bot 用户执行长度（按字符计）与滑动窗口限频；真人用户直接放行。
+func check(user *models.User, content string) error {
 	if user == nil || !user.IsBot {
 		return nil
 	}
-	if len(form.Content) > agentMaxContentLen {
+	if utf8.RuneCountInString(content) > agentMaxContentLen {
 		return ErrAgentTooLong
 	}
 	if !agentRateAllow(user.Id, time.Now()) {
 		return ErrAgentTooFast
 	}
 	return nil
+}
+
+func (AgentRateLimitStrategy) CheckTopic(user *models.User, form req.CreateTopicReq) error {
+	return check(user, form.Content)
 }
 
 func (AgentRateLimitStrategy) CheckArticle(user *models.User, form req.CreateArticleReq) error {
-	if user == nil || !user.IsBot {
-		return nil
-	}
-	if len(form.Content) > agentMaxContentLen {
-		return ErrAgentTooLong
-	}
-	if !agentRateAllow(user.Id, time.Now()) {
-		return ErrAgentTooFast
-	}
-	return nil
+	return check(user, form.Content)
 }
 
 func (AgentRateLimitStrategy) CheckComment(user *models.User, form req.CreateCommentReq) error {
-	if user == nil || !user.IsBot {
-		return nil
-	}
-	if len(form.Content) > agentMaxContentLen {
-		return ErrAgentTooLong
-	}
-	if !agentRateAllow(user.Id, time.Now()) {
-		return ErrAgentTooFast
-	}
-	return nil
+	return check(user, form.Content)
 }

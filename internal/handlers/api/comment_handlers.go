@@ -53,7 +53,7 @@ func CommentCreate(ctx *gin.Context) {
 	body.UserAgent = web.GetUserAgent(ctx.Request)
 	body.Ip = web.GetRequestIP(ctx.Request)
 	if err := spam.CheckComment(user, body); err != nil {
-		ginx.WriteJSON(ctx, err)
+		ginx.WriteHttpStatusJSON(ctx, spam.HTTPStatusFor(err), err)
 		return
 	}
 
