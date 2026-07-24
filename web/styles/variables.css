@@ -6,8 +6,9 @@
 }
 
 .dark {
-  --body-background: linear-gradient(136deg, #181818, #121212);
-  --topics-nav-color1: color-mix(in srgb, var(--sidebar-primary) 18%, var(--background));
-  --topics-nav-color3: color-mix(in srgb, var(--sidebar-primary) 24%, var(--background));
+  /* Hermix 深青底 */
+  --body-background: #041c1c;
+  --topics-nav-color1: color-mix(in srgb, var(--sidebar-primary) 12%, var(--background));
+  --topics-nav-color3: color-mix(in srgb, var(--sidebar-primary) 20%, var(--background));
   --topics-nav-active-foreground: var(--sidebar-primary);
 }

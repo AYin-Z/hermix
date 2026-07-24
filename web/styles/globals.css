@@ -11,6 +11,10 @@
 @import "./user.css";
 @import "./auth.css";
 @import "./pages.css";
+@import "./hermix.css";
+
+/* Hermix 字体 — 衬线标题 · 黑体正文 · 等宽代码 */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono&display=swap");
 
 @source "../app";
 @source "../components";
@@ -86,7 +90,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 0.5rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.546 0.245 262.881);
@@ -102,43 +106,56 @@
   --dashboard-accent-soft: oklch(0.94 0.03 190);
 }
 
+/* Hermix — hermesagent.org.cn 深色东方设计语言 (hex→oklch) */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.424 0.199 265.638);
-  --primary-foreground: oklch(0.97 0.014 254.604);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.623 0.214 259.815);
-  --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-  --dashboard-surface: oklch(0.18 0.012 260);
-  --dashboard-panel: oklch(0.215 0.01 260);
-  --dashboard-panel-muted: oklch(0.27 0.012 260);
-  --dashboard-accent: oklch(0.68 0.09 190);
-  --dashboard-accent-soft: oklch(0.28 0.035 190);
+  --background: oklch(0.2075 0.0303 195.07);      /* #041c1c 深青 */
+  --foreground: oklch(0.9383 0.0449 69.39);       /* #ffe6cb 暖 cream */
+  --card: oklch(0.2620 0.0367 195.15);            /* #0a2a2a */
+  --card-foreground: oklch(0.9383 0.0449 69.39);
+  --popover: oklch(0.2620 0.0367 195.15);
+  --popover-foreground: oklch(0.9383 0.0449 69.39);
+  --primary: oklch(0.8868 0.1822 95.33);          /* #FFD700 金 */
+  --primary-foreground: oklch(0.1506 0.0209 195.16); /* #020e0e */
+  --secondary: oklch(0.2459 0.0365 195.04);       /* #062626 */
+  --secondary-foreground: oklch(0.9383 0.0449 69.39);
+  --muted: oklch(0.2418 0.0289 195.41);           /* #0d2424 */
+  --muted-foreground: oklch(0.7857 0.0381 86.17); /* #c4b89e */
+  --accent: oklch(0.2917 0.0405 195.16);          /* #0e3232 */
+  --accent-foreground: oklch(0.8868 0.1822 95.33);
+  --destructive: oklch(0.5519 0.1763 28.07);      /* #c43a31 朱砂 */
+  --border: oklch(0.3264 0.0340 195.61);          /* #1e3a3a */
+  --input: oklch(0.2418 0.0289 195.41);
+  --ring: oklch(0.8868 0.1822 95.33);
+  --chart-1: oklch(0.8868 0.1822 95.33);
+  --chart-2: oklch(0.7258 0.1782 43.19);
+  --chart-3: oklch(0.8452 0.1299 164.98);
+  --chart-4: oklch(0.5916 0.0917 143.86);
+  --chart-5: oklch(0.5519 0.1763 28.07);
+  --sidebar: oklch(0.2075 0.0303 195.07);
+  --sidebar-foreground: oklch(0.7857 0.0381 86.17);
+  --sidebar-primary: oklch(0.8868 0.1822 95.33);
+  --sidebar-primary-foreground: oklch(0.1506 0.0209 195.16);
+  --sidebar-accent: oklch(0.2620 0.0367 195.15);
+  --sidebar-accent-foreground: oklch(0.8868 0.1822 95.33);
+  --sidebar-border: oklch(0.3264 0.0340 195.61);
+  --sidebar-ring: oklch(0.8868 0.1822 95.33);
+  --dashboard-surface: oklch(0.2075 0.0303 195.07);
+  --dashboard-panel: oklch(0.2620 0.0367 195.15);
+  --dashboard-panel-muted: oklch(0.2459 0.0365 195.04);
+  --dashboard-accent: oklch(0.8452 0.1299 164.98);
+  --dashboard-accent-soft: oklch(0.2917 0.0405 195.16);
+  /* Hermix 品牌扩展变量 */
+  --gold: oklch(0.8868 0.1822 95.33);
+  --gold-dim: oklch(0.6848 0.1372 92.16);
+  --orange: oklch(0.7258 0.1782 43.19);
+  --cinnabar: oklch(0.5519 0.1763 28.07);
+  --teal: oklch(0.8452 0.1299 164.98);
+  --jade: oklch(0.5916 0.0917 143.86);
+  --bg-deepest: oklch(0.1506 0.0209 195.16);
+  --bg-elevated: oklch(0.2459 0.0365 195.04);
+  --bg-card-hover: oklch(0.2917 0.0405 195.16);
+  --agent-badge: oklch(0.7045 0.1926 39.23);
+  --agent-border: oklch(0.7546 0.1512 38.26);
 }
 
 @layer base {

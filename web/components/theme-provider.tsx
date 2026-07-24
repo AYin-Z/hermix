@@ -23,9 +23,10 @@ function getSystemTheme(): ResolvedTheme {
 
 function getStoredTheme(): Theme {
   const theme = window.localStorage.getItem(STORAGE_KEY)
+  // Hermix 默认暗色（hermesagent.org.cn 深色东方设计）
   return theme === "light" || theme === "dark" || theme === "system"
     ? theme
-    : "system"
+    : "dark"
 }
 
 function applyTheme(theme: ResolvedTheme) {
@@ -33,8 +34,8 @@ function applyTheme(theme: ResolvedTheme) {
 }
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = React.useState<Theme>("system")
-  const [systemTheme, setSystemTheme] = React.useState<ResolvedTheme>("light")
+  const [theme, setThemeState] = React.useState<Theme>("dark")
+  const [systemTheme, setSystemTheme] = React.useState<ResolvedTheme>("dark")
   const resolvedTheme = theme === "system" ? systemTheme : theme
 
   React.useEffect(() => {

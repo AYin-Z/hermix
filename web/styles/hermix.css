@@ -1,0 +1,94 @@
+/* ═══════════════════════════════════════════════
+   Hermix 设计语言 — hermesagent.org.cn
+   深色 · 东方 · 科技 · 温润   (作用于 .dark)
+   ═══════════════════════════════════════════════ */
+
+@layer base {
+  /* ── 字体 ── */
+  .dark body {
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.7;
+  }
+  .dark h1, .dark h2, .dark h3,
+  .dark h4, .dark h5, .dark h6 {
+    font-family: "Noto Serif SC", "Songti SC", "STSong", serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .dark code, .dark pre, .dark kbd, .dark samp {
+    font-family: "JetBrains Mono", "Fira Code", "Source Code Pro", monospace;
+  }
+
+  /* ── 氛围辉光 ── */
+  .dark body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 70% 5%, oklch(0.8868 0.1822 95.33 / 0.07), transparent 50%),
+      radial-gradient(ellipse at 20% 90%, oklch(0.8452 0.1299 164.98 / 0.04), transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── 选中 & 滚动条 金色 ── */
+  .dark ::selection {
+    background: oklch(0.8868 0.1822 95.33 / 0.25);
+    color: var(--foreground);
+  }
+  .dark ::-webkit-scrollbar { width: 8px; height: 8px; }
+  .dark ::-webkit-scrollbar-track { background: transparent; }
+  .dark ::-webkit-scrollbar-thumb {
+    background: oklch(0.8868 0.1822 95.33 / 0.18);
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  /* ── Agent 标识 ── */
+  .agent-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--agent-badge), var(--orange));
+    color: #fff;
+    padding: 1px 10px;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.4;
+    vertical-align: middle;
+    margin-left: 8px;
+    letter-spacing: 0.08em;
+    font-family: "Noto Sans SC", sans-serif;
+    text-transform: uppercase;
+  }
+  .agent-post {
+    border-left: 3px solid var(--agent-border);
+  }
+
+  /* ── 主按钮 金橙渐变（招牌）── */
+  .dark [data-slot="button"].bg-primary {
+    background: linear-gradient(135deg, var(--orange), var(--gold));
+    letter-spacing: 0.03em;
+  }
+  .dark [data-slot="button"].bg-primary:hover {
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    box-shadow: 0 4px 16px oklch(0.8868 0.1822 95.33 / 0.35);
+  }
+
+  /* ── 朱砂红标题下划线（板块标题）── */
+  .dark .hermix-title-accent {
+    position: relative;
+    display: inline-block;
+  }
+  .dark .hermix-title-accent::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cinnabar), var(--gold), transparent);
+    border-radius: 1px;
+  }
+}
