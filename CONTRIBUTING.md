@@ -1,54 +1,64 @@
-# Contributing to Hermix
+# Contributing to BBS-GO
 
-Hermix 是 Hermes 中文社区的混合论坛项目。欢迎任何形式的贡献。
+Thank you for your interest in contributing to BBS-GO.
 
-## 快速开始
+BBS-GO is an open-source, self-hosted community platform for forums, Q&A, and reusable knowledge. We welcome bug reports, documentation improvements, feature ideas, and code contributions.
+
+## Ways to Contribute
+
+- Report bugs through [GitHub Issues](https://github.com/mlogclub/bbs-go/issues)
+- Ask usage questions in [GitHub Discussions](https://github.com/mlogclub/bbs-go/discussions)
+- Improve documentation and examples
+- Submit fixes and small improvements
+- Propose larger features before implementing them
+
+## Before Opening a Pull Request
+
+1. Search existing issues and discussions to avoid duplicates.
+2. For larger changes, open an issue or discussion first and describe the proposal.
+3. Keep pull requests focused and easy to review.
+4. Include screenshots for UI changes when possible.
+5. Update documentation when behavior changes.
+
+## Development Notes
+
+- Go backend lives in `server/`.
+- React frontend/dashboard lives in `web/`.
+- Dashboard routes are under `/dashboard`; the old `admin/` frontend is no longer maintained.
+- User-facing strings should support both `en-US` and `zh-CN` where applicable.
+
+Useful checks:
 
 ```bash
-# Clone 项目
-git clone https://github.com/AYin-Z/hermix.git
-cd hermix
+# Backend
+cd server && go test ./...
 
-# 搭建开发环境
-bash scripts/setup-dev.sh
-cd dev/nodebb && ./nodebb dev
+# Frontend
+cd web && pnpm lint && pnpm typecheck
 ```
 
-## 贡献什么
+For documentation site changes:
 
-| 领域 | 说明 | 入门难度 |
-|------|------|----------|
-| **深色主题** | SCSS/Less 样式，模板定制 | ⭐ 低 |
-| **Agent 插件** | JavaScript 后端逻辑，NodeBB hooks | ⭐⭐ 中 |
-| **文档** | PRD、Wiki、教程 | ⭐ 低 |
-| **翻译** | i18n 本地化 | ⭐ 低 |
-| **Bug 报告** | 提 Issue | ⭐ 低 |
-
-## 提交规范
-
-```
-<type>: <简短描述>
-
-# type: feat / fix / docs / style / refactor / test / chore
+```bash
+cd bbs-go-docs && pnpm build
 ```
 
-## 分支策略
+## Licensing of Contributions
 
-- `main` — 稳定分支，保持可发布状态
-- 直接在 `main` 上开发（小团队模式），或开 `feat/<name>` 分支
+BBS-GO is open source under GPLv3, with commercial licensing available for teams that need proprietary redistribution, custom commercial terms, deployment support, customization, migration, or long-term maintenance.
 
-## PR 流程
+By contributing to BBS-GO, you agree that your contributions may be distributed under the project's open-source license and may also be used as part of BBS-GO's commercial licensing offerings.
 
-1. 确保代码已自测
-2. 确保样式与设计系统（`theme/hermix.less`）一致
-3. 提交 PR 到 `main`
-4. 等待 review / CI 通过
+Please only contribute code, documentation, assets, or other materials that you have the right to submit.
 
-## 设计参考
+## Commercial Licensing and Private Support
 
-- 色彩/字体/布局见 `AGENTS.md` 第 4 节设计系统
-- 完整产品逻辑见 `PRD.md`
+For commercial licensing, deployment support, customization, migration, or long-term maintenance, email:
 
-## 许可证
+<g330721072@gmail.com>
 
-GPL v3（与上游 NodeBB 兼容）
+For security reports, email the same address with `[Security]` in the subject instead of opening a public issue.
+
+## Code of Conduct
+
+Be respectful and constructive. Assume good intent, keep discussions technical and practical, and help make the project welcoming for both users and contributors.
