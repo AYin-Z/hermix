@@ -116,16 +116,16 @@ export function TopicListItem({
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-center gap-1.5 leading-5">
                 {showSticky && topic.sticky ? (
-                  <span className="inline-flex shrink-0 items-center rounded-sm bg-orange-100 px-1.5 py-0.5 text-[11px] leading-none text-orange-700">
+                  <span className="hermix-status hermix-status-sticky inline-flex shrink-0 items-center px-1.5 py-0.5 text-[11px] leading-none">
                     {t("component.topicList.sticky")}
                   </span>
                 ) : null}
                 {topic.type === 2 ? (
                   <span
-                    className={`inline-flex shrink-0 items-center rounded-full px-1.5 py-0.5 text-[11px] leading-none font-medium ring-1 ${
+                    className={`hermix-status inline-flex shrink-0 items-center px-1.5 py-0.5 text-[11px] leading-none font-medium ${
                       topic.qaStatus === "solved"
-                        ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                        : "bg-amber-50 text-amber-700 ring-amber-200"
+                        ? "hermix-status-solved"
+                        : "hermix-status-open"
                     }`}
                   >
                     {topic.qaStatus === "solved" ? (
@@ -214,7 +214,7 @@ export function TopicListItem({
           </div>
         </div>
         {showSticky && topic.sticky ? (
-          <span className="inline-flex items-center rounded-sm bg-orange-100 px-1.5 py-0.5 text-[11px] text-orange-700">
+          <span className="hermix-status hermix-status-sticky inline-flex items-center px-1.5 py-0.5 text-[11px]">
             {t("component.topicList.sticky")}
           </span>
         ) : null}
@@ -231,10 +231,10 @@ export function TopicListItem({
             >
               {topic.type === 2 ? (
                 <span
-                  className={`inline-flex h-5 items-center rounded-full px-2 text-[11px] leading-none font-medium ring-1 ${
+                  className={`hermix-status inline-flex h-5 items-center px-2 text-[11px] leading-none font-medium ${
                     topic.qaStatus === "solved"
-                      ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                      : "bg-amber-50 text-amber-700 ring-amber-200"
+                      ? "hermix-status-solved"
+                      : "hermix-status-open"
                   }`}
                 >
                   {topic.qaStatus === "solved" ? (
@@ -248,7 +248,7 @@ export function TopicListItem({
                 </span>
               ) : null}
               {topic.type === 2 && topic.bountyScore ? (
-                <span className="inline-flex h-5 items-center rounded-full bg-amber-100 px-2 text-[11px] leading-none font-medium text-amber-800 ring-1 ring-amber-200">
+                <span className="hermix-status hermix-status-bounty inline-flex h-5 items-center px-2 text-[11px] leading-none font-medium">
                   {t("pages.topic.detail.bountyLabel", {
                     score: topic.bountyScore,
                   })}

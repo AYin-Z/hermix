@@ -93,4 +93,85 @@
     background: linear-gradient(90deg, var(--cinnabar), var(--gold), transparent);
     border-radius: 0;
   }
+
+  /* ── Kicker 等宽小标签（主站招牌，30 处高频）── */
+  .dark .hermix-kicker {
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    line-height: 1.4;
+  }
+
+  /* ── 面板头（等宽 · 大写 · 字距 · 底线）── */
+  .dark .hermix-panel-header {
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+
+  /* ── 方角网格线骨架（主站招牌：直角网格表格，非独立卡片浮层）── */
+  .dark .hermix-grid {
+    border-left: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+  }
+  .dark .hermix-cell {
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    transition: background-color 0.18s ease-out;
+  }
+  .dark .hermix-cell:hover {
+    background: oklch(0.9383 0.0449 69.39 / 0.04); /* cream a04 */
+  }
+
+  /* ── 卡片 hover 三联动（克制 · 主站 .2s ease-out：上浮 + 阴影切档 + 金边点亮）
+     顶部内高光 inset 增加"厚重"体积感 ── */
+  .dark .hermix-card {
+    border: 1px solid var(--border);
+    background: var(--card);
+    box-shadow: inset 0 1px 0 oklch(0.9383 0.0449 69.39 / 0.06);
+    transition:
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out,
+      border-color 0.2s ease-out;
+  }
+  .dark .hermix-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 16px 40px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 oklch(0.9383 0.0449 69.39 / 0.1);
+    border-color: oklch(0.8868 0.1822 95.33 / 0.35); /* 金边 */
+  }
+
+  /* ── 状态标签（方角 · 主题色，替代深色下跳色的硬编码浅色）
+     边框用 inset box-shadow，不占布局；金/玉/橙/朱砂对应四种语义 ── */
+  .dark .hermix-status {
+    border-radius: 0;
+  }
+  .dark .hermix-status-open {
+    background: oklch(0.8868 0.1822 95.33 / 0.12); /* 金 12% */
+    color: var(--gold);
+    box-shadow: inset 0 0 0 1px oklch(0.8868 0.1822 95.33 / 0.35);
+  }
+  .dark .hermix-status-solved {
+    background: oklch(0.5916 0.0917 143.86 / 0.16); /* 玉绿 16% */
+    color: oklch(0.7842 0.1163 160);
+    box-shadow: inset 0 0 0 1px oklch(0.5916 0.0917 143.86 / 0.45);
+  }
+  .dark .hermix-status-bounty {
+    background: oklch(0.7258 0.1782 43.19 / 0.14); /* 橙 14% */
+    color: var(--orange);
+    box-shadow: inset 0 0 0 1px oklch(0.7258 0.1782 43.19 / 0.4);
+  }
+  .dark .hermix-status-sticky {
+    background: oklch(0.5519 0.1763 28.07 / 0.16); /* 朱砂 16% */
+    color: oklch(0.72 0.16 30);
+    box-shadow: inset 0 0 0 1px oklch(0.5519 0.1763 28.07 / 0.45);
+  }
 }

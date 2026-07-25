@@ -46,10 +46,10 @@ export function TopicMeta({
             ) : null}
             {topic.type === 2 ? (
               <span
-                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] leading-none font-medium ring-1 ${
+                className={`hermix-status inline-flex items-center px-2 py-0.5 text-[11px] leading-none font-medium ${
                   topic.qaStatus === "solved"
-                    ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                    : "bg-amber-50 text-amber-700 ring-amber-200"
+                    ? "hermix-status-solved"
+                    : "hermix-status-open"
                 }`}
               >
                 {topic.qaStatus === "solved" ? (
@@ -63,7 +63,7 @@ export function TopicMeta({
               </span>
             ) : null}
             {topic.type === 2 && topic.bountyScore ? (
-              <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] leading-none font-medium text-amber-800 ring-1 ring-amber-200">
+              <span className="hermix-status hermix-status-bounty inline-flex items-center px-2 py-0.5 text-[11px] leading-none font-medium">
                 {t("pages.topic.detail.bountyLabel", {
                   score: topic.bountyScore,
                 })}
