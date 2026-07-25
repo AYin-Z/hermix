@@ -213,6 +213,19 @@
     line-height: 0.98;
   }
 
+  /* ── 侧栏 CTA（签到 / 登录引导）收进金橙招牌色 ──
+     上游 task-widgets 用硬编码 indigo-600，与主站金/橙体系冲突（跟 header
+     的 Create 金橙钮打架）。复用主按钮的招牌渐变，与全站 CTA 统一 ── */
+  .dark .hermix-cta {
+    background: linear-gradient(135deg, var(--orange), var(--gold));
+    color: var(--primary-foreground);
+    letter-spacing: 0.03em;
+  }
+  .dark .hermix-cta:hover {
+    background: linear-gradient(135deg, var(--gold), var(--orange));
+    box-shadow: 0 4px 16px oklch(0.8868 0.1822 95.33 / 0.35);
+  }
+
   /* ── 用户档案横幅：覆盖上游浅色文字衬底 ──
      上游 .profile-info 用白→透明横向渐变（为浅色主题设计），深色下浅色文字
      压在白底上不可读。翻成同形状的深色衬底，让文字重新可读 ── */

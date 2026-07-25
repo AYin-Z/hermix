@@ -86,7 +86,7 @@ function TasksUserCardContent({
         )}
         className="relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-4 text-left shadow-sm dark:border-slate-800/80 dark:bg-slate-900"
       >
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-50/80 via-white/70 to-emerald-50/80 dark:from-indigo-900/30 dark:via-slate-900/60 dark:to-emerald-900/20" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-50/80 via-white/70 to-emerald-50/80 dark:from-[oklch(0.8868_0.1822_95.33_/_0.1)] dark:via-slate-900/60 dark:to-[oklch(0.7258_0.1782_43.19_/_0.08)]" />
         <div className="relative flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-base font-semibold text-slate-400 dark:bg-slate-800">
             ?
@@ -100,7 +100,7 @@ function TasksUserCardContent({
             </p>
           </div>
         </div>
-        <span className="relative inline-flex items-center justify-center rounded-lg bg-indigo-600 px-3 py-2 text-[11px] font-semibold text-white shadow-sm transition hover:bg-indigo-500">
+        <span className="hermix-cta relative inline-flex items-center justify-center rounded-lg px-3 py-2 text-[11px] font-semibold text-white shadow-sm transition">
           {t("user.tasks.userCard.signInAction")}
           <ArrowRight className="h-3.5 w-3.5" />
         </span>
@@ -115,7 +115,7 @@ function TasksUserCardContent({
         <div className="min-w-0 flex-1">
           <Link
             href={`/user/${effectiveUser.id}`}
-            className="block truncate text-base font-semibold text-slate-900 hover:text-indigo-600 dark:text-slate-50"
+            className="block truncate text-base font-semibold text-slate-900 hover:text-primary dark:text-slate-50"
           >
             {displayName(effectiveUser)}
           </Link>
@@ -168,7 +168,7 @@ function TasksUserCardContent({
           </div>
           <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200/70 dark:bg-slate-800">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-indigo-500/80 to-emerald-400"
+              className="h-full rounded-full bg-gradient-to-r from-[var(--gold)] to-[var(--orange)]"
               style={{
                 width: `${effectiveUser.expProgress.expProgressPercent || 0}%`,
               }}
@@ -296,7 +296,7 @@ export function CheckInCard({
           <div className="min-h-9">
             {!isCheckedIn ? (
               <button
-                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-300/60 focus-visible:outline-none disabled:opacity-60"
+                className="hermix-cta inline-flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-semibold text-white shadow-sm transition focus-visible:ring-2 focus-visible:ring-[var(--gold)]/40 focus-visible:outline-none disabled:opacity-60"
                 type="button"
                 disabled={pending}
                 onClick={() => void doCheckIn()}
@@ -334,7 +334,7 @@ export function CheckInCard({
                   <UserAvatar user={item.user} size={30} />
                   <div className="min-w-0 flex-1">
                     <Link
-                      className="truncate font-semibold text-slate-900 hover:text-indigo-600 dark:text-slate-50"
+                      className="truncate font-semibold text-slate-900 hover:text-primary dark:text-slate-50"
                       href={`/user/${item.user.id}`}
                     >
                       {displayName(item.user)}
