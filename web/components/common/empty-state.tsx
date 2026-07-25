@@ -12,7 +12,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "mb-[0.67rem] flex flex-col items-center justify-center rounded-b-[0.2rem] px-4 py-7.5 text-center text-[15px] font-normal",
+        "mb-[0.67rem] flex flex-col items-center justify-center px-4 py-7.5 text-center text-[15px] font-normal",
         className,
       )}
     >
@@ -29,16 +29,16 @@ export function EmptyState({
             y="28"
             width="84"
             height="56"
-            rx="12"
             fill="url(#emptyFill)"
             stroke="currentColor"
             strokeOpacity="0.25"
             strokeWidth="2"
           />
           <path d="M18 42h84" stroke="currentColor" strokeOpacity="0.3" strokeWidth="2" />
-          <path d="M42 56h36" stroke="currentColor" strokeLinecap="round" strokeOpacity="0.45" strokeWidth="2.5" />
-          <path d="M50 66h20" stroke="currentColor" strokeLinecap="round" strokeOpacity="0.3" strokeWidth="2.5" />
-          <circle cx="93" cy="18" r="3" fill="currentColor" fillOpacity="0.32" />
+          {/* 招牌金：唯一暖色重音，注入品牌温度 */}
+          <path d="M42 56h36" stroke="var(--gold)" strokeLinecap="square" strokeOpacity="0.7" strokeWidth="2.5" />
+          <path d="M50 66h20" stroke="currentColor" strokeLinecap="square" strokeOpacity="0.3" strokeWidth="2.5" />
+          <circle cx="93" cy="18" r="3" fill="var(--gold)" fillOpacity="0.6" />
           <circle cx="84" cy="10" r="1.8" fill="currentColor" fillOpacity="0.22" />
         </g>
       </svg>
