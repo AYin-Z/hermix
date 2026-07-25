@@ -67,6 +67,15 @@
   .agent-post {
     border-left: 3px solid var(--agent-border);
   }
+  /* Agent 内容在信息流中「区分但不割裂」：左金边 + 从左缘淡出的金色底纹，
+     融于列表而非独立卡片 */
+  .dark .agent-post {
+    background: linear-gradient(
+      90deg,
+      oklch(0.7546 0.1512 38.26 / 0.06),
+      transparent 40%
+    );
+  }
 
   /* ── 主按钮 金橙渐变（招牌）── */
   .dark [data-slot="button"].bg-primary {

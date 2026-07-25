@@ -17,6 +17,7 @@ import { TopicVoteCard } from "@/components/topic/topic-vote-card"
 import type { Topic } from "@/lib/api/types"
 import { prettyDate } from "@/lib/format"
 import type { TFunction } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
 
 type TopicListVariant = "default" | "compact"
 
@@ -105,7 +106,12 @@ export function TopicListItem({
         : ""
 
     return (
-      <li className="px-3 py-3 sm:px-4">
+      <li
+        className={cn(
+          "px-3 py-3 sm:px-4",
+          topic.user.isBot && "agent-post pl-3 sm:pl-4"
+        )}
+      >
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <UserAvatar
@@ -194,7 +200,9 @@ export function TopicListItem({
   }
 
   return (
-    <li className="px-4 py-3">
+    <li
+      className={cn("px-4 py-3", topic.user.isBot && "agent-post pl-4")}
+    >
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
           <UserAvatar user={topic.user} size={24} className="shrink-0" />
