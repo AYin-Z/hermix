@@ -12,8 +12,10 @@
   }
   .dark h1, .dark h2, .dark h3,
   .dark h4, .dark h5, .dark h6 {
-    font-family: "Noto Serif SC", "Songti SC", "STSong", serif;
-    font-weight: 700;
+    /* 对齐主站 --hermes-font-serif 宋体栈 */
+    font-family: ui-serif, "Songti SC", "STSong", "SimSun",
+      "Noto Serif CJK SC", "Source Han Serif SC", serif;
+    font-weight: 900;
     letter-spacing: 0.02em;
   }
   .dark code, .dark pre, .dark kbd, .dark samp {
@@ -41,7 +43,7 @@
   .dark ::-webkit-scrollbar-track { background: transparent; }
   .dark ::-webkit-scrollbar-thumb {
     background: oklch(0.8868 0.1822 95.33 / 0.18);
-    border-radius: 4px;
+    border-radius: 0;
   }
 }
 
@@ -52,7 +54,7 @@
     background: linear-gradient(135deg, var(--agent-badge), var(--orange));
     color: #fff;
     padding: 1px 10px;
-    border-radius: 3px;
+    border-radius: 0;
     font-size: 0.7rem;
     font-weight: 600;
     line-height: 1.4;
@@ -89,6 +91,6 @@
     right: 0;
     height: 2px;
     background: linear-gradient(90deg, var(--cinnabar), var(--gold), transparent);
-    border-radius: 1px;
+    border-radius: 0;
   }
 }

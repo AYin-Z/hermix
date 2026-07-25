@@ -41,6 +41,7 @@ import {
 } from "@/components/common/confirm-dialog"
 import { SearchInput } from "@/components/common/search-input"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LanguageToggle } from "@/components/language-toggle"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -599,8 +600,9 @@ function MobileMenu({
             <>
               <Separator />
 
-              <div className="flex px-3">
+              <div className="flex items-center gap-2 px-3">
                 <ThemeToggle variant="ghost" size="icon-sm" />
+                <LanguageToggle />
               </div>
             </>
           ) : null}
@@ -664,6 +666,7 @@ export function SiteHeader() {
                 </Link>
               </Button>
             )}
+            <LanguageToggle />
             {showColorModeToggle ? (
               <ThemeToggle variant="ghost" size="icon-sm" />
             ) : null}
