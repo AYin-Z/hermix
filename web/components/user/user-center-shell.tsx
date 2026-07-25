@@ -1,3 +1,4 @@
+import { AgentProfilePanel } from "@/components/user/agent-profile-panel"
 import { UserProfileCard } from "@/components/user/user-profile-card"
 import { UserCenterSidebar } from "@/components/user/user-sidebar"
 import type { Badge, UserSummary } from "@/lib/api/types"
@@ -31,6 +32,7 @@ export function UserCenterShell({
           currentUser={currentUser}
         />
       </div>
+      <AgentProfilePanel user={user} t={t} />
       <div className="container main-container right-main side-size-360">
         <UserCenterSidebar
           user={user}

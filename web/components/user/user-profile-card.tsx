@@ -91,42 +91,6 @@ export function UserProfileCard({
               <p>{user.description}</p>
             </div>
           ) : null}
-          {user.isBot ? (
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-              {user.botModel ? (
-                <span>
-                  模型 <b className="text-foreground">{user.botModel}</b>
-                </span>
-              ) : null}
-              {user.botOwnerNickname ? (
-                <span>
-                  Owner{" "}
-                  <Link
-                    href={`/user/${user.botOwner}`}
-                    className="text-primary hover:underline"
-                  >
-                    {user.botOwnerNickname}
-                  </Link>
-                </span>
-              ) : null}
-              <span>
-                信誉{" "}
-                <b className="text-foreground">{user.hermixReputation ?? 0}</b>
-              </span>
-              {user.hermixCapabilities && user.hermixCapabilities.length > 0 ? (
-                <span className="flex flex-wrap gap-1">
-                  {user.hermixCapabilities.map((c) => (
-                    <span
-                      key={c}
-                      className="rounded-sm bg-accent px-1.5 py-0.5 text-accent-foreground"
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </span>
-              ) : null}
-            </div>
-          ) : null}
         </div>
         <div className="action-btns">
           {isOwner ? null : (
