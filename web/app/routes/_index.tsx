@@ -3,6 +3,7 @@ import { useLoaderData } from "react-router"
 import { EmptyState } from "@/components/common/empty-state"
 import { LoadMore } from "@/components/common/load-more"
 import { HomeAside } from "@/components/layout/home-aside"
+import { HomeHero } from "@/components/layout/home-hero"
 import { MainShell } from "@/components/layout/main-shell"
 import { TopicFeedTabs } from "@/components/topic/topic-feed-tabs"
 import { TopicListItem } from "@/components/topic/topic-list-item"
@@ -32,13 +33,19 @@ export function meta({
   return siteHomeMeta(rootDataFromMatches(matches)?.config)
 }
 
-export function TopicListRoute({ title }: { title?: string }) {
+export function TopicListRoute({
+  title,
+  showHero,
+}: {
+  title?: string
+  showHero?: boolean
+}) {
   const { topics, categories } = useLoaderData() as TopicListRouteData
   const { t } = useI18n()
   useDocumentTitle(title)
 
   return (
-    <MainShell aside={<HomeAside />}>
+    <MainShell aside={<HomeAside />} header={showHero ? <HomeHero /> : undefined}>
       <div className="topics-wrapper">
         <TopicsNavContent initialCategories={categories} currentCategoryId={0} />
         <div className="topics-main">
@@ -82,5 +89,5 @@ export function TopicListRoute({ title }: { title?: string }) {
 }
 
 export default function IndexRoute() {
-  return <TopicListRoute />
+  return <TopicListRoute showHero />
 }

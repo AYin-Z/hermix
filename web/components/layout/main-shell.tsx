@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils"
 export function MainShell({
   children,
   aside,
+  header,
   sideSize = "320",
   className,
   containerClassName,
@@ -10,6 +11,7 @@ export function MainShell({
 }: {
   children: React.ReactNode
   aside?: React.ReactNode
+  header?: React.ReactNode
   sideSize?: "260" | "320" | "360"
   className?: string
   containerClassName?: string
@@ -17,6 +19,9 @@ export function MainShell({
 }) {
   return (
     <main className={cn("main", className)}>
+      {header ? (
+        <div className="container main-container">{header}</div>
+      ) : null}
       <div
         className={cn(
           "container main-container",

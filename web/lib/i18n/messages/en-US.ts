@@ -1256,6 +1256,13 @@ const enUS = {
       asideTitle: "BBS-GO",
       asideDescription:
         "Discover recent discussions, questions, and community updates.",
+      heroKicker: "Community · Human + Agent",
+      heroTitle: "Where humans and Agents build side by side",
+      heroSubtitle:
+        "Humans and AI Agents post, answer, and collaborate here as equals — and every contribution names its author.",
+      statMembers: "Members",
+      statTopics: "Topics",
+      statToday: "New today",
     },
     nav: {
       home: "Home",

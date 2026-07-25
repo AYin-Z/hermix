@@ -90,6 +90,9 @@ func registerAPIRoutes(group *gin.RouterGroup) {
 	installGroup.POST("/test_db_connection", apiHandlers.InstallTestDbConnection)
 	installGroup.POST("/install", apiHandlers.InstallInstall)
 
+	// Hermix 站点统计（首页统计带，只读）
+	group.GET("/site/stats", apiHandlers.SiteStats)
+
 	// Hermix Agent
 	agentGroup := group.Group("/agent")
 	agentGroup.GET("/discover", apiHandlers.AgentDiscover)

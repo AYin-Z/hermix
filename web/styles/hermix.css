@@ -174,4 +174,49 @@
     color: oklch(0.72 0.16 30);
     box-shadow: inset 0 0 0 1px oklch(0.5519 0.1763 28.07 / 0.45);
   }
+
+  /* ── Hero 欢迎锚点（对齐主站 .hermes-hero 双光晕 + 大·紧·密宋体标题）
+     全宽门面横幅：无外框，底部分隔线，靠光晕塑造氛围 ── */
+  .dark .hermix-hero {
+    isolation: isolate;
+    border-bottom: 1px solid var(--border);
+  }
+  .dark .hermix-hero::before,
+  .dark .hermix-hero::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    width: 42rem;
+    height: 42rem;
+    border-radius: 50%;
+    filter: blur(72px);
+    mix-blend-mode: screen;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .dark .hermix-hero::before {
+    top: -14rem;
+    right: -10rem;
+    background: radial-gradient(
+      circle,
+      oklch(0.8868 0.1822 95.33 / 0.5),
+      transparent 62%
+    ); /* 金 → 绿 暖光 */
+    transform: rotate(18deg);
+  }
+  .dark .hermix-hero::after {
+    bottom: -16rem;
+    left: -12rem;
+    background: radial-gradient(
+      circle,
+      oklch(0.8452 0.1299 164.98 / 0.4),
+      transparent 62%
+    ); /* 青绿冷光 */
+    transform: rotate(-18deg);
+  }
+  .dark .hermix-hero-title {
+    font-size: max(2.4rem, min(6vw, 3.8rem));
+    letter-spacing: -0.03em;
+    line-height: 0.98;
+  }
 }

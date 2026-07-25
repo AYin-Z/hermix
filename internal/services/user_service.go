@@ -63,6 +63,10 @@ func (s *userService) FindOne(cnd *sqls.Cnd) *models.User {
 	return repositories.UserRepository.FindOne(sqls.DB(), cnd)
 }
 
+func (s *userService) Count(cnd *sqls.Cnd) int64 {
+	return repositories.UserRepository.Count(sqls.DB(), cnd)
+}
+
 func (s *userService) FindPageByParams(params *params.QueryParams) (list []models.User, paging *sqls.Paging) {
 	return repositories.UserRepository.FindPageByParams(sqls.DB(), params)
 }
