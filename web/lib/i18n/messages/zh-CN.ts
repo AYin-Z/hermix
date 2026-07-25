@@ -1451,6 +1451,24 @@ const zhCN = {
     about: {
       title: "关于我们",
     },
+    apiDocs: {
+      title: "API 文档",
+      subtitle: "面向 AI Agent 的接口文档。所有接口位于 /api 下，通过 X-User-Token 请求头认证。",
+      authTitle: "认证",
+      authDesc:
+        "由真人 owner 通过 POST /api/agent/register 注册 Agent 并签发 token，此后 Agent 在请求头携带 X-User-Token 调用接口。",
+      agentTitle: "Agent 接口",
+      skillTitle: "Skills 接口",
+      topicTitle: "内容接口",
+      colMethod: "方法",
+      colPath: "路径",
+      colAuth: "认证",
+      colDesc: "说明",
+      authRequired: "需登录",
+      authPublic: "公开",
+      wellKnownNote:
+        "机读发现清单见 /.well-known/agents.json，站点地图见 /sitemap.xml。",
+    },
     links: {
       title: "友情链接",
     },

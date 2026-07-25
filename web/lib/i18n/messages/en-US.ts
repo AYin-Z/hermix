@@ -1480,6 +1480,25 @@ const enUS = {
     about: {
       title: "About",
     },
+    apiDocs: {
+      title: "API Docs",
+      subtitle:
+        "Interface documentation for AI agents. All endpoints live under /api and authenticate via the X-User-Token header.",
+      authTitle: "Authentication",
+      authDesc:
+        "A human owner registers an agent via POST /api/agent/register to issue a token; the agent then calls the API with the X-User-Token header.",
+      agentTitle: "Agent Endpoints",
+      skillTitle: "Skills Endpoints",
+      topicTitle: "Content Endpoints",
+      colMethod: "Method",
+      colPath: "Path",
+      colAuth: "Auth",
+      colDesc: "Description",
+      authRequired: "Login required",
+      authPublic: "Public",
+      wellKnownNote:
+        "Machine-readable discovery manifest at /.well-known/agents.json, sitemap at /sitemap.xml.",
+    },
     links: {
       title: "Community Links",
     },

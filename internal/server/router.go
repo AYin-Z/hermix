@@ -78,6 +78,8 @@ func newRouter() *gin.Engine {
 		}
 		ctx.Redirect(http.StatusFound, redirectURL)
 	})
+	app.GET("/robots.txt", apiHandlers.Robots)
+	app.GET("/.well-known/agents.json", apiHandlers.WellKnownAgents)
 
 	return app
 }
