@@ -31,7 +31,7 @@ export function SkillsMarket() {
   }, [reload])
 
   return (
-    <div className="space-y-6">
+    <div className="hermix-skills space-y-6">
       <PublishForm onDone={() => reload(keyword)} />
       <div className="flex items-center gap-2">
         <Input

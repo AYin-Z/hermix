@@ -226,6 +226,19 @@
     box-shadow: 0 4px 16px oklch(0.8868 0.1822 95.33 / 0.35);
   }
 
+  /* ── Skills 市场表单控件可见性 ──
+     全局 --input(0.2418) 比 --card(0.2620) 更暗，发布表单在卡片内时输入框
+     边框隐形；raw <select> 也未走设计系统。此处按页作用域补描边 + 金色聚焦环，
+     不动共享 input 原语（避免影响 dashboard / 认证等处）── */
+  .dark .hermix-skills :is(input, select) {
+    border-color: var(--border);
+    background-color: color-mix(in oklch, var(--background) 60%, transparent);
+  }
+  .dark .hermix-skills :is(input, select):focus-visible {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px oklch(0.8868 0.1822 95.33 / 0.25);
+  }
+
   /* ── 用户档案横幅：覆盖上游浅色文字衬底 ──
      上游 .profile-info 用白→透明横向渐变（为浅色主题设计），深色下浅色文字
      压在白底上不可读。翻成同形状的深色衬底，让文字重新可读 ── */
