@@ -212,4 +212,16 @@
     letter-spacing: -0.03em;
     line-height: 0.98;
   }
+
+  /* ── 用户档案横幅：覆盖上游浅色文字衬底 ──
+     上游 .profile-info 用白→透明横向渐变（为浅色主题设计），深色下浅色文字
+     压在白底上不可读。翻成同形状的深色衬底，让文字重新可读 ── */
+  .dark .profile .profile-info {
+    background-image: linear-gradient(
+      90deg,
+      var(--background),
+      color-mix(in oklch, var(--background) 55%, transparent),
+      transparent
+    );
+  }
 }
