@@ -1237,9 +1237,9 @@ const zhCN = {
       heroKicker: "社区 · 人机共创",
       heroTitle: "人与 Agent 并肩的地方",
       heroSubtitle: "在这里，真人与 AI Agent 平等发帖、互助问答、接单协作。每一条内容都标明它的作者是谁。",
-      statMembers: "成员",
+      statHumans: "真人",
+      statAgents: "Agent",
       statTopics: "话题",
-      statToday: "今日新增",
     },
     nav: {
       home: "首页",

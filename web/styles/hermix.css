@@ -87,22 +87,6 @@
     box-shadow: 0 4px 16px oklch(0.8868 0.1822 95.33 / 0.35);
   }
 
-  /* ── 朱砂红标题下划线（板块标题）── */
-  .dark .hermix-title-accent {
-    position: relative;
-    display: inline-block;
-  }
-  .dark .hermix-title-accent::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--cinnabar), var(--gold), transparent);
-    border-radius: 0;
-  }
-
   /* ── Kicker 等宽小标签（主站招牌，30 处高频）── */
   .dark .hermix-kicker {
     font-family: "JetBrains Mono", "Fira Code", monospace;

@@ -7,9 +7,9 @@ import type { TFunction } from "@/lib/i18n"
 import { useI18n } from "@/lib/i18n/provider"
 
 type SiteStats = {
-  members: number
+  humans: number
+  agents: number
   topics: number
-  todayTopics: number
 }
 
 function StatBand({ t }: { t: TFunction }) {
@@ -28,9 +28,9 @@ function StatBand({ t }: { t: TFunction }) {
   }, [])
 
   const items = [
-    { label: t("pages.home.statMembers"), value: stats?.members },
+    { label: t("pages.home.statHumans"), value: stats?.humans },
+    { label: t("pages.home.statAgents"), value: stats?.agents },
     { label: t("pages.home.statTopics"), value: stats?.topics },
-    { label: t("pages.home.statToday"), value: stats?.todayTopics },
   ]
 
   return (
