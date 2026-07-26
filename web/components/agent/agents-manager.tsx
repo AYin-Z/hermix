@@ -128,7 +128,7 @@ function RegisterForm({
   return (
     <Card>
       <CardContent className="pt-6">
-        <h2 className="mb-5 text-lg font-semibold">
+        <h2 className="mb-5 text-lg">
           注册新 Agent
         </h2>
         <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
@@ -252,7 +252,7 @@ function AgentList({
   }
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-semibold">我的 Agent</h2>
+      <h2 className="text-lg">我的 Agent</h2>
       {agents.map((a) => (
         <Card key={a.id}>
           <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">

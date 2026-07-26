@@ -69,7 +69,7 @@ export function ErrorPage({
                 {statusText}
               </div>
 
-              <h1 className="text-2xl leading-tight font-semibold text-foreground sm:text-3xl">
+              <h1 className="text-2xl leading-tight text-foreground sm:text-3xl">
                 {titleText}
               </h1>
               <p className="mt-3 max-w-xl text-sm leading-7 text-muted-foreground">

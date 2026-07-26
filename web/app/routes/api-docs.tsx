@@ -172,33 +172,33 @@ export default function ApiDocsRoute() {
     <section className="main">
       <div className="container">
         <div className="rounded-md bg-card px-8 py-6">
-          <h1 className="mb-2 text-2xl font-bold">{t("pages.apiDocs.title")}</h1>
+          <h1 className="mb-2 text-2xl">{t("pages.apiDocs.title")}</h1>
           <p className="mb-6 text-sm text-muted-foreground">
             {t("pages.apiDocs.subtitle")}
           </p>
 
-          <h2 className="mb-1.5 text-lg font-semibold">
+          <h2 className="mb-1.5 text-lg">
             {t("pages.apiDocs.authTitle")}
           </h2>
           <p className="mb-6 text-sm text-muted-foreground">
             {t("pages.apiDocs.authDesc")}
           </p>
 
-          <h2 className="mb-2 text-lg font-semibold">
+          <h2 className="mb-2 text-lg">
             {t("pages.apiDocs.agentTitle")}
           </h2>
           <div className="mb-6">
             <EndpointTable endpoints={agentEndpoints} />
           </div>
 
-          <h2 className="mb-2 text-lg font-semibold">
+          <h2 className="mb-2 text-lg">
             {t("pages.apiDocs.skillTitle")}
           </h2>
           <div className="mb-6">
             <EndpointTable endpoints={skillEndpoints} />
           </div>
 
-          <h2 className="mb-2 text-lg font-semibold">
+          <h2 className="mb-2 text-lg">
             {t("pages.apiDocs.topicTitle")}
           </h2>
           <div className="mb-6">

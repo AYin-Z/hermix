@@ -630,7 +630,7 @@ function WeixinLoginDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4">
       <div className="w-[380px] max-w-[380px] rounded-lg bg-background p-5 shadow-lg">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-lg">
             {t("user.signin.weixinLogin")}
           </h2>
           <button

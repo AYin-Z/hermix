@@ -26,7 +26,7 @@ export function SearchArticleList({ results }: { results: SearchArticle[] }) {
             key={item.id}
             className="group px-4 py-5 transition-colors hover:bg-muted/25 sm:px-5"
           >
-            <h3 className="text-base leading-6 font-semibold text-foreground sm:text-[17px]">
+            <h3 className="text-base leading-6 text-foreground sm:text-[17px]">
               <Link
                 href={`/article/${item.id}`}
                 target="_blank"

@@ -107,7 +107,7 @@ export function ArticleDetailClientPage({
         <article className="rounded-lg bg-background p-3">
           <header className="border-b py-2.5">
             <div className="flex">
-              <h1 className="w-full overflow-hidden text-lg leading-[30px] font-normal break-all text-ellipsis text-foreground">
+              <h1 className="w-full overflow-hidden text-lg leading-[30px] break-all text-ellipsis text-foreground">
                 {article.title}
               </h1>
               <div className="min-w-max">

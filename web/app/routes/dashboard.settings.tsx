@@ -1305,7 +1305,7 @@ function NavSettings({
       <div className="grid gap-4 lg:grid-cols-[minmax(260px,36%)_1fr]">
         <div className="rounded-lg border bg-[var(--dashboard-panel)] p-3 shadow-xs">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-medium">{s("nav.primaryList")}</h3>
+            <h3 className="text-sm">{s("nav.primaryList")}</h3>
             <Button size="icon-sm" onClick={addParent}>
               <PlusIcon />
               <span className="sr-only">{s("script.add")}</span>
@@ -1369,7 +1369,7 @@ function NavSettings({
         <div className="rounded-lg border bg-[var(--dashboard-panel)] p-3 shadow-xs">
           {selected ? (
             <div className="grid gap-4">
-              <h3 className="text-sm font-medium">{s("nav.detailTitle")}</h3>
+              <h3 className="text-sm">{s("nav.detailTitle")}</h3>
               <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
                 <ShadcnField>
                   <FieldLabel>{s("nav.tableTitle")}</FieldLabel>
@@ -1406,7 +1406,7 @@ function NavSettings({
               </div>
 
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">
+                <h3 className="text-sm">
                   {s("nav.childrenTitle")}
                 </h3>
                 <Button
@@ -2303,7 +2303,7 @@ function PageSettings({
                 className="overflow-hidden rounded-md border bg-[var(--dashboard-panel)]"
               >
                 <div className="flex items-center justify-between gap-3 border-b bg-muted/30 px-4 py-3">
-                  <h4 className="text-sm font-medium">
+                  <h4 className="text-sm">
                     {s("page.footerLinkItem", { index: index + 1 })}
                   </h4>
                   <Button
@@ -2447,7 +2447,7 @@ function Field({
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 pt-2">
-      <h3 className="shrink-0 text-sm font-semibold">{children}</h3>
+      <h3 className="shrink-0 text-sm">{children}</h3>
       <Separator className="flex-1" />
     </div>
   )

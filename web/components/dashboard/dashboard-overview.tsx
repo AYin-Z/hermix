@@ -282,7 +282,7 @@ export function DashboardOverview() {
               <p className="text-xs font-medium tracking-wide text-primary uppercase">
                 {t("dashboard.overview.hero.eyebrow")}
               </p>
-              <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              <h1 className="text-2xl tracking-tight md:text-3xl">
                 {t("dashboard.overview.hero.title", { name: adminName })}
               </h1>
               <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -392,7 +392,7 @@ export function DashboardOverview() {
         <section className="rounded-lg border bg-[var(--dashboard-panel)] p-4 text-card-foreground shadow-xs">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold">
+              <h2 className="text-base">
                 {t("dashboard.overview.pending.title")}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -434,7 +434,7 @@ export function DashboardOverview() {
         </section>
 
         <section className="rounded-lg border bg-[var(--dashboard-panel)] p-4 text-card-foreground shadow-xs">
-          <h2 className="text-base font-semibold">
+          <h2 className="text-base">
             {t("dashboard.overview.quick.title")}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -463,7 +463,7 @@ export function DashboardOverview() {
       <section className="rounded-lg border bg-[var(--dashboard-panel)] p-4 text-card-foreground shadow-xs">
         <div className="flex items-center gap-2">
           <ClockIcon className="size-4 text-muted-foreground" />
-          <h2 className="text-base font-semibold">
+          <h2 className="text-base">
             {t("dashboard.overview.recent.title")}
           </h2>
         </div>
@@ -473,7 +473,7 @@ export function DashboardOverview() {
             return (
               <div key={key} className="rounded-md border p-3">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-sm font-medium">
+                  <h3 className="text-sm">
                     {t(`dashboard.overview.recent.${key}`)}
                   </h3>
                   <a

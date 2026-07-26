@@ -22,7 +22,7 @@ export function TopicAttachments({ attachments, t }: { attachments?: Attachment[
 
   return (
     <section className="mx-4 mb-4 rounded-md border border-border bg-muted/30 p-3">
-      <h2 className="mb-2 text-sm font-medium text-foreground">{t("pages.topic.detail.attachments")}</h2>
+      <h2 className="mb-2 text-sm text-foreground">{t("pages.topic.detail.attachments")}</h2>
       <ul className="space-y-3">
         {attachments.map((attachment) => (
           <li

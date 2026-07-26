@@ -19,7 +19,7 @@ export function UserInfo({ user, t }: { user: UserInfoSummary; t: TFunction }) {
     <section className="mb-2.5 rounded-lg bg-background">
       <div className="px-2.5 py-2.5 text-center">
         <UserAvatar user={user} size={80} className="mx-auto" />
-        <h2 className="mx-auto my-2.5 truncate text-[15px] font-bold">
+        <h2 className="mx-auto my-2.5 truncate text-[15px]">
           <Link href={`/user/${user.id}`} className="hover:underline">
             {displayName(user)}
           </Link>

@@ -334,7 +334,7 @@ export function InstallWizard({
       ) : null}
       <div className="w-full max-w-5xl">
         <div className="mb-5 text-center">
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">
+          <h1 className="mb-2 text-3xl text-gray-900">
             {t("pages.install.title")}
           </h1>
           <div className="mx-auto h-1.5 w-32 rounded-full bg-primary" />
@@ -350,7 +350,7 @@ export function InstallWizard({
                 description={t("pages.install.welcome.description")}
               />
               <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                <h3 className="mb-2.5 font-medium text-blue-900">
+                <h3 className="mb-2.5 text-blue-900">
                   {t("pages.install.welcome.requirements.title")}
                 </h3>
                 <ul className="space-y-2 text-blue-800">
@@ -366,7 +366,7 @@ export function InstallWizard({
                 </ul>
               </div>
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                <h3 className="mb-2.5 font-medium text-gray-900">
+                <h3 className="mb-2.5 text-gray-900">
                   {t("pages.install.language.title")}
                 </h3>
                 <p className="mb-3 text-gray-600">
@@ -806,7 +806,7 @@ export function InstallWizard({
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
               <div>
-                <h2 className="mb-4 text-2xl font-semibold text-gray-900">
+                <h2 className="mb-4 text-2xl text-gray-900">
                   {t("pages.install.step.complete")}
                 </h2>
                 <p className="mb-6 text-gray-600">
@@ -885,7 +885,7 @@ function SectionTitle({
 }) {
   return (
     <div className="text-center">
-      <h2 className="mb-3 text-2xl font-semibold text-gray-900">{title}</h2>
+      <h2 className="mb-3 text-2xl text-gray-900">{title}</h2>
       {description ? <p className="mb-4 text-gray-600">{description}</p> : null}
     </div>
   )

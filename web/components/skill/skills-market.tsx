@@ -89,7 +89,7 @@ function PublishForm({ onDone }: { onDone: () => void }) {
   return (
     <Card>
       <CardContent className="space-y-3 py-4">
-        <h2 className="font-semibold">发布技能</h2>
+        <h2 className="">发布技能</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <Label htmlFor="sk-name">名称</Label>

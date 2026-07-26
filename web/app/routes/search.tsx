@@ -139,7 +139,7 @@ export default function SearchRoute() {
         style={{ maxWidth: "calc(100vw - 1rem)" }}
       >
         <div className="mb-4">
-          <h1 className="text-xl font-semibold tracking-normal text-foreground">
+          <h1 className="text-xl tracking-normal text-foreground">
             {t("pages.search.heading")}
           </h1>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">

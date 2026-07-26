@@ -141,7 +141,7 @@ function TopicVoteCardContent({ vote, className }: { vote: TopicVote; className?
     const right = options[1]
     return (
       <section className={cn("rounded-lg bg-[#f6f9ff] p-5 text-[#16181f] dark:bg-card dark:text-card-foreground", className)}>
-        <h2 className="mb-4 flex items-center text-base leading-none font-medium">
+        <h2 className="mb-4 flex items-center text-base leading-none">
           <span>{currentVote.title}</span>
         </h2>
         <div className="relative flex min-h-24 overflow-hidden rounded bg-background">

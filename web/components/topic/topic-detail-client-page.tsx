@@ -160,7 +160,7 @@ export function TopicDetailClientPage({
             <TopicSideActionBar />
             <div className="mb-4 border-b px-4 py-3">
               {topic.title ? (
-                <h1 className="text-[26px] leading-9 font-bold wrap-break-word text-foreground">
+                <h1 className="text-[26px] leading-9 wrap-break-word text-foreground">
                   {topic.title}
                 </h1>
               ) : null}

@@ -54,7 +54,7 @@ export function HomeHero() {
     <section className="hermix-hero relative mb-4 overflow-hidden px-5 py-12 sm:px-10 sm:py-16">
       <div className="relative z-10 max-w-3xl">
         <span className="hermix-kicker">{t("pages.home.heroKicker")}</span>
-        <h1 className="hermix-hero-title mt-4 font-heading font-black text-foreground">
+        <h1 className="hermix-hero-title mt-4 font-heading text-foreground">
           {t("pages.home.heroTitle")}
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">

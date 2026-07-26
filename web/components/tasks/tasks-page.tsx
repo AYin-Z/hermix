@@ -100,7 +100,7 @@ export function TasksPageContent({
         <div className="flex flex-col gap-3 border-b border-border px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <h1 className="text-base font-semibold text-foreground">
+              <h1 className="text-base text-foreground">
                 {t("user.tasks.title")}
               </h1>
               <span className="inline-flex items-center rounded-md border border-border bg-muted/40 px-2 py-0.5 text-xs font-medium text-muted-foreground">
@@ -234,7 +234,7 @@ function TaskCard({ task }: { task: TaskInfo }) {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-sm font-semibold text-foreground">
+            <h3 className="text-sm text-foreground">
               {task.title}
             </h3>
             <span

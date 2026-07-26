@@ -333,7 +333,7 @@ function RolePermissionDrawer({
                           }
                         />
                         <div className="min-w-0 flex-1">
-                          <h3 className="truncate text-sm font-medium">
+                          <h3 className="truncate text-sm">
                             {groupLabel === groupLabelKey
                               ? group.name
                               : groupLabel}

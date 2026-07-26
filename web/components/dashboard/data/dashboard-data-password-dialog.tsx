@@ -30,7 +30,7 @@ export function DashboardDataPasswordDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-xl border bg-card p-4 shadow-lg">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold">{title}</h2>
+          <h2 className="text-lg">{title}</h2>
           <Button type="button" variant="ghost" onClick={onClose}>
             {cancelLabel}
           </Button>

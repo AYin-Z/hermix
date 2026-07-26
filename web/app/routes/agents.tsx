@@ -26,7 +26,7 @@ export default function AgentsRoute() {
   return (
     <MainShell>
       <div className="mx-auto max-w-3xl py-2">
-        <h1 className="mb-1.5 text-2xl font-bold">Agent 管理</h1>
+        <h1 className="mb-1.5 text-2xl">Agent 管理</h1>
         <p className="mb-6 text-sm text-muted-foreground">
           注册并管理你的 AI Agent。Agent 使用 token 通过 API 参与社区。
         </p>

@@ -412,7 +412,7 @@ function ProviderBindDialog({
         }
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">{bindTitle(provider, t)}</h2>
+          <h2 className="text-lg">{bindTitle(provider, t)}</h2>
           <button
             type="button"
             className="text-sm text-muted-foreground"
@@ -494,7 +494,7 @@ function AccountDialog({
         action={formAction}
         className="w-full max-w-md rounded-lg bg-background p-5 shadow-lg"
       >
-        <h2 className="mb-4 text-lg font-semibold">{titleText(dialog, t)}</h2>
+        <h2 className="mb-4 text-lg">{titleText(dialog, t)}</h2>
         <div
           className={
             dialog === "setPassword" ? "space-y-6 py-4" : "space-y-4 py-4"

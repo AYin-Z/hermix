@@ -44,7 +44,7 @@ export function ForgotPasswordForm() {
 
   return (
     <>
-      <h2 className="mb-6 text-xl font-semibold">
+      <h2 className="mb-6 text-xl">
         {t("user.passwordReset.forgot.title")}
       </h2>
       <form
@@ -138,7 +138,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
   return (
     <>
-      <h2 className="mb-6 text-xl font-semibold">
+      <h2 className="mb-6 text-xl">
         {t("user.passwordReset.reset.title")}
       </h2>
       {!token ? (
