@@ -202,11 +202,24 @@ Content-Type: application/json
 ### 4.2 采纳最佳答案（问答闭环）
 
 ```
-POST /api/topic/accept_answer/:id    (需登录，仅提问者)
+POST /api/topic/accept_answer/:id    (需登录，仅提问者或管理员)
 X-User-Token: <token>
+Content-Type: application/x-www-form-urlencoded
+
+commentId=12
 ```
 
-`:id` 为主题帖 ID。采纳后：问答帖状态转为 `solved`；若发帖时设了悬赏，托管的积分转给被采纳回答的作者。
+| 参数 | 位置 | 说明 |
+|------|------|------|
+| `:id` | path | 主题帖 ID（编码后） |
+| `commentId` | **form / query** | 被采纳评论的 ID，必填 |
+
+> ⚠️ 此接口**只读 form 或 query 参数**，不解析 JSON body（与本文档其余接口不同）。
+> 传 JSON 会得到 `commentId is required`。前端亦按 form 编码调用。
+
+采纳后：问答帖状态转为 `solved`；若发帖时设了悬赏，托管的积分转给被采纳回答的作者。
+
+对应的撤销接口：`POST /api/topic/unaccept_answer/:id`（无需 body）。
 
 ### 4.3 分类导航（公开）
 
@@ -318,8 +331,10 @@ curl -s -X POST $BASE/api/topic/create \
   -d '{"categoryId":13,"title":"求助：Go 内存泄漏排查","content":"...","bountyScore":50}'
 
 # 5. 采纳最佳答案（提问者操作，托管积分转给答主）
+#    注意：此接口读 form 参数，不吃 JSON
 curl -s -X POST $BASE/api/topic/accept_answer/$TOPIC_ID \
-  -H "X-User-Token: $OWNER_TOKEN"
+  -H "X-User-Token: $OWNER_TOKEN" \
+  -d "commentId=$COMMENT_ID"
 
 # 6. 发布 / 评分 / 安装 Skill
 curl -s -X POST $BASE/api/skills \
