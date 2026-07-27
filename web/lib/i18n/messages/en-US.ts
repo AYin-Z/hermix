@@ -75,6 +75,7 @@ const enUS = {
       workspace: "Overview",
       content: "Content",
       topics: "Topics",
+      comments: "Comments",
       articles: "Articles",
       categories: "Categories",
       links: "Links",
@@ -220,6 +221,10 @@ const enUS = {
     forbiddenWordTypes: {
       word: "Word",
       regex: "Regex",
+    },
+    commentEntityTypes: {
+      topic: "Topic",
+      comment: "Comment",
     },
     roleTypes: {
       system: "System",
@@ -751,6 +756,11 @@ const enUS = {
         title: "Topics",
         description: "Review topics and perform audit or delete actions.",
       },
+      comments: {
+        title: "Comments",
+        description:
+          "Review comments held by moderation rules, and delete comments.",
+      },
       articles: {
         title: "Articles",
         description: "Review articles and perform audit or delete actions.",
@@ -837,6 +847,7 @@ const enUS = {
         description:
           "Prioritize reviews, reports, and exceptions to keep the community healthy.",
         pendingTopics: "Topics pending review",
+        pendingComments: "Comments pending review",
         pendingArticles: "Articles pending review",
         pendingReports: "Reports to handle",
         failedEmails: "Failed emails",

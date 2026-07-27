@@ -62,6 +62,10 @@ function dashboardBreadcrumbs(
       url: "/dashboard/topics",
       items: {
         topics: { title: t("dashboard.nav.topics"), url: "/dashboard/topics" },
+        comments: {
+          title: t("dashboard.nav.comments"),
+          url: "/dashboard/comments",
+        },
         articles: {
           title: t("dashboard.nav.articles"),
           url: "/dashboard/articles",

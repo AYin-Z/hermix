@@ -36,12 +36,10 @@ func (u *LocalUploader) PutObject(_ dto.UploadConfig, key string, body io.Reader
 }
 
 func (u *LocalUploader) CopyImage(cfg dto.UploadConfig, originUrl string) (string, error) {
-	data, ct, err := download(originUrl)
+	data, ct, key, err := prepareCopyImage(originUrl)
 	if err != nil {
 		return "", err
 	}
-	ct = NormalizeImageContentType(ct)
-	key := GenerateImageKey(data, ct)
 	opts := &PutOptions{ContentType: ct, ContentLength: int64(len(data))}
 	return u.PutObject(cfg, key, bytes.NewReader(data), opts)
 }

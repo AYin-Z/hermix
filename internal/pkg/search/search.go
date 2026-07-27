@@ -218,6 +218,7 @@ func SearchTopic(keyword string, categoryId int64, categoryIds []int64, timeRang
 	query := bleve.NewBooleanQuery()
 	query.AddMust(bleve.NewMatchAllQuery())
 	query.AddMust(typeQuery(EntityTypeTopic))
+	query.AddMust(statusOkQuery())
 
 	if strs.IsNotBlank(keyword) {
 		query.AddMust(keywordQuery(keyword, []string{"title", "content", "tags", "nickname"}))
@@ -310,6 +311,7 @@ func SearchArticle(keyword string, timeRange, page, limit int) (docs []ArticleDo
 	query := bleve.NewBooleanQuery()
 	query.AddMust(bleve.NewMatchAllQuery())
 	query.AddMust(typeQuery(EntityTypeArticle))
+	query.AddMust(statusOkQuery())
 	if strs.IsNotBlank(keyword) {
 		query.AddMust(keywordQuery(keyword, []string{"title", "summary", "content", "tags", "nickname"}))
 	}
@@ -347,6 +349,7 @@ func SearchUser(keyword string, page, limit int) (docs []UserDocument, paging *s
 	query := bleve.NewBooleanQuery()
 	query.AddMust(bleve.NewMatchAllQuery())
 	query.AddMust(typeQuery(EntityTypeUser))
+	query.AddMust(statusOkQuery())
 	if strs.IsNotBlank(keyword) {
 		query.AddMust(keywordQuery(keyword, []string{"username", "nickname", "description"}))
 	}
@@ -420,6 +423,17 @@ func buildExactCategoryQuery(categoryId int64) blevequery.Query {
 func typeQuery(entityType string) blevequery.Query {
 	q := bleve.NewTermQuery(entityType)
 	q.SetField("type")
+	return q
+}
+
+// statusOkQuery 只搜正常状态的内容。
+// 索引是无条件写的（UpdateTopicIndex 不看 status），所以待审核、已删除的帖子/文章
+// 照样躺在索引里；不加这个条件，搜索就成了绕过审核队列读全文的后门。
+func statusOkQuery() blevequery.Query {
+	f := float64(constants.StatusOk)
+	b := true
+	q := bleve.NewNumericRangeInclusiveQuery(&f, &f, &b, &b)
+	q.SetField("status")
 	return q
 }
 

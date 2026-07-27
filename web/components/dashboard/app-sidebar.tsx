@@ -61,6 +61,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             permission: PERMISSIONS.DASHBOARD_TOPIC_VIEW,
           },
           {
+            title: t("dashboard.nav.comments"),
+            url: "/dashboard/comments",
+            permission: PERMISSIONS.DASHBOARD_COMMENT_VIEW,
+          },
+          {
             title: t("dashboard.nav.articles"),
             url: "/dashboard/articles",
             permission: PERMISSIONS.DASHBOARD_ARTICLE_VIEW,

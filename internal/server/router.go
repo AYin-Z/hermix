@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"slices"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -43,9 +44,16 @@ func newRouter() *gin.Engine {
 		AllowCredentials: true,
 		MaxAge:           600,
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodOptions, http.MethodHead, http.MethodDelete, http.MethodPut},
-		AllowHeaders:     []string{"*"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-User-Token", "X-Requested-With"},
 	}
-	if len(corsConfig.AllowOrigins) == 0 {
+	// 通配来源与「带凭据」不能共存：gin-contrib/cors 见到任何 "*" 就会置
+	// AllowAllOrigins，同时保留 AllowCredentials —— 浏览器会拒绝这种组合，
+	// 而配置本身表达的是「任意站点都可携带用户 cookie 调用本站 API」。
+	// 因此显式降级为匿名 CORS，别把凭据许诺出去。
+	// 另外 AllowHeaders 不再用 "*"：自定义请求头是简单请求之外的一道天然
+	// CSRF 屏障，放开等于一旦白名单里加了具体域名，那道屏障也一起没了。
+	if len(corsConfig.AllowOrigins) == 0 || slices.Contains(corsConfig.AllowOrigins, "*") {
+		corsConfig.AllowOrigins = nil
 		corsConfig.AllowAllOrigins = true
 		corsConfig.AllowCredentials = false
 	}
@@ -348,6 +356,12 @@ func registerAdminRoutes(group *gin.RouterGroup) {
 	topicGroup.POST("/mark_solved", adminHandlers.TopicMarkSolved)
 	topicGroup.POST("/mark_unsolved", adminHandlers.TopicMarkUnsolved)
 	topicGroup.GET("/:id", adminHandlers.TopicDetail)
+
+	adminCommentGroup := group.Group("/comment")
+	adminCommentGroup.POST("/list", adminHandlers.CommentList)
+	adminCommentGroup.POST("/audit", adminHandlers.CommentAudit)
+	adminCommentGroup.POST("/delete", adminHandlers.CommentRemove)
+	adminCommentGroup.GET("/:id", adminHandlers.CommentDetail)
 
 	categoryGroup := group.Group("/category")
 	categoryGroup.POST("/list", adminHandlers.CategoryList)

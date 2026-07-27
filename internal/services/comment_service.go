@@ -83,6 +83,45 @@ func (s *commentService) Delete(id int64) error {
 	return repositories.CommentRepository.UpdateColumn(sqls.DB(), id, "status", constants.StatusDeleted)
 }
 
+// Audit 放行待审评论。
+// 发布时若命中违禁词，评论会以 StatusReview 落库且不计楼层数、不发通知，
+// 这里补上当时跳过的那几步，所以只接受 StatusReview 的评论 —— 对已放行/已删除的
+// 评论重复调用会把计数加两次。
+func (s *commentService) Audit(id int64) error {
+	comment := s.Get(id)
+	if comment == nil {
+		return errors.New("comment not found")
+	}
+	if comment.Status == constants.StatusOk {
+		return nil
+	}
+	if comment.Status != constants.StatusReview {
+		return errors.New(locales.Get("comment.not_in_review"))
+	}
+
+	if err := sqls.DB().Transaction(func(tx *gorm.DB) error {
+		if err := repositories.CommentRepository.UpdateColumn(tx, comment.Id, "status", constants.StatusOk); err != nil {
+			return err
+		}
+		switch comment.EntityType {
+		case constants.EntityTopic:
+			return TopicService.onComment(tx, comment.EntityId, comment)
+		case constants.EntityComment:
+			return s.onComment(tx, comment)
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	UserService.IncrCommentCount(comment.UserId)
+	event.Send(event.CommentCreateEvent{
+		UserId:    comment.UserId,
+		CommentId: comment.Id,
+	})
+	return nil
+}
+
 func (s *commentService) DeleteByUser(user *models.User, id int64) error {
 	if user == nil {
 		return errs.NotLogin()
@@ -111,6 +150,14 @@ func (s *commentService) Publish(userId int64, form req.CreateCommentReq) (*mode
 		return nil, errors.New(locales.Get("comment.content_required"))
 	}
 
+	// 违禁词命中则进人工审核队列，不直接放出。
+	// 此前只有主题发布查违禁词，评论完全不查 —— 敏感内容改用评论发即可绕过整条审核链。
+	status := constants.StatusOk
+	if hits := ForbiddenWordService.Check(form.Content); len(hits) > 0 {
+		slog.Info("评论命中违禁词", slog.String("hits", strings.Join(hits, ",")))
+		status = constants.StatusReview
+	}
+
 	comment := &models.Comment{
 		UserId:      userId,
 		EntityType:  form.EntityType,
@@ -118,7 +165,7 @@ func (s *commentService) Publish(userId int64, form req.CreateCommentReq) (*mode
 		Content:     form.Content,
 		ContentType: constants.ContentTypeText,
 		QuoteId:     form.QuoteId,
-		Status:      constants.StatusOk,
+		Status:      status,
 		UserAgent:   form.UserAgent,
 		Ip:          form.Ip,
 		IpLocation:  iplocator.IpLocation(form.Ip),
@@ -140,6 +187,11 @@ func (s *commentService) Publish(userId int64, form req.CreateCommentReq) (*mode
 			return err
 		}
 
+		// 待审评论对读者不可见，先不计入楼层数与「最后回复」，等放行时再补。
+		if comment.Status != constants.StatusOk {
+			return nil
+		}
+
 		switch form.EntityType {
 		case constants.EntityTopic:
 			if err := TopicService.onComment(tx, entityId, comment); err != nil {
@@ -155,6 +207,11 @@ func (s *commentService) Publish(userId int64, form req.CreateCommentReq) (*mode
 
 	if err != nil {
 		return nil, err
+	}
+
+	// 待审评论不计数、不发通知，避免审核前就把内容以通知形式推给他人。
+	if comment.Status != constants.StatusOk {
+		return comment, nil
 	}
 
 	// 用户跟帖计数

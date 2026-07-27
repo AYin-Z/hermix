@@ -182,6 +182,12 @@ func (s *topicPublishService) _IsNeedReview(form req.CreateTopicReq) bool {
 		return true
 	}
 
+	// 隐藏内容同样是会被读者看到的正文，此前不查违禁词，等于绕过审核的口子。
+	if hits := ForbiddenWordService.Check(form.HideContent); len(hits) > 0 {
+		slog.Info("帖子隐藏内容命中违禁词", slog.String("hits", strings.Join(hits, ",")))
+		return true
+	}
+
 	return false
 }
 

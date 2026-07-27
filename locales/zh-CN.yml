@@ -25,6 +25,8 @@ topic:
   insufficient_score: "积分不足，无法设置悬赏"
   bounty_deduct: "问答悬赏"
   bounty_reward: "问答被采纳悬赏"
+  answer_already_accepted: "该问题已采纳答案，无法重复采纳"
+  bounty_paid_cannot_unaccept: "悬赏已发放，无法取消采纳"
   bounty_refund: "问答悬赏退回"
   qa_bounty_disabled: "未开启问答悬赏功能"
   bounty_required: "当前要求问答帖必须设置悬赏积分"
@@ -142,6 +144,13 @@ vote:
 comment:
   invalid_params: "参数非法"
   content_required: "请输入评论内容"
+  not_in_review: "该评论不处于待审核状态"
+
+user_report:
+  reason_required: "请填写举报原因"
+  reason_too_long: "举报原因过长"
+  target_not_found: "举报的内容不存在"
+  already_reported: "你已举报过该内容，请等待处理"
 
 favorite:
   article_not_found: "收藏的文章不存在"
@@ -181,6 +190,12 @@ install:
 
 upload:
   image_too_large: "图片不能超过 %d M"
+  image_type_not_allowed: "仅支持 JPG / PNG / GIF / WebP / BMP 图片"
+
+forbidden_word:
+  word_required: "请填写违禁词"
+  invalid_type: "违禁词类型非法"
+  invalid_regex: "正则表达式无效：%s"
 
 attachment:
   not_found: "附件不存在或已下架"

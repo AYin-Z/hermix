@@ -39,12 +39,10 @@ func (u *TencentCosUploader) PutObject(cfg dto.UploadConfig, key string, body io
 }
 
 func (u *TencentCosUploader) CopyImage(cfg dto.UploadConfig, originUrl string) (string, error) {
-	data, ct, err := download(originUrl)
+	data, ct, key, err := prepareCopyImage(originUrl)
 	if err != nil {
 		return "", err
 	}
-	ct = NormalizeImageContentType(ct)
-	key := GenerateImageKey(data, ct)
 	opts := &PutOptions{ContentType: ct, ContentLength: int64(len(data))}
 	return u.PutObject(cfg, key, bytes.NewReader(data), opts)
 }

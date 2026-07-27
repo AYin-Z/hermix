@@ -34,6 +34,7 @@ type OverviewMetricKey =
 
 type PendingKey =
   | "pendingTopics"
+  | "pendingComments"
   | "pendingArticles"
   | "pendingReports"
   | "failedEmails"
@@ -113,6 +114,7 @@ function normalizeOverview(data: AdminRecord | null): OverviewData | null {
     },
     pending: {
       pendingTopics: toNumber(pending.pendingTopics),
+      pendingComments: toNumber(pending.pendingComments),
       pendingArticles: toNumber(pending.pendingArticles),
       pendingReports: toNumber(pending.pendingReports),
       failedEmails: toNumber(pending.failedEmails),
@@ -176,6 +178,12 @@ export function DashboardOverview() {
       href: "/dashboard/topics",
       icon: MessageSquareIcon,
       permission: PERMISSIONS.DASHBOARD_TOPIC_VIEW,
+    },
+    {
+      key: "pendingComments",
+      href: "/dashboard/comments",
+      icon: MessageSquareIcon,
+      permission: PERMISSIONS.DASHBOARD_COMMENT_VIEW,
     },
     {
       key: "pendingArticles",

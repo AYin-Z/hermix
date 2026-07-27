@@ -4,7 +4,9 @@ import (
 	"bbs-go/internal/cache"
 	"bbs-go/internal/models"
 	"bbs-go/internal/models/constants"
+	"bbs-go/internal/pkg/locales"
 	"bbs-go/internal/repositories"
+	"errors"
 	"regexp"
 	"strings"
 
@@ -52,6 +54,9 @@ func (s *forbiddenWordService) Count(cnd *sqls.Cnd) int64 {
 }
 
 func (s *forbiddenWordService) Create(t *models.ForbiddenWord) error {
+	if err := s.validate(t); err != nil {
+		return err
+	}
 	if err := repositories.ForbiddenWordRepository.Create(sqls.DB(), t); err != nil {
 		return err
 	}
@@ -60,10 +65,33 @@ func (s *forbiddenWordService) Create(t *models.ForbiddenWord) error {
 }
 
 func (s *forbiddenWordService) Update(t *models.ForbiddenWord) error {
+	if err := s.validate(t); err != nil {
+		return err
+	}
 	if err := repositories.ForbiddenWordRepository.Update(sqls.DB(), t); err != nil {
 		return err
 	}
 	cache.ForbiddenWordCache.Invalidate()
+	return nil
+}
+
+// validate 落库前校验规则本身。
+// Check 里编译失败的正则是静默跳过的，所以一个手滑写错的规则会被当成"已生效"
+// 挂在后台列表里，实际一次都不会命中 —— 那种漏洞只能等出事才发现，必须在入口拦掉。
+func (s *forbiddenWordService) validate(t *models.ForbiddenWord) error {
+	t.Word = strings.TrimSpace(t.Word)
+	if strs.IsBlank(t.Word) {
+		return errors.New(locales.Get("forbidden_word.word_required"))
+	}
+	switch t.Type {
+	case constants.ForbiddenWordTypeWord:
+	case constants.ForbiddenWordTypeRegex:
+		if _, err := regexp.Compile(t.Word); err != nil {
+			return errors.New(locales.Getf("forbidden_word.invalid_regex", err.Error()))
+		}
+	default:
+		return errors.New(locales.Get("forbidden_word.invalid_type"))
+	}
 	return nil
 }
 

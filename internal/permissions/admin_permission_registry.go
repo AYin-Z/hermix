@@ -34,6 +34,11 @@ var (
 		{Method: "POST", Pattern: "/api/admin/article/delete", Permissions: []PermissionDefinition{PermissionArticleDelete}},
 		{Method: "POST", Pattern: "/api/admin/article/tags", Permissions: []PermissionDefinition{PermissionArticleTags}},
 
+		{Method: "POST", Pattern: "/api/admin/comment/list", Permissions: []PermissionDefinition{PermissionCommentView}},
+		{Method: "GET", Pattern: "/api/admin/comment/*", Permissions: []PermissionDefinition{PermissionCommentView}},
+		{Method: "POST", Pattern: "/api/admin/comment/audit", Permissions: []PermissionDefinition{PermissionCommentAudit}},
+		{Method: "POST", Pattern: "/api/admin/comment/delete", Permissions: []PermissionDefinition{PermissionCommentDelete}},
+
 		{Method: "GET", Pattern: "/api/admin/category/*", Permissions: []PermissionDefinition{PermissionCategoryView}},
 		{Method: "GET", Pattern: "/api/admin/category/options", Permissions: []PermissionDefinition{PermissionCategoryView}},
 		{Method: "POST", Pattern: "/api/admin/category/list", Permissions: []PermissionDefinition{PermissionCategoryView}},

@@ -1,7 +1,9 @@
 package ginx
 
 import (
+	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -64,11 +66,34 @@ func SetCookieKV(ctx *gin.Context, name, value string, opts ...CookieOption) {
 	if options.expires > 0 {
 		maxAge = int(options.expires.Seconds())
 	}
-	ctx.SetCookie(name, value, maxAge, "/", "", false, options.httpOnly)
+	setSameSiteLax(ctx)
+	ctx.SetCookie(name, value, maxAge, "/", "", isHTTPS(ctx), options.httpOnly)
 }
 
 func RemoveCookie(ctx *gin.Context, name string) {
-	ctx.SetCookie(name, "", -1, "/", "", false, true)
+	setSameSiteLax(ctx)
+	ctx.SetCookie(name, "", -1, "/", "", isHTTPS(ctx), true)
+}
+
+// setSameSiteLax 给后续 SetCookie 打上 SameSite=Lax。
+// 会话 cookie 缺少 SameSite 时浏览器按 None 处理，跨站表单/图片请求都会带上它，
+// 站内所有状态变更接口（改资料、发帖、采纳答案…）因此可被 CSRF 触发。
+// Lax 保留正常的站外链接跳转（GET 顶层导航仍携带 cookie），只挡掉跨站的
+// POST 与子资源请求，对现有前端无影响。
+func setSameSiteLax(ctx *gin.Context) {
+	ctx.SetSameSite(http.SameSiteLaxMode)
+}
+
+// isHTTPS 判断当前请求是否走 TLS，用于决定 Secure 标记。
+// 生产在 traefik 后面，TLS 在反代终止，因此需同时看 X-Forwarded-Proto。
+func isHTTPS(ctx *gin.Context) bool {
+	if ctx.Request == nil {
+		return false
+	}
+	if ctx.Request.TLS != nil {
+		return true
+	}
+	return strings.EqualFold(ctx.GetHeader("X-Forwarded-Proto"), "https")
 }
 
 type CookieOption func(*cookieOptions)

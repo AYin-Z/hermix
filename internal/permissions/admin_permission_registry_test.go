@@ -110,19 +110,30 @@ func TestAdminPermissionRegistryRejectsUnknownAdminPath(t *testing.T) {
 	}
 }
 
-func TestAdminPermissionRegistryRejectsCommentManagementPaths(t *testing.T) {
+func TestAdminPermissionRegistryProtectsCommentManagementPaths(t *testing.T) {
 	paths := []struct {
-		method string
-		path   string
+		method   string
+		path     string
+		expected string
 	}{
-		{method: "GET", path: "/api/admin/comment/1"},
-		{method: "POST", path: "/api/admin/comment/list"},
-		{method: "DELETE", path: "/api/admin/comment/1"},
+		{method: "GET", path: "/api/admin/comment/1", expected: PermissionCommentView.Code},
+		{method: "POST", path: "/api/admin/comment/list", expected: PermissionCommentView.Code},
+		{method: "POST", path: "/api/admin/comment/audit", expected: PermissionCommentAudit.Code},
+		{method: "POST", path: "/api/admin/comment/delete", expected: PermissionCommentDelete.Code},
 	}
 
 	for _, path := range paths {
-		if code, ok := GetAdminPermissionCode(path.method, path.path); ok {
-			t.Fatalf("expected %s %s to be rejected, got %s", path.method, path.path, code)
+		code, ok := GetAdminPermissionCode(path.method, path.path)
+		if !ok {
+			t.Fatalf("expected %s %s to be registered", path.method, path.path)
 		}
+		if code != path.expected {
+			t.Fatalf("expected %s for %s %s, got %s", path.expected, path.method, path.path, code)
+		}
+	}
+
+	// 未注册的方法仍然要落到拒绝分支，别被 /api/admin/comment/* 通配规则顺带放行。
+	if code, ok := GetAdminPermissionCode("DELETE", "/api/admin/comment/1"); ok {
+		t.Fatalf("expected DELETE /api/admin/comment/1 to be rejected, got %s", code)
 	}
 }

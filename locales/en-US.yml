@@ -25,6 +25,8 @@ topic:
   insufficient_score: "Insufficient points to set bounty"
   bounty_deduct: "Q&A bounty"
   bounty_reward: "Q&A accepted answer reward"
+  answer_already_accepted: "An answer has already been accepted for this question"
+  bounty_paid_cannot_unaccept: "The bounty has been paid out and the answer cannot be unaccepted"
   bounty_refund: "Q&A bounty refund"
   qa_bounty_disabled: "Q&A bounty is not enabled"
   bounty_required: "Bounty points are required for Q&A posts"
@@ -142,6 +144,13 @@ vote:
 comment:
   invalid_params: "Invalid request parameters"
   content_required: "Comment content is required"
+  not_in_review: "This comment is not pending review"
+
+user_report:
+  reason_required: "Please provide a reason"
+  reason_too_long: "The reason is too long"
+  target_not_found: "The reported content does not exist"
+  already_reported: "You have already reported this content, please wait for review"
 
 favorite:
   article_not_found: "Favorite article not found"
@@ -181,6 +190,12 @@ install:
 
 upload:
   image_too_large: "Image cannot exceed %d M"
+  image_type_not_allowed: "Only JPG / PNG / GIF / WebP / BMP images are supported"
+
+forbidden_word:
+  word_required: "Please provide a word"
+  invalid_type: "Invalid forbidden word type"
+  invalid_regex: "Invalid regular expression: %s"
 
 attachment:
   not_found: "Attachment not found or unavailable"

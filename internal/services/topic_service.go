@@ -7,9 +7,11 @@ import (
 	"bbs-go/internal/pkg/locales"
 	"bbs-go/internal/pkg/search"
 	"errors"
+	"log/slog"
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"bbs-go/internal/pkg/params"
 
@@ -181,12 +183,18 @@ func (s *topicService) Edit(userId, topicId int64, form req.EditTopicReq) error 
 			tagIds []int64
 			err    error
 		)
-		if err = repositories.TopicRepository.Updates(ctx.Tx, topicId, map[string]interface{}{
+		updates := map[string]interface{}{
 			"category_id":  form.CategoryId,
 			"title":        form.Title,
 			"content":      form.Content,
 			"hide_content": hideContent,
-		}); err != nil {
+		}
+		// 编辑同样要过违禁词：否则先发一篇干净的、过审后再编辑塞进违禁内容，就绕开了整条审核链。
+		if hits := ForbiddenWordService.Check(form.Title + "\n" + form.Content + "\n" + hideContent); len(hits) > 0 {
+			slog.Info("帖子编辑命中违禁词", slog.String("hits", strings.Join(hits, ",")))
+			updates["status"] = constants.StatusReview
+		}
+		if err = repositories.TopicRepository.Updates(ctx.Tx, topicId, updates); err != nil {
 			return err
 		}
 
@@ -572,14 +580,25 @@ func (s *topicService) AcceptAnswer(topicId, commentId, userId int64, isAdmin bo
 		return errors.New(locales.Get("common.not_found"))
 	}
 
+	// 已采纳过就直接拒绝：悬赏在发帖时已托管扣除，重复采纳会重复发放而作者不再扣分，
+	// 等于任何提问者都能对自己的小号无限次采纳来凭空造分。
+	if topic.AcceptedCommentId > 0 {
+		return errors.New(locales.Get("topic.answer_already_accepted"))
+	}
+
 	now := dates.NowTimestamp()
 	if err := sqls.WithTransaction(func(ctx *sqls.TxContext) error {
-		if err := repositories.TopicRepository.Updates(ctx.Tx, topic.Id, map[string]interface{}{
+		// 条件更新 + 行数校验，把并发的第二个请求挡在事务内（上面的预检只是为了给出友好提示）。
+		affected, err := repositories.TopicRepository.UpdatesIfNotAccepted(ctx.Tx, topic.Id, map[string]interface{}{
 			"accepted_comment_id": comment.Id,
 			"qa_status":           constants.QaStatusSolved,
 			"solved_at":           now,
-		}); err != nil {
+		})
+		if err != nil {
 			return err
+		}
+		if affected == 0 {
+			return errors.New(locales.Get("topic.answer_already_accepted"))
 		}
 		if topic.BountyScore > 0 && comment.UserId != topic.UserId {
 			if err := UserService.AddScoreTx(ctx, comment.UserId, topic.BountyScore, constants.SourceTypeQaBounty, strconv.FormatInt(topic.Id, 10), locales.Get("topic.bounty_reward")); err != nil {
@@ -612,6 +631,17 @@ func (s *topicService) UnacceptAnswer(topicId, userId int64, isAdmin bool) error
 	}
 	if topic.UserId != userId && !isAdmin {
 		return errors.New(locales.Get("topic.no_permission"))
+	}
+
+	// 悬赏一旦付出就不允许再取消采纳。
+	// 取消采纳只会清空 accepted_comment_id、不会把分追回答主，而 Delete 又以
+	// accepted_comment_id == 0 作为「未发放、可退款」的判据 —— 采纳→取消→删帖
+	// 因此能让同一笔悬赏既付给答主又退给作者，凭空增发。
+	// 追回是更糟的选择（答主可能已花掉，会出现负分），所以按「付款不可撤销」处理。
+	if topic.AcceptedCommentId > 0 && topic.BountyScore > 0 {
+		if comment := CommentService.Get(topic.AcceptedCommentId); comment != nil && comment.UserId != topic.UserId {
+			return errors.New(locales.Get("topic.bounty_paid_cannot_unaccept"))
+		}
 	}
 
 	return s.Updates(topic.Id, map[string]interface{}{

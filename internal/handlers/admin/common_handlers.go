@@ -69,6 +69,7 @@ func CommonOverview(ctx *gin.Context) {
 
 	pending := map[string]int64{
 		"pendingTopics":   repositories.TopicRepository.Count(db, sqls.NewCnd().Eq("status", constants.StatusReview)),
+		"pendingComments": repositories.CommentRepository.Count(db, sqls.NewCnd().Eq("status", constants.StatusReview)),
 		"pendingArticles": repositories.ArticleRepository.Count(db, sqls.NewCnd().Eq("status", constants.StatusReview)),
 		"pendingReports":  repositories.UserReportRepository.Count(db, sqls.NewCnd().Eq("audit_status", 0)),
 		"failedEmails":    repositories.EmailLogRepository.Count(db, sqls.NewCnd().Eq("status", constants.EmailLogStatusFailed)),

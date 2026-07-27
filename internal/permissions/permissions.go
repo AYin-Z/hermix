@@ -55,7 +55,9 @@ var (
 	PermissionArticleDelete = PermissionDefinition{Type: TypeDashboard, Code: "dashboard.article.delete", GroupName: GroupContent, SortNo: 230, NameEn: "Delete Articles", NameZh: "删除文章"}
 	PermissionArticleTags   = PermissionDefinition{Type: TypeDashboard, Code: "dashboard.article.tags", GroupName: GroupContent, SortNo: 240, NameEn: "Update Article Tags", NameZh: "维护文章标签"}
 
+	PermissionCommentView   = PermissionDefinition{Type: TypeDashboard, Code: "dashboard.comment.view", GroupName: GroupContent, SortNo: 300, NameEn: "View Comments", NameZh: "查看评论"}
 	PermissionCommentDelete = PermissionDefinition{Type: TypeDashboard, Code: "dashboard.comment.delete", GroupName: GroupContent, SortNo: 310, NameEn: "Delete Comments", NameZh: "删除评论"}
+	PermissionCommentAudit  = PermissionDefinition{Type: TypeDashboard, Code: "dashboard.comment.audit", GroupName: GroupContent, SortNo: 320, NameEn: "Audit Comments", NameZh: "审核评论"}
 
 	PermissionCategoryView   = PermissionDefinition{Type: TypeDashboard, Code: "dashboard.category.view", GroupName: GroupContent, SortNo: 400, NameEn: "View Categories", NameZh: "查看分类"}
 	PermissionCategoryCreate = PermissionDefinition{Type: TypeDashboard, Code: "dashboard.category.create", GroupName: GroupContent, SortNo: 410, NameEn: "Create Categories", NameZh: "创建分类"}
@@ -129,7 +131,9 @@ var Permissions = []PermissionDefinition{
 	PermissionArticleAudit,
 	PermissionArticleDelete,
 	PermissionArticleTags,
+	PermissionCommentView,
 	PermissionCommentDelete,
+	PermissionCommentAudit,
 	PermissionCategoryView,
 	PermissionCategoryCreate,
 	PermissionCategoryUpdate,

@@ -4,7 +4,7 @@ const (
 	DefaultTokenExpireDays       = 7   // 用户登录token默认有效期
 	SummaryLen                   = 256 // 摘要长度
 	UploadMaxM                   = 10
-	UploadMaxBytes         int64 = 1024 * 1024 * 1024 * UploadMaxM
+	UploadMaxBytes         int64 = 1024 * 1024 * UploadMaxM
 	CookieTokenKey               = "bbsgo_token"
 	TopicListPageSize            = 30 // 帖子列表分页大小
 )

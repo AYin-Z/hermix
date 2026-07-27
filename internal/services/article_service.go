@@ -6,6 +6,7 @@ import (
 	"bbs-go/internal/pkg/locales"
 	"bbs-go/internal/pkg/search"
 	"errors"
+	"log/slog"
 	"math"
 	"strings"
 
@@ -163,6 +164,14 @@ func (s *articleService) Publish(userId int64, form req.CreateArticleReq) (artic
 	if SysConfigService.IsArticlePending() {
 		status = constants.StatusReview
 	}
+	// 命中违禁词一律进审核队列（此前文章完全不查违禁词，只有主题查）。
+	if hits := ForbiddenWordService.Check(form.Title); len(hits) > 0 {
+		slog.Info("文章标题命中违禁词", slog.String("hits", strings.Join(hits, ",")))
+		status = constants.StatusReview
+	} else if hits := ForbiddenWordService.Check(form.Content); len(hits) > 0 {
+		slog.Info("文章内容命中违禁词", slog.String("hits", strings.Join(hits, ",")))
+		status = constants.StatusReview
+	}
 
 	article = &models.Article{
 		UserId:      userId,
@@ -214,6 +223,11 @@ func (s *articleService) Edit(articleId int64, tags []string, title, content str
 		updates := map[string]any{
 			"title":   title,
 			"content": content,
+		}
+		// 编辑同样要过违禁词，理由同发布：否则「先发干净的、过审后再编辑」就能绕过审核。
+		if hits := ForbiddenWordService.Check(title + "\n" + content); len(hits) > 0 {
+			slog.Info("文章编辑命中违禁词", slog.String("hits", strings.Join(hits, ",")))
+			updates["status"] = constants.StatusReview
 		}
 		if cover != nil {
 			updates["cover"] = jsons.ToJsonStr(cover)

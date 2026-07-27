@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"log/slog"
 
@@ -12,6 +13,7 @@ import (
 	"bbs-go/internal/models/constants"
 	"bbs-go/internal/pkg/common"
 	"bbs-go/internal/pkg/locales"
+	"bbs-go/internal/pkg/uploader"
 	"bbs-go/internal/services"
 )
 
@@ -51,8 +53,13 @@ func UploadHandle(ctx *gin.Context) {
 		size = int64(len(fileBytes))
 	}
 
+	// contentType 传下去仅供日志与兼容，真实类型由 PutImageStream 按内容嗅探。
 	url, err := services.UploadService.PutImageStream(body, size, contentType)
 	if err != nil {
+		if errors.Is(err, uploader.ErrImageTypeNotAllowed) {
+			ginx.WriteJSON(ctx, ginx.ErrorMessage(locales.Get("upload.image_type_not_allowed")))
+			return
+		}
 		ginx.WriteJSON(ctx, err)
 		return
 	}

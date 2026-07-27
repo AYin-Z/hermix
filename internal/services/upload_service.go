@@ -61,19 +61,42 @@ func (s *uploadService) ObjectURL(key string) string {
 }
 
 // PutImage 上传图片（已有完整字节）；key 使用内容 MD5，供 CopyImage 等场景。
-func (s *uploadService) PutImage(data []byte, contentType string) (string, error) {
-	contentType = uploader.NormalizeImageContentType(contentType)
-	key := uploader.GenerateImageKey(data, contentType)
+// 类型按内容嗅探并受白名单约束，contentType 参数仅作兼容保留、不再被信任。
+func (s *uploadService) PutImage(data []byte, _ string) (string, error) {
+	head := data
+	if len(head) > uploader.SniffLen {
+		head = head[:uploader.SniffLen]
+	}
+	contentType, ext, err := uploader.ResolveImageType(head)
+	if err != nil {
+		return "", err
+	}
+	key := uploader.GenerateImageKeyWithExt(ext)
 	opts := &uploader.PutOptions{ContentType: contentType, ContentLength: int64(len(data))}
 	return s.putObject(key, bytes.NewReader(data), opts)
 }
 
-// PutImageStream 流式上传图片；key 使用 UUID，无需先读完整 body。
-func (s *uploadService) PutImageStream(body io.Reader, contentLength int64, contentType string) (string, error) {
-	contentType = uploader.NormalizeImageContentType(contentType)
-	key := uploader.GenerateImageKeyByContentType(contentType)
+// PutImageStream 流式上传图片。
+//
+// 先读出首 512 字节做内容嗅探，再把它拼回 body 继续流式写入 —— 落盘扩展名与
+// 回吐的 Content-Type 都取自嗅探结果，客户端声明的 contentType 一概不采信
+// （否则声明 text/html 即可在本站源下存入可执行脚本）。
+func (s *uploadService) PutImageStream(body io.Reader, contentLength int64, _ string) (string, error) {
+	head := make([]byte, uploader.SniffLen)
+	n, err := io.ReadFull(body, head)
+	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
+		return "", err
+	}
+	head = head[:n]
+
+	contentType, ext, err := uploader.ResolveImageType(head)
+	if err != nil {
+		return "", err
+	}
+
+	key := uploader.GenerateImageKeyWithExt(ext)
 	opts := &uploader.PutOptions{ContentType: contentType, ContentLength: contentLength}
-	return s.putObject(key, body, opts)
+	return s.putObject(key, io.MultiReader(bytes.NewReader(head), body), opts)
 }
 
 func (s *uploadService) CopyImage(url string) (string, error) {

@@ -92,6 +92,15 @@ func (r *topicRepository) Updates(db *gorm.DB, id int64, columns map[string]inte
 	return
 }
 
+// UpdatesIfNotAccepted 仅在尚未采纳答案时更新，返回受影响行数。
+// 用于把「判断未采纳」和「写入采纳」并进一条 SQL，避免并发下的重复发放。
+func (r *topicRepository) UpdatesIfNotAccepted(db *gorm.DB, id int64, columns map[string]interface{}) (int64, error) {
+	tx := db.Model(&models.Topic{}).
+		Where("id = ? and accepted_comment_id = ?", id, 0).
+		Updates(columns)
+	return tx.RowsAffected, tx.Error
+}
+
 func (r *topicRepository) UpdateColumn(db *gorm.DB, id int64, name string, value interface{}) (err error) {
 	err = db.Model(&models.Topic{}).Where("id = ?", id).UpdateColumn(name, value).Error
 	return

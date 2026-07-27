@@ -1,16 +1,14 @@
 package api
 
 import (
-	"bbs-go/internal/models"
 	"bbs-go/internal/models/req"
 	"bbs-go/internal/pkg/common"
+	"bbs-go/internal/pkg/errs"
 	"bbs-go/internal/services"
 
 	"github.com/gin-gonic/gin"
 
 	"bbs-go/internal/pkg/ginx"
-
-	"github.com/mlogclub/simple/common/dates"
 )
 
 func UserReportSubmit(ctx *gin.Context) {
@@ -19,17 +17,16 @@ func UserReportSubmit(ctx *gin.Context) {
 		ginx.WriteJSON(ctx, err)
 		return
 	}
-	report := &models.UserReport{
-		DataId:     req.DecodedDataId(),
-		DataType:   req.DataType,
-		Reason:     req.Reason,
-		CreateTime: dates.NowTimestamp(),
+	// 原先不要求登录：任何人都能匿名往审核队列灌任意 dataType/dataId，
+	// 举报人记成 0 既无法追责也无法去重。举报是人工审核的入口，必须实名。
+	user := common.GetCurrentUser(ctx)
+	if user == nil {
+		ginx.WriteJSON(ctx, errs.NotLogin())
+		return
 	}
-
-	if user := common.GetCurrentUser(ctx); user != nil {
-		report.UserId = user.Id
+	if err := services.UserReportService.Submit(user.Id, req.DataType, req.DecodedDataId(), req.Reason); err != nil {
+		ginx.WriteJSON(ctx, err)
+		return
 	}
-	services.UserReportService.Create(report)
 	ginx.WriteJSON(ctx, nil)
-
 }

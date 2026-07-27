@@ -490,7 +490,7 @@ func TopicHideContent(ctx *gin.Context) {
 		if user := common.GetCurrentUser(ctx); user != nil {
 			if user.Id == topic.UserId || services.CommentService.IsCommented(user.Id, constants.EntityTopic, topic.Id) {
 				show = true
-				hideContent = markdown.ToHTML(topic.HideContent)
+				hideContent = render.SanitizeHtml(markdown.ToHTML(topic.HideContent))
 			}
 		}
 	}

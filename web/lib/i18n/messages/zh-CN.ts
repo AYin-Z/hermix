@@ -75,6 +75,7 @@ const zhCN = {
       workspace: "工作台",
       content: "内容",
       topics: "话题",
+      comments: "评论",
       articles: "文章",
       categories: "分类",
       links: "链接",
@@ -220,6 +221,10 @@ const zhCN = {
     forbiddenWordTypes: {
       word: "词条",
       regex: "正则",
+    },
+    commentEntityTypes: {
+      topic: "话题",
+      comment: "评论",
     },
     roleTypes: {
       system: "系统",
@@ -735,6 +740,10 @@ const zhCN = {
         title: "话题管理",
         description: "审核话题并执行删除等管理操作。",
       },
+      comments: {
+        title: "评论管理",
+        description: "审核命中违禁词的待审评论，并执行删除操作。",
+      },
       articles: {
         title: "文章管理",
         description: "审核文章并执行删除等管理操作。",
@@ -819,6 +828,7 @@ const zhCN = {
         title: "待处理事项",
         description: "优先处理审核、举报和异常，让社区保持健康运转。",
         pendingTopics: "待审核话题",
+        pendingComments: "待审核评论",
         pendingArticles: "待审核文章",
         pendingReports: "待处理举报",
         failedEmails: "邮件发送失败",

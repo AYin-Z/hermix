@@ -34,6 +34,13 @@ func xssProtection(htmlContent string) string {
 	return ugcProtection.Sanitize(htmlContent)
 }
 
+// SanitizeHtml 对外暴露的 XSS 过滤，供 handlers 中不走 handleTopicHtmlContent
+// 的内容路径复用（如主题隐藏内容）。lute 的 SetSanitize 不会移除
+// iframe/embed/form/base/meta，必须再过一遍 bluemonday。
+func SanitizeHtml(htmlContent string) string {
+	return xssProtection(htmlContent)
+}
+
 // handleHtmlContent 处理html内容
 func handleHtmlContent(htmlContent string) string {
 	htmlContent, _ = handleHtmlContentWithToc(htmlContent, false)
