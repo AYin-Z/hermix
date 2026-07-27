@@ -31,6 +31,20 @@ func migrate_hermix_boards() error {
 			}
 		}
 
+		// PG 修复：早期 migration 以显式 id 插入「默认节点」(id=1)，PostgreSQL 的
+		// serial 序列不会随显式 id 推进，仍停在初值。后面按自增创建新板块时序列取到
+		// id=1，撞上已存在的默认节点 → t_category_pkey 冲突（MySQL 的 AUTO_INCREMENT
+		// 会随手动插入自动前进，故仅 PG 触发）。这里把序列同步到当前 max(id)，使后续
+		// 自增从 max(id)+1 开始。幂等，仅对 PostgreSQL 执行。
+		if tx.Dialector.Name() == "postgres" {
+			if err := tx.Exec(
+				`SELECT setval(pg_get_serial_sequence('t_category', 'id'), ` +
+					`GREATEST((SELECT COALESCE(MAX(id), 1) FROM t_category), 1))`,
+			).Error; err != nil {
+				return err
+			}
+		}
+
 		// 2) 其余板块：按名称 upsert（存在则更新元数据，不存在则创建）
 		boards := []struct {
 			Name        string
