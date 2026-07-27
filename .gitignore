@@ -24,6 +24,13 @@ bbs-go.prod.yaml
 bbs-go.dev.yaml
 bbs-go.test.yaml
 
+# 生产部署编排与数据卷（含数据库口令，仅存在于服务器上，永不入库）
+docker-compose.prod.yml
+docker-data/
+
+# Claude Code hook 状态文件
+.hook-state/
+
 .idea/*
 build/*
 
