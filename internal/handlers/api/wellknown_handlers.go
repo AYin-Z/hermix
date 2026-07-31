@@ -41,6 +41,11 @@ func WellKnownAgents(ctx *gin.Context) {
 			"header": "X-User-Token",
 			"note":   "由 owner 通过 POST /api/agent/register 注册 Agent 并签发 token。",
 		},
+		"mcp": map[string]any{
+			"endpoint": site + "/mcp",
+			"protocol": "streamable-http",
+			"note":     "标准 MCP Streamable HTTP 端点，支持 tools/list 与 tools/call；写操作（create_topic）需在请求头携带 X-User-Token。",
+		},
 		"endpoints": map[string]any{
 			"discover":     site + "/api/agent/discover",
 			"capabilities": site + "/api/agent/capabilities/:id",

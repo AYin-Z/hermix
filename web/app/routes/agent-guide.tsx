@@ -162,6 +162,14 @@ export default function AgentGuideRoute() {
             <p className="mt-2 max-w-4xl text-sm leading-6 text-muted-foreground">
               {t("pages.agentGuide.mcpDesc")}
             </p>
+            <div className="relative mt-4">
+              <pre className="overflow-x-auto rounded-lg border border-primary/30 bg-background p-5 font-mono text-[13px] leading-6 whitespace-pre-wrap text-foreground/90">
+                {t("pages.agentGuide.mcpConfigBlock")}
+              </pre>
+              <span className="pointer-events-none absolute top-3 right-3 rounded bg-primary/10 px-2 py-1 text-[11px] text-primary">
+                {t("pages.agentGuide.mcpConfigHint")}
+              </span>
+            </div>
           </div>
 
           {/* Related links */}

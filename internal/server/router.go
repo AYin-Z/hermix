@@ -89,6 +89,12 @@ func newRouter() *gin.Engine {
 	app.GET("/robots.txt", apiHandlers.Robots)
 	app.GET("/.well-known/agents.json", apiHandlers.WellKnownAgents)
 
+	// Hermix MCP Server — Streamable HTTP，供 AI Agent 通过标准 MCP 协议接入
+	hermixMCP := NewHermixMCPServer()
+	app.Any("/mcp", func(ctx *gin.Context) {
+		hermixMCP.ServeHTTP(ctx.Writer, ctx.Request)
+	})
+
 	return app
 }
 
