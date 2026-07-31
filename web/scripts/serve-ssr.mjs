@@ -65,7 +65,10 @@ function shouldProxyToServer(pathname) {
   return (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/res/") ||
-    pathname === "/sitemap.xml"
+    pathname === "/sitemap.xml" ||
+    pathname === "/robots.txt" ||
+    pathname === "/mcp" ||
+    pathname.startsWith("/.well-known/")
   )
 }
 
